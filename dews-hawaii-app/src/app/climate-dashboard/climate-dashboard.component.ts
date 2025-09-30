@@ -6,7 +6,7 @@ import { geoIdentity, geoPath } from 'd3-geo';
 import type { FeatureCollection } from 'geojson';
 import * as d3 from 'd3';
 import { take } from 'rxjs/operators';
-
+import { firstValueFrom } from 'rxjs';
 import { StatBoxComponent } from '../stat-box/stat-box.component';
 import { DataHighchartComponent } from '../data-highchart/data-highchart.component';
 
@@ -112,9 +112,8 @@ export class ClimateDashboardComponent implements OnDestroy {
     } else if (d === 'Temperature') {
       this.loadTemperatureData();
     } else if (d === 'Drought') {
-      this.loadSPIData(6); // still your SPI loader
+      this.loadAllSPIData();  
     }
-    // Temperature: later
   }
 
 
@@ -561,6 +560,29 @@ export class ClimateDashboardComponent implements OnDestroy {
     if (this.selectedDataset() === 'Drought') return 'SPI';
     return '';
   });
+
+  spiSeries = signal<{ scale: number; data: { month: string; value: number }[] }[]>([]);
+
+  private loadAllSPIData() {
+    const scales = [1, 6, 12];
+
+    const requests = scales.map(async scale => {
+      const csv = await firstValueFrom(
+        this.http.get(`statewide_spi${scale}.csv`, { responseType: 'text' })
+      );
+
+      const parsed = this.parseCsv(csv, 'state');
+      const stateData = parsed
+        .filter(r => r.state.toLowerCase() === 'statewide')
+        .map(r => ({ month: r.month, value: r.value }));
+
+      return { scale, data: stateData };
+    });
+
+    Promise.all(requests).then(results => {
+      this.spiSeries.set(results);
+    });
+  }
 
 
   pickIsland(isle: Island) {

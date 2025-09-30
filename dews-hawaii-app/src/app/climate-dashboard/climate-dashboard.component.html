@@ -322,11 +322,20 @@
         </div>
 
         <div class="chart-wrap">
+          <app-data-highchart
+            *ngIf="selectedDataset() === 'Drought' && spiSeries().length > 0"
+            [multiSeries]="spiSeries()"
+            [dataset]="selectedDataset()"
+            [unit]="unit()">
+          </app-data-highchart>
+
           <app-data-highchart 
+            *ngIf="selectedDataset() !== 'Drought'"
             [data]="filteredTsData()" 
             [unit]="unit()" 
             [dataset]="selectedDataset()">
           </app-data-highchart>
+
 
         </div>
 
