@@ -18,13 +18,14 @@ import { HighchartsChartModule } from 'highcharts-angular';
 })
 export class DataHighchartComponent implements OnChanges {
   @Input() data: { month: string; value: number }[] = [];
+  @Input() dataset: string = '';
+
   @Input() unit: string = '';
-  @Input() title: string = '';
 
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = {
-    chart: { type: 'line', height: 300 },
-    title: { text: 'SPI Time Series' },
+    chart: { height: 300 },
+    title: { text: '' },
     xAxis: { categories: [] },
     yAxis: {
       min: -3,
@@ -35,6 +36,7 @@ export class DataHighchartComponent implements OnChanges {
     tooltip: {
       valueDecimals: 2   
     },
+    legend: { enabled: false },
     series: []
   };
 
@@ -45,12 +47,15 @@ export class DataHighchartComponent implements OnChanges {
   }
 
   private updateChart() {
-    const isSPI = this.unit === 'SPI';
+    const isSPI = this.dataset === 'Drought';
+    const isTemp = this.dataset === 'Temperature';
+    const isRain = this.dataset === 'Rainfall';
 
     this.chartOptions = {
       ...this.chartOptions,
-      chart: { type: isSPI ? 'line' : 'column', height: 300 }, 
-      title: { text: this.title || (isSPI ? 'Drought Time Series' : 'Rainfall Time Series') },
+      chart: { height: 300 },
+      legend: { enabled: false },
+      title: { text: '' },
       xAxis: {
         categories: this.data.map(d => d.month),
         title: { text: 'Month' }
@@ -59,20 +64,15 @@ export class DataHighchartComponent implements OnChanges {
         min: isSPI ? -3 : undefined,
         max: isSPI ? 3 : undefined,
         tickInterval: isSPI ? 1 : undefined,
-        title: { text: this.unit || '' },
+        title: { text: this.unit },
         plotBands: isSPI ? [
-          {
-            from: -3,
-            to: -1,
-            color: 'rgba(255,0,0,0.2)',
-            label: { text: 'Dry', style: { color: '#600' } }
-          }
+          { from: -3, to: -1, color: 'rgba(255,0,0,0.2)', label: { text: 'Dry', style: { color: '#600' } } }
         ] : []
       },
       series: [
         {
-          name: isSPI ? 'SPI' : 'Rainfall',
-          type: isSPI ? 'line' : 'column', 
+          name: this.unit,
+          type: (isSPI || isTemp) ? 'line' : 'column',   // ✅ works now because dataset is passed
           data: this.data.map(d => Number(d.value.toFixed(2))),
         }
       ]

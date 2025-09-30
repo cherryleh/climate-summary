@@ -109,6 +109,8 @@ export class ClimateDashboardComponent implements OnDestroy {
 
     if (d === 'Rainfall') {
       this.loadRainfallData();
+    } else if (d === 'Temperature') {
+      this.loadTemperatureData();
     } else if (d === 'Drought') {
       this.loadSPIData(6); // still your SPI loader
     }
@@ -468,6 +470,24 @@ export class ClimateDashboardComponent implements OnDestroy {
         const headers = rows[0];
         const data: { month: string; value: number }[] = [];
 
+        for (let i = 1; i < rows.length; i++) {
+          if (!rows[i][0]) continue;
+          const label = rows[i][0].trim();
+          if (label.toLowerCase() !== 'statewide') continue; // only statewide
+          for (let j = 1; j < headers.length; j++) {
+            data.push({ month: headers[j], value: +rows[i][j] });
+          }
+        }
+        this.tsData.set(data);
+      });
+  }
+
+  private loadTemperatureData() {
+    this.http.get('statewide_temp.csv', { responseType: 'text' })
+      .subscribe(csv => {
+        const rows = csv.split('\n').map(r => r.split(','));
+        const headers = rows[0];
+        const data: { month: string; value: number }[] = [];
         for (let i = 1; i < rows.length; i++) {
           if (!rows[i][0]) continue;
           const label = rows[i][0].trim();

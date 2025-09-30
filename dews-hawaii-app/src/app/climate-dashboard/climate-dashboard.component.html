@@ -322,7 +322,12 @@
         </div>
 
         <div class="chart-wrap">
-          <app-data-highchart [data]="filteredTsData()" [unit]="unit()"></app-data-highchart>
+          <app-data-highchart 
+            [data]="filteredTsData()" 
+            [unit]="unit()" 
+            [dataset]="selectedDataset()">
+          </app-data-highchart>
+
         </div>
 
       </section>
