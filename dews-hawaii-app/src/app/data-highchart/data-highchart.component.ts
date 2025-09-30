@@ -54,7 +54,18 @@ export class DataHighchartComponent implements OnChanges {
         min: -3,
         max: 3,
         tickInterval: 1,
-        title: { text: this.unit || 'SPI' }
+        title: { text: this.unit || 'SPI' },
+        plotBands: [
+          {
+            from: -3,        // Start of shading
+            to: -1,          // End of shading
+            color: 'rgba(255,0,0,0.2)', // semi-transparent red
+            label: {
+              text: 'Dry',
+              style: { color: '#600' }
+            }
+          }
+        ]
       },
       series: [
         {
@@ -66,4 +77,5 @@ export class DataHighchartComponent implements OnChanges {
       ]
     };
   }
+
 }
