@@ -1,0 +1,10 @@
+.chart-wrap {
+  height: 500px;     
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container {
+  height: 90%;          
+  width: 100%;
+}

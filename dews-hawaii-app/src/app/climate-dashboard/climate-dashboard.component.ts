@@ -8,7 +8,7 @@ import * as d3 from 'd3';
 import { take } from 'rxjs/operators';
 
 import { StatBoxComponent } from '../stat-box/stat-box.component';
-import { SpiChartComponent } from '../spi-chart/spi-chart.component';
+import { DataHighchartComponent } from '../data-highchart/data-highchart.component';
 
 import * as GeoTIFF from 'geotiff';
 import { Pool } from 'geotiff';
@@ -79,7 +79,7 @@ function canonIsland(name: string): string {
 @Component({
   selector: 'app-climate-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, SpiChartComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, DataHighchartComponent],
   templateUrl: './climate-dashboard.component.html',
   styleUrls: ['./climate-dashboard.component.css']
 })
