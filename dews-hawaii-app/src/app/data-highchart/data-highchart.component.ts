@@ -44,38 +44,39 @@ export class DataHighchartComponent implements OnChanges {
   }
 
   private updateChart() {
+    const isSPI = this.unit === 'SPI';
+
     this.chartOptions = {
       ...this.chartOptions,
+      chart: { type: isSPI ? 'line' : 'column', height: 300 }, // ⬅️ switch chart type
       xAxis: {
         categories: this.data.map(d => d.month),
         title: { text: 'Month' }
       },
       yAxis: {
-        min: -3,
-        max: 3,
-        tickInterval: 1,
-        title: { text: this.unit || 'SPI' },
-        plotBands: [
+        min: isSPI ? -3 : undefined,
+        max: isSPI ? 3 : undefined,
+        tickInterval: isSPI ? 1 : undefined,
+        title: { text: this.unit || '' },
+        plotBands: isSPI ? [
           {
-            from: -3,        // Start of shading
-            to: -1,          // End of shading
-            color: 'rgba(255,0,0,0.2)', // semi-transparent red
-            label: {
-              text: 'Dry',
-              style: { color: '#600' }
-            }
+            from: -3,
+            to: -1,
+            color: 'rgba(255,0,0,0.2)',
+            label: { text: 'Dry', style: { color: '#600' } }
           }
-        ]
+        ] : []
       },
       series: [
         {
-          name: 'SPI',
-          type: 'line',
+          name: isSPI ? 'SPI' : 'Rainfall',
+          type: isSPI ? 'line' : 'column', // ⬅️ dynamically switch
           data: this.data.map(d => Number(d.value.toFixed(2))),
-          color: '#0ea5e9'
         }
       ]
     };
   }
+
+
 
 }

@@ -102,10 +102,19 @@ export class ClimateDashboardComponent implements OnDestroy {
   // ===== Dataset/time =====
   dataset = signal<Dataset>('Rainfall');
   selectedDataset() { return this.dataset(); }
+
   pickDataset(d: Dataset) {
     this.dataset.set(d);
     this.loadRasterOnce(d);
+
+    if (d === 'Rainfall') {
+      this.loadRainfallData();
+    } else if (d === 'Drought') {
+      this.loadSPIData(6); // still your SPI loader
+    }
+    // Temperature: later
   }
+
 
   colorbarMin = 0;
   colorbarMax = 1;
@@ -372,9 +381,32 @@ export class ClimateDashboardComponent implements OnDestroy {
     // Divisions metadata (optional)
     this.http.get<any>('hawaii_islands_divisions.geojson').subscribe(fc => this.allDivisions = fc);
 
-    // Initial SPI load (6-month default)
-    this.loadSPIData(6);
+    const d = this.selectedDataset();
+    this.loadRasterOnce(d);
+
+    if (d === 'Rainfall') {
+      this.loadRainfallData();
+    } else if (d === 'Drought') {
+      this.loadSPIData(6);
+    }
   }
+
+  // ===== Chart time-range filter =====
+  timeRange = signal<number>(12); // default = last 12 months
+
+  setTimeRange(months: number) {
+    this.timeRange.set(months);
+  }
+
+  // Filtered time series based on selected range
+  filteredTsData = computed(() => {
+    const data = this.tsData();
+    const months = this.timeRange();
+    if (!data || data.length === 0) return [];
+
+    return data.slice(-months); // take last N entries
+  });
+
 
   private drawColorbar(dataset: Dataset) {
     requestAnimationFrame(() => {
@@ -428,6 +460,26 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
     return data;
   }
+
+  private loadRainfallData() {
+    this.http.get('statewide_rf.csv', { responseType: 'text' })
+      .subscribe(csv => {
+        const rows = csv.split('\n').map(r => r.split(','));
+        const headers = rows[0];
+        const data: { month: string; value: number }[] = [];
+
+        for (let i = 1; i < rows.length; i++) {
+          if (!rows[i][0]) continue;
+          const label = rows[i][0].trim();
+          if (label.toLowerCase() !== 'statewide') continue; // only statewide
+          for (let j = 1; j < headers.length; j++) {
+            data.push({ month: headers[j], value: +rows[i][j] });
+          }
+        }
+        this.tsData.set(data);
+      });
+  }
+
 
   private loadSPIData(scale: number) {
     // Island-level (always)

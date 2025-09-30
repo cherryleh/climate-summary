@@ -309,10 +309,22 @@
             </button>
           </div>
         </div>
+        <div class="chart-controls">
+          <button class="btn"
+                  [class.active]="timeRange() === 12"
+                  (click)="setTimeRange(12)">Last year</button>
+          <button class="btn"
+                  [class.active]="timeRange() === 36"
+                  (click)="setTimeRange(36)">Last 3 years</button>
+          <button class="btn"
+                  [class.active]="timeRange() === 60"
+                  (click)="setTimeRange(60)">Last 5 years</button>
+        </div>
 
         <div class="chart-wrap">
-          <app-data-highchart [data]="tsData()" [unit]="unit()"></app-data-highchart>
+          <app-data-highchart [data]="filteredTsData()" [unit]="unit()"></app-data-highchart>
         </div>
+
       </section>
 
 
