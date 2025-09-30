@@ -19,6 +19,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 export class DataHighchartComponent implements OnChanges {
   @Input() data: { month: string; value: number }[] = [];
   @Input() unit: string = '';
+  @Input() title: string = '';
 
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = {
@@ -48,7 +49,8 @@ export class DataHighchartComponent implements OnChanges {
 
     this.chartOptions = {
       ...this.chartOptions,
-      chart: { type: isSPI ? 'line' : 'column', height: 300 }, // ⬅️ switch chart type
+      chart: { type: isSPI ? 'line' : 'column', height: 300 }, 
+      title: { text: this.title || (isSPI ? 'Drought Time Series' : 'Rainfall Time Series') },
       xAxis: {
         categories: this.data.map(d => d.month),
         title: { text: 'Month' }
@@ -70,7 +72,7 @@ export class DataHighchartComponent implements OnChanges {
       series: [
         {
           name: isSPI ? 'SPI' : 'Rainfall',
-          type: isSPI ? 'line' : 'column', // ⬅️ dynamically switch
+          type: isSPI ? 'line' : 'column', 
           data: this.data.map(d => Number(d.value.toFixed(2))),
         }
       ]
