@@ -561,7 +561,18 @@ export class ClimateDashboardComponent implements OnDestroy {
     return '';
   });
 
+  // Keep original
   spiSeries = signal<{ scale: number; data: { month: string; value: number }[] }[]>([]);
+
+  // Add a filtered version
+  filteredSpiSeries = computed(() => {
+    const months = this.timeRange();
+    return this.spiSeries().map(s => ({
+      scale: s.scale,
+      data: s.data.slice(-months)   // last N months per scale
+    }));
+  });
+
 
   private loadAllSPIData() {
     const scales = [1, 6, 12];

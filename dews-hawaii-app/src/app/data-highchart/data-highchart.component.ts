@@ -54,23 +54,13 @@ export class DataHighchartComponent implements OnChanges {
 
   private updateChart() {
     const isSPI = this.dataset === 'Drought';
-    const isTemp = this.dataset === 'Temperature';
-
-    console.log('=== updateChart called ===');
-    console.log('dataset:', this.dataset);
-    console.log('multiSeries:', this.multiSeries);
-    console.log('data:', this.data);
-
     let categories: string[] = [];
     let series: Highcharts.SeriesOptionsType[] = [];
 
     if (isSPI && this.multiSeries.length > 0) {
-      // Collect all unique months across scales
       categories = Array.from(
         new Set(this.multiSeries.flatMap(s => s.data.map(d => d.month)))
       ).sort();
-
-      console.log('SPI categories:', categories);
 
       series = this.multiSeries.map(s => {
         const valueMap = new Map(s.data.map(d => [d.month, d.value]));
@@ -79,17 +69,15 @@ export class DataHighchartComponent implements OnChanges {
           return v != null ? Number(v.toFixed(2)) : null;
         });
 
-        console.log(`Series SPI-${s.scale}`, aligned);
-
         return {
           name: `SPI-${s.scale}`,
           type: 'line',
-          data: aligned
+          data: aligned,
+          marker: { enabled: false }
         };
       });
     } else {
       categories = this.data.map(d => d.month);
-      console.log('Non-SPI categories:', categories);
 
       series = [
         {
@@ -105,7 +93,7 @@ export class DataHighchartComponent implements OnChanges {
 
     this.chartOptions = JSON.parse(JSON.stringify({
       chart: { height: 300 },
-      legend: { enabled: true },
+      legend: { enabled: isSPI },
       title: { text: '' },
       xAxis: { categories, title: { text: 'Month' } },
       yAxis: {
@@ -114,15 +102,26 @@ export class DataHighchartComponent implements OnChanges {
         tickInterval: isSPI ? 1 : undefined,
         title: { text: isSPI ? 'SPI' : this.unit },
         plotBands: isSPI
-          ? [
-              {
-                from: -3,
-                to: -1,
-                color: 'rgba(255,0,0,0.2)',
-                label: { text: 'Dry', style: { color: '#600' } }
+        ? [
+            {
+              from: -3,
+              to: -1,
+              color: 'rgba(255,0,0,0.2)',
+              label: {
+                text: 'Drought',
+                align: 'center',          // center horizontally (default)
+                verticalAlign: 'top',     // put it at the top edge of the band
+                y: 30,                   // move up further (negative = up)
+                style: {
+                  color: '#600',
+                  fontSize: '14px',       // make text larger
+                  fontWeight: 'bold'
+                },
               }
-            ]
-          : []
+            }
+          ]
+        : []
+
       },
       series
     }));
