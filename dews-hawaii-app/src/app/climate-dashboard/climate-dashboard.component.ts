@@ -350,7 +350,10 @@ export class ClimateDashboardComponent implements OnDestroy {
   ngOnInit(): void {
     // Base islands
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
-      const projection = geoIdentity().reflectY(true).fitSize([560, 320], fc);
+      const projection = geoIdentity().reflectY(true).fitExtent(
+        [[0, 10], [560, 310]],
+        fc
+      );
       const path = geoPath(projection as any);
 
       // keep projection for raster placement
@@ -408,7 +411,6 @@ export class ClimateDashboardComponent implements OnDestroy {
     return data.slice(-months); // take last N entries
   });
 
-
   private drawColorbar(dataset: Dataset) {
     requestAnimationFrame(() => {
       const canvas = document.getElementById('colorbarCanvas') as HTMLCanvasElement | null;
@@ -420,7 +422,8 @@ export class ClimateDashboardComponent implements OnDestroy {
       const w = canvas.width;
       const h = canvas.height;
 
-      const grad = ctx.createLinearGradient(0, 0, w, 0);
+      // Vertical gradient (top → bottom)
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
       const steps = 50;
       for (let i = 0; i <= steps; i++) {
         const t = i / steps;
@@ -432,6 +435,7 @@ export class ClimateDashboardComponent implements OnDestroy {
       ctx.fillRect(0, 0, w, h);
     });
   }
+
 
 
   ngOnDestroy(): void {
@@ -716,7 +720,10 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.viewMode.set('islands');
 
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
-      const projection = geoIdentity().reflectY(true).fitSize([560, 320], fc);
+      const projection = geoIdentity().reflectY(true).fitExtent(
+        [[0, 10], [560, 310]],
+        fc
+      );
       const path = geoPath(projection as any);
       this.project = (projection as any);
       this.updateRasterRect();

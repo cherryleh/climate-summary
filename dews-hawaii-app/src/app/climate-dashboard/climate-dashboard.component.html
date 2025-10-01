@@ -50,7 +50,7 @@
           <app-stat-box label="Value" value="2.0 in"></app-stat-box>
           <app-stat-box label="Anomaly" value="-3.2 in"></app-stat-box>
           <app-stat-box label="Rank" value="Driest" note="out of 35 years"></app-stat-box>
-          <app-stat-box label="Drought" value="Exceptionally Dry"></app-stat-box>
+          <app-stat-box label="Drought" value="Moderately Dry"></app-stat-box>
         </div>
 
         <!-- Temperature -->
@@ -58,7 +58,7 @@
           <app-stat-box label="Value" value="78 °F"></app-stat-box>
           <app-stat-box label="Anomaly" value="+1.5 °F"></app-stat-box>
           <app-stat-box label="Rank" value="Warmest" note="out of 35 years"></app-stat-box>
-          <app-stat-box label="Drought" value="Moderate"></app-stat-box>
+          <app-stat-box label="Drought" value="Moderately Dry"></app-stat-box>
         </div>
 
         <!-- Drought -->
@@ -278,13 +278,16 @@
 
           </svg>
           <div class="colorbar legend" *ngIf="rasterHref()">
-            <canvas id="colorbarCanvas" width="240" height="20"></canvas>
-            <div class="ticks">
-              <span>{{ colorbarMin | number:'1.1-1' }} {{ unit() }}</span>
-              <span *ngIf="colorbarMid !== null">{{ colorbarMid | number:'1.1-1' }} {{ unit() }}</span>
-              <span>{{ colorbarMax | number:'1.1-1' }} {{ unit() }}</span>
+            <div class="colorbar-wrap">
+              <canvas id="colorbarCanvas" width="20" height="160"></canvas>
+              <div class="ticks">
+                <span>{{ colorbarMax | number:'1.1-1' }} {{ unit() }}</span>
+                <span *ngIf="colorbarMid !== null">{{ colorbarMid | number:'1.1-1' }} {{ unit() }}</span>
+                <span>{{ colorbarMin | number:'1.1-1' }} {{ unit() }}</span>
+              </div>
             </div>
           </div>
+
           <!-- Colorbar Legend -->
 
 
