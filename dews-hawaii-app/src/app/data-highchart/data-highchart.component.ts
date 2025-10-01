@@ -50,8 +50,6 @@ export class DataHighchartComponent implements OnChanges {
     }
   }
 
-  
-
   private updateChart() {
     const isSPI = this.dataset === 'Drought';
     let categories: string[] = [];
@@ -62,18 +60,34 @@ export class DataHighchartComponent implements OnChanges {
         new Set(this.multiSeries.flatMap(s => s.data.map(d => d.month)))
       ).sort();
 
-      series = this.multiSeries.map(s => {
+      // Define custom labels for each SPI scale
+      const spiLabels: Record<number, string> = {
+        1: 'Short-term Drought',
+        6: 'Medium-term Drought',
+        12: 'Long-term Drought'
+      };
+
+        series = this.multiSeries.map((s, i) => {
         const valueMap = new Map(s.data.map(d => [d.month, d.value]));
         const aligned = categories.map(m => {
           const v = valueMap.get(m);
           return v != null ? Number(v.toFixed(2)) : null;
         });
 
-        return {
-          name: `SPI-${s.scale}`,
+        // Gradient-like colors for short, medium, long drought
+        const gradientColors = [
+          '#74add1', // bluish (short-term)
+          '#fdae61', // orange (medium-term)
+          '#d73027'  // red (long-term)
+        ];
+
+      return {
+          name: spiLabels[s.scale] ?? `SPI-${s.scale}`,
           type: 'line',
           data: aligned,
-          marker: { enabled: false }
+          color: gradientColors[i % gradientColors.length], // pick from palette
+          marker: { enabled: false },
+          lineWidth: 2
         };
       });
     } else {
@@ -83,13 +97,11 @@ export class DataHighchartComponent implements OnChanges {
         {
           name: this.unit,
           type: this.dataset === 'Rainfall' ? 'column' : 'line',
-          data: this.data.map(d => Number(d.value.toFixed(2)))
+          data: this.data.map(d => Number(d.value.toFixed(2))),
+          marker: { enabled: false }
         }
       ];
-      console.log('Series (non-SPI):', series);
     }
-
-    console.log('Final series passed to Highcharts:', series);
 
     this.chartOptions = JSON.parse(JSON.stringify({
       chart: { height: 300 },
@@ -102,29 +114,25 @@ export class DataHighchartComponent implements OnChanges {
         tickInterval: isSPI ? 1 : undefined,
         title: { text: isSPI ? 'SPI' : this.unit },
         plotBands: isSPI
-        ? [
-            {
-              from: -3,
-              to: -1,
-              color: 'rgba(255,0,0,0.2)',
-              label: {
-                text: 'Drought',
-                align: 'center',          // center horizontally (default)
-                verticalAlign: 'top',     // put it at the top edge of the band
-                y: 30,                   // move up further (negative = up)
-                style: {
-                  color: '#600',
-                  fontSize: '14px',       // make text larger
-                  fontWeight: 'bold'
-                },
+          ? [
+              {
+                from: -3,
+                to: -1,
+                color: 'rgba(255,0,0,0.2)',
+                label: {
+                  text: 'Drought',
+                  align: 'center',
+                  verticalAlign: 'top',
+                  y: 30,
+                  style: { color: '#600', fontSize: '14px', fontWeight: 'bold' }
+                }
               }
-            }
-          ]
-        : []
-
+            ]
+          : []
       },
       series
     }));
     this.updateFlag = true;
   }
+
 }
