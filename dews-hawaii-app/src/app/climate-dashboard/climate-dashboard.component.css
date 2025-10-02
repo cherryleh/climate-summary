@@ -311,9 +311,9 @@
 }
 .colorbar.legend {
   position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
+  top: 12px;         /* push it down a little from the top */
+  right: 12px;       /* keep it anchored on the right */
+  transform: none;   /* remove vertical centering */
   background: rgba(255,255,255,0.9);
   padding: 8px;
   border-radius: 6px;
@@ -321,8 +321,9 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   display: flex;
   align-items: center;
-  gap: 8px;  /* space between bar and labels */
+  gap: 8px;          /* space between bar and labels */
 }
+
 
 .colorbar-wrap {
   display: flex;
