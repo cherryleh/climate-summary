@@ -171,6 +171,9 @@ export class ClimateDashboardComponent implements OnDestroy {
     if (stub) {
       this.pickIsland(stub);
     }
+    if (this.selectedDataset() === 'Drought') {
+      this.loadAllSPIData();
+    }
   }
 
 
@@ -188,8 +191,17 @@ export class ClimateDashboardComponent implements OnDestroy {
     alert(`Subscribed ${this.email()} to monthly ${this.selectedDataset()} updates for ${label}.`);
   }
 
+  chartVisible = signal(true);
   chartFullscreen = signal(false);
-  toggleChartFullscreen() { this.chartFullscreen.set(!this.chartFullscreen()); }
+  toggleChartFullscreen() {
+    this.chartFullscreen.set(!this.chartFullscreen());
+    if (!this.chartFullscreen()) {
+      // Delay rendering until after panel has collapsed
+      this.chartVisible.set(false);
+      setTimeout(() => this.chartVisible.set(true), 300); // match your CSS transition duration
+    }
+  }
+
 
   // ===== Raster (GeoTIFF) =====
   rasterHref = signal<string | null>(null); // Object URL to a PNG/WEBP
@@ -391,7 +403,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     if (d === 'Rainfall') {
       this.loadRainfallData();
     } else if (d === 'Drought') {
-      this.loadSPIData(6);
+      this.loadAllSPIData();
     }
   }
 
@@ -578,26 +590,48 @@ export class ClimateDashboardComponent implements OnDestroy {
   });
 
 
-  private loadAllSPIData() {
+  private async loadAllSPIData() {
     const scales = [1, 6, 12];
+    const scope = this.selectedScope();
+    const isle = this.selectedIsland();
+    const div = this.selectedDivision();
 
     const requests = scales.map(async scale => {
+      let file = 'statewide_spi' + scale + '.csv';
+      let labelKey: 'state' | 'island' | 'division' | 'moku' | 'ahupuaa' = 'state';
+
+      if (scope === 'divisions') { file = `division_spi${scale}.csv`; labelKey = 'division'; }
+      else if (scope === 'moku') { file = `moku_spi${scale}.csv`; labelKey = 'moku'; }
+      else if (scope === 'ahupuaa') { file = `ahupuaa_spi${scale}.csv`; labelKey = 'ahupuaa'; }
+      else if (isle) { file = `county_spi${scale}.csv`; labelKey = 'island'; }
+
       const csv = await firstValueFrom(
-        this.http.get(`statewide_spi${scale}.csv`, { responseType: 'text' })
+        this.http.get(file, { responseType: 'text' })
       );
+      const parsed = this.parseCsv(csv, labelKey);
 
-      const parsed = this.parseCsv(csv, 'state');
-      const stateData = parsed
-        .filter(r => r.state.toLowerCase() === 'statewide')
-        .map(r => ({ month: r.month, value: r.value }));
+      let data: { month: string; value: number }[];
 
-      return { scale, data: stateData };
+      if (div) {
+        data = parsed
+          .filter(r => r[labelKey].toLowerCase() === div.toLowerCase())
+          .map(r => ({ month: r.month, value: r.value }));
+      } else if (isle) {
+        data = parsed
+          .filter(r => r[labelKey].toLowerCase() === isle.name.toLowerCase())
+          .map(r => ({ month: r.month, value: r.value }));
+      } else {
+        data = parsed
+          .filter(r => r.state?.toLowerCase() === 'statewide')
+          .map(r => ({ month: r.month, value: r.value }));
+      }
+
+      return { scale, data };
     });
 
-    Promise.all(requests).then(results => {
-      this.spiSeries.set(results);
-    });
+    Promise.all(requests).then(results => this.spiSeries.set(results));
   }
+
 
 
   pickIsland(isle: Island) {
@@ -692,6 +726,9 @@ export class ClimateDashboardComponent implements OnDestroy {
         this.pathById.set(pathById);
         this.centroidById.set(centroidById);
       });
+       if (this.selectedDataset() === 'Drought') {
+        this.loadAllSPIData();   
+      }
     }
 
     // Update chart series with island SPI
