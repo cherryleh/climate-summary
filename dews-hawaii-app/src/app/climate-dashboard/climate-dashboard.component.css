@@ -202,7 +202,19 @@
 .snapshot-controls { display:flex; flex-wrap:wrap; gap:12px 20px; align-items:flex-start; margin:2px 0 6px; }
 .snapshot-controls .control { display:flex; flex-direction:column; gap:4px; min-width:max-content; }
 .snapshot-controls .control .tiny { font-weight:600; letter-spacing:.02em; }
-.chips-toggle .chip { background:#fff; border-color:#dbeafe; }
+/* Make dataset selection buttons bigger */
+.chips-toggle .chip {
+  padding: 5px 8px;     /* larger click area */
+  font-size: 15px;     /* bolder text */
+  border-radius: 10px;    /* slightly rounder */
+}
+
+.chips-toggle .chip.chip-selected {
+  background: #bae6fd;
+  border-color: #7dd3fc;
+  color: #075985;
+}
+
 .chips-toggle .chip.chip-selected { background:#e0f2fe; border-color:#7dd3fc; color:#075985; }
 
 /* Keep the statement wide; you already have .info-box – just ensure spacing feels tight */
