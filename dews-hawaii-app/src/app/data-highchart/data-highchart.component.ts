@@ -109,8 +109,8 @@ export class DataHighchartComponent implements OnChanges {
       title: { text: '' },
       xAxis: { categories, title: { text: 'Month' } },
       yAxis: {
-        min: isSPI ? -2 : undefined,
-        max: isSPI ? 2 : undefined,
+        min: isSPI ? -3 : undefined,
+        max: isSPI ? 3 : undefined,
         tickInterval: isSPI ? 1 : undefined,
         title: { text: isSPI ? 'SPI' : this.unit },
         plotBands: isSPI
