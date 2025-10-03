@@ -16,7 +16,7 @@ import { interpolateViridis, interpolateRdBu } from 'd3-scale-chromatic';
 import { NgZone } from '@angular/core';
 
 
-type Scope = 'divisions' | 'moku' | 'ahupuaa';
+type Scope = 'divisions' | 'moku' | 'ahupuaa' | 'watershed';
 type Dataset = 'Rainfall' | 'Temperature' | 'Drought';
 
 interface Island {
@@ -216,10 +216,13 @@ export class ClimateDashboardComponent implements OnDestroy {
       this.viewMode.set('divisions');
 
       const file = scope === 'moku'
-        ? 'moku.geojson'
-        : scope === 'ahupuaa'
-          ? 'ahupuaa.geojson'
+      ? 'moku.geojson'
+      : scope === 'ahupuaa'
+        ? 'ahupuaa.geojson'
+        : scope === 'watershed'
+          ? 'watershed.geojson'
           : 'hawaii_islands_divisions.geojson';
+
 
       this.http.get<any>(file).subscribe(fc => {
         const fcCounty: FeatureCollection = {
@@ -238,11 +241,14 @@ export class ClimateDashboardComponent implements OnDestroy {
         const features = fcCounty.features.map((f: any) => {
           const p = f.properties || {};
           const name =
-            scope === 'ahupuaa'
-              ? (this.getProp(p, ['ahupuaa','Ahupuaʻa','Ahupuaa','AHUPUAA','AHUPUAA_N']) || 'Ahupuaʻa')
-              : scope === 'moku'
-                ? (this.getProp(p, ['moku','Moku','MOKU']) || 'Moku')
+          scope === 'ahupuaa'
+            ? (this.getProp(p, ['ahupuaa','Ahupuaʻa','Ahupuaa','AHUPUAA','AHUPUAA_N']) || 'Ahupuaʻa')
+            : scope === 'moku'
+              ? (this.getProp(p, ['moku','Moku','MOKU']) || 'Moku')
+              : scope === 'watershed'
+                ? (this.getProp(p, ['watershed','Watershed','WATERSHED','NAME']) || 'Watershed')
                 : (this.getProp(p, ['division','Division','name','NAME']) || 'Division');
+
 
           const islandRaw = this.getProp(p, ['mokupuni','island','isle','Island','ISLAND']) || county;
           const islandCanon = canonIsland(String(islandRaw));
@@ -559,7 +565,7 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   private parseCsv(
     csvData: string,
-    labelKey: 'state' | 'island' | 'division' | 'moku' | 'ahupuaa' | 'county'
+    labelKey: 'state' | 'island' | 'division' | 'moku' | 'ahupuaa' | 'county' | 'watershed'
   ) {
     const rows = csvData.split('\n').map(r => r.split(','));
     const headers = rows[0];
@@ -573,6 +579,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
     return data;
   }
+
 
 
   private loadRainfallData() {
@@ -696,11 +703,12 @@ export class ClimateDashboardComponent implements OnDestroy {
 
     const requests = scales.map(async scale => {
       let file = 'statewide_spi' + scale + '.csv';
-      let labelKey: 'state' | 'division' | 'moku' | 'ahupuaa' | 'county' = 'state';
+      let labelKey: 'state' | 'division' | 'moku' | 'ahupuaa' | 'watershed' | 'county' = 'state';
 
       if (scope === 'divisions') { file = `climate_spi${scale}.csv`; labelKey = 'division'; }
       else if (scope === 'moku') { file = `moku_spi${scale}.csv`; labelKey = 'moku'; }
       else if (scope === 'ahupuaa') { file = `ahupuaa_spi${scale}.csv`; labelKey = 'ahupuaa'; }
+      else if (scope === 'watershed') { file = `watershed_spi${scale}.csv`; labelKey = 'watershed'; }
       else if (county) { file = `county_spi${scale}.csv`; labelKey = 'county'; }
 
       const csv = await firstValueFrom(this.http.get(file, { responseType: 'text' }));
@@ -758,7 +766,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     const divName = d.includes("::") ? d.split("::")[1] : d;
     const scope = this.selectedScope();
 
-    let key: 'division' | 'moku' | 'ahupuaa' = 'division';
+    let key: 'division' | 'moku' | 'ahupuaa' | 'watershed' = 'division';
     if (scope === 'moku') key = 'moku';
     else if (scope === 'ahupuaa') key = 'ahupuaa';
 

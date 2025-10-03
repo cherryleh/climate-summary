@@ -195,7 +195,7 @@
   padding: 12px 16px;
   min-height: 100px;
 }
-.snapshot-hero .panel-head { align-items:flex-start; gap:12px; margin-bottom:6px; }
+.snapshot-hero .panel-head { align-items:flex-start; gap:12px; margin-bottom:0; }
 .snapshot-hero .title { font-weight: 600; }
 
 /* Compact control bar: “Select a dataset” + “Select a time scale” */

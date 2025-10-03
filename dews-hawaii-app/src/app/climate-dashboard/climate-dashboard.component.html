@@ -157,6 +157,15 @@
                 >
                   Ahupuaʻa
                 </button>
+                <button
+                  class="chip chip-option"
+                  [class.chip-selected]="selectedScope() === 'watershed'"
+                  (click)="setScope('watershed')"
+                  role="tab"
+                  [attr.aria-selected]="selectedScope() === 'watershed' ? 'true' : 'false'"
+                >
+                  Watersheds
+                </button>
               </div>
                 <div class="scope-wrap" *ngIf="viewMode() === 'divisions' && selectedScope()">
                 <label for="divisionSelect" class="label tiny">
