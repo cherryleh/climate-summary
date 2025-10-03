@@ -1,0 +1,33 @@
+/* CSS */
+.powered-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: #f8f9fa; /* light gray background */
+  font-size: 1rem;
+  color: #333;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.powered-footer span {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.powered-footer .logos {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.powered-footer .logos img {
+  height: 100px;  /* control logo size */
+  width: auto;
+  transition: transform 0.2s ease-in-out;
+}
+
+.powered-footer .logos img:hover {
+  transform: scale(1.05);
+}

@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { geoIdentity, geoPath } from 'd3-geo';
-import type { FeatureCollection, Feature } from 'geojson';
+import type { FeatureCollection} from 'geojson';
 import * as d3 from 'd3';
-import { take } from 'rxjs/operators';
 import { firstValueFrom } from 'rxjs';
 import { StatBoxComponent } from '../stat-box/stat-box.component';
 import { DataHighchartComponent } from '../data-highchart/data-highchart.component';
+import { FooterComponent } from '../footer/footer.component';
 
 import * as GeoTIFF from 'geotiff';
 import { Pool } from 'geotiff';
@@ -87,7 +87,7 @@ function canonIsland(name: string): string {
 @Component({
   selector: 'app-climate-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, DataHighchartComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, DataHighchartComponent, FooterComponent],
   templateUrl: './climate-dashboard.component.html',
   styleUrls: ['./climate-dashboard.component.css']
 })
