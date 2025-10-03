@@ -255,7 +255,7 @@
 
             <!-- Draw all labels on top -->
             <g class="labels">
-              <g *ngIf="viewMode() === 'divisions' && selectedScope() === 'ahupuaa' && hoveredLabel() as hl">
+              <g *ngIf="viewMode() === 'divisions' && (selectedScope() === 'ahupuaa' || selectedScope() === 'watershed') && hoveredLabel() as hl">
                 <text
                   [attr.x]="hl.x"
                   [attr.y]="hl.y - 6"
@@ -270,7 +270,7 @@
               <ng-container *ngFor="let feature of islands(); trackBy: trackByIsle">
                 <ng-container *ngIf="centroidById()[feature.id] as c">
                     <text
-                      *ngIf="!(viewMode() === 'divisions' && selectedScope() === 'ahupuaa')" 
+                      *ngIf="!(viewMode() === 'divisions' && (selectedScope() === 'ahupuaa' || selectedScope() === 'watershed'))" 
                       [attr.x]="c[0]"
                       [attr.y]="c[1] + 12"
                       text-anchor="middle"

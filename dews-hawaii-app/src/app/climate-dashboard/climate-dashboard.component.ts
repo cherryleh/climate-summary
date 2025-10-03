@@ -246,7 +246,7 @@ export class ClimateDashboardComponent implements OnDestroy {
             : scope === 'moku'
               ? (this.getProp(p, ['moku','Moku','MOKU']) || 'Moku')
               : scope === 'watershed'
-                ? (this.getProp(p, ['watershed','Watershed','WATERSHED','NAME']) || 'Watershed')
+                ? (this.getProp(p, ['watershed','Watershed','WATERSHED','name']) || 'Watershed')
                 : (this.getProp(p, ['division','Division','name','NAME']) || 'Division');
 
 
