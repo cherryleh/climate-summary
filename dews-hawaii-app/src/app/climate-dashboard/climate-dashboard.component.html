@@ -214,43 +214,36 @@
 
 
             <!-- Draw all island/division polygons first -->
-            <g class="features">
               <path
                 *ngFor="let feature of islands(); trackBy: trackByIsle"
                 [attr.d]="pathById()[feature.id]"
-
                 fill="transparent"
                 [attr.pointer-events]="'all'"
-
                 [attr.stroke]="
                   (viewMode() === 'divisions' && selectedDivision() === feature.key) ||
-                    (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
-
+                  (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
                     ? 'var(--primary)'
                     : (hoveredFeature() === feature.name ? '#6b7280' : '#9ca3af')
                 "
                 [attr.stroke-width]="
                   (viewMode() === 'divisions' && selectedDivision() === feature.key) ||
-                    (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
-
+                  (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
                     ? 2
                     : (hoveredFeature() === feature.name ? 2 : 1)
                 "
                 [attr.filter]="
                   (viewMode() === 'divisions' && selectedDivision() === feature.key) ||
-                    (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
-
+                  (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
                     ? 'url(#glow)'
                     : null
                 "
-
                 (click)="viewMode() === 'islands' ? pickCounty(getCountyForIsland(feature.name)) : pickDivision(feature.key)"
                 (mouseenter)="onHover(feature, $event)"
-                (mouseleave)="hoveredLabel.set(null)"
+                (mouseleave)="onLeave()"
               ></path>
 
 
-            </g>
+
 
 
             <!-- Draw all labels on top -->

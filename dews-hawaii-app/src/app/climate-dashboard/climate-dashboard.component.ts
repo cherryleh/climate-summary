@@ -662,7 +662,8 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
   onHover(feature: any, event: MouseEvent) {
-    if (this.selectedScope() === 'ahupuaa') {
+    const scope = this.selectedScope();
+    if (scope === 'ahupuaa' || scope === 'watershed') {
       const svg = (event.target as SVGPathElement).ownerSVGElement!;
       const pt = svg.createSVGPoint();
       pt.x = event.clientX;
@@ -673,7 +674,15 @@ export class ClimateDashboardComponent implements OnDestroy {
         this.hoveredLabel.set({ name: feature.name, x: svgP.x, y: svgP.y });
       }
     }
+    // Highlight the polygon
+    this.hoveredFeature.set(feature.name);
   }
+
+  onLeave() {
+    this.hoveredFeature.set(null);
+    this.hoveredLabel.set(null);
+  }
+
 
   unit = computed(() => {
     if (this.selectedDataset() === 'Rainfall') return 'in';
