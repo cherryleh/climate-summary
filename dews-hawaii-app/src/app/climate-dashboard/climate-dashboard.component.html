@@ -245,8 +245,8 @@
                 "
 
                 (click)="viewMode() === 'islands' ? pickCounty(getCountyForIsland(feature.name)) : pickDivision(feature.key)"
-                (mouseenter)="hoveredFeature.set(feature.name)"
-                (mouseleave)="hoveredFeature.set(null)"
+                (mouseenter)="onHover(feature, $event)"
+                (mouseleave)="hoveredLabel.set(null)"
               ></path>
 
 

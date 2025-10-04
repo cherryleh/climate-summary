@@ -355,3 +355,15 @@
   background: var(--primary);
   color: white;
 }
+
+.ahupuaa-label {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  fill: #111; /* dark gray */
+  stroke: #fff; /* optional: adds a subtle outline for contrast */
+  stroke-width: 0.3px;
+  paint-order: stroke; /* ensures stroke is behind the fill */
+  pointer-events: none;
+  user-select: none;
+}
