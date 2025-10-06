@@ -837,6 +837,14 @@ export class ClimateDashboardComponent implements OnDestroy {
       this.centroidById.set(centroidById);
     });
 
+    if (this.selectedDataset() === 'Drought') {
+      this.loadAllSPIData(); // ensures spiSeries is repopulated for statewide
+    } else if (this.selectedDataset() === 'Rainfall') {
+      this.loadRainfallData();
+    } else if (this.selectedDataset() === 'Temperature') {
+      this.loadTemperatureData();
+    }
+
     const stateData = this.statewideSPI
       .filter((r: any) => r.state.toLowerCase() === 'statewide')
       .map((r: any) => ({ month: r.month, value: r.value }));
