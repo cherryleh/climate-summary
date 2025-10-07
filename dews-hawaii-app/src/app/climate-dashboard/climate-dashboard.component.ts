@@ -847,20 +847,16 @@ export class ClimateDashboardComponent implements OnDestroy {
     });
   }
 
-  
-
   reset() {
     this.selectedCounty.set(null);
     this.selectedDivision.set(null);
     this.viewMode.set('islands');
 
+    // reload map outlines
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
-      const projection = geoIdentity().reflectY(true).fitExtent(
-        [[0, 10], [560, 310]],
-        fc
-      );
+      const projection = geoIdentity().reflectY(true).fitExtent([[0, 10], [560, 310]], fc);
       const path = geoPath(projection as any);
-      this.project = (projection as any);
+      this.project = projection as any;
       this.updateRasterRect();
 
       const features = fc.features.map((f: any) => {
@@ -881,17 +877,46 @@ export class ClimateDashboardComponent implements OnDestroy {
       this.centroidById.set(centroidById);
     });
 
-    if (this.selectedDataset() === 'Drought') {
-      this.loadAllSPIData(); // ensures spiSeries is repopulated for statewide
-    } else if (this.selectedDataset() === 'Rainfall') {
-      this.loadRainfallData();
-    } else if (this.selectedDataset() === 'Temperature') {
-      this.loadTemperatureData();
-    }
+    const dataset = this.selectedDataset();
 
-    const stateData = this.statewideSPI
-      .filter((r: any) => r.state.toLowerCase() === 'statewide')
-      .map((r: any) => ({ month: r.month, value: r.value }));
-    this.tsData.set(stateData);
+    // reload data normally
+    if (dataset === 'Drought') this.loadAllSPIData();
+    else if (dataset === 'Rainfall') this.loadRainfallData();
+    else if (dataset === 'Temperature') this.loadTemperatureData();
+
+    // === smooth transition ===
+    // small helper to animate once data is ready
+    const applyStatewide = () => {
+      const stateData = this.statewideSPI
+        .filter((r: any) => r.state?.toLowerCase() === 'statewide')
+        .map((r: any) => ({ month: r.month, value: r.value }));
+
+      if (!stateData.length) return false; // still not ready
+      const old = this.tsData();
+
+      if (!old || !old.length) {
+        this.tsData.set(stateData);
+        return true;
+      }
+
+      // trigger animation
+      const intermediate = stateData.map((d, i) => ({
+        month: d.month,
+        value: old[i] ? old[i].value : 0
+      }));
+      this.tsData.set(intermediate);
+      setTimeout(() => this.tsData.set(stateData), 50);
+      return true;
+    };
+
+    // try immediately; if data not ready yet, retry shortly
+    if (!applyStatewide()) {
+      const check = setInterval(() => {
+        if (applyStatewide()) clearInterval(check);
+      }, 100);
+    }
   }
+
+
+
 }
