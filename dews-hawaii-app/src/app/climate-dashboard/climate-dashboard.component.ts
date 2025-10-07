@@ -552,14 +552,21 @@ export class ClimateDashboardComponent implements OnDestroy {
       const w = canvas.width;
       const h = canvas.height;
 
-      // Vertical gradient (top → bottom)
       const grad = ctx.createLinearGradient(0, 0, 0, h);
       const steps = 50;
       for (let i = 0; i <= steps; i++) {
         const t = i / steps;
-        const val = this.colorbarMin + t * (this.colorbarMax - this.colorbarMin);
+        const reversed =
+          this.selectedDataset() === 'Rainfall' ||
+          this.selectedDataset() === 'Temperature';
+
+        const val = reversed
+          ? this.colorbarMax - t * (this.colorbarMax - this.colorbarMin)
+          : this.colorbarMin + t * (this.colorbarMax - this.colorbarMin);
+
         grad.addColorStop(t, this.colorScale(val));
       }
+
 
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
