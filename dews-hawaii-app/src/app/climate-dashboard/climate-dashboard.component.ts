@@ -70,10 +70,12 @@ const DIVISIONS: Record<string, string[]> = {
 function getCountyForIsland(islandName: string): string {
   return COUNTY_BY_ISLAND[islandName] ?? islandName;
 }
+
 function getIslandsInSameCounty(islandName: string): string[] {
   const c = getCountyForIsland(islandName);
   return COUNTY_GROUPS[c] ?? [islandName];
 }
+
 function canonIsland(name: string): string {
   if (!name) return '';
   return name
@@ -123,6 +125,15 @@ export class ClimateDashboardComponent implements OnDestroy {
     } else if (d === 'Drought') {
       this.loadAllSPIData();  
     }
+  }
+
+  private normalizeKey(name: string): string {
+    return name
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/['’ʻ`]/g, '')
+      .toLowerCase()
+      .trim();
   }
 
 
@@ -741,10 +752,11 @@ export class ClimateDashboardComponent implements OnDestroy {
 
       if (div) {
         // Specific division selected
-        const divName = div.includes("::") ? div.split("::")[1] : div;
+        const divKey = div.trim().toLowerCase(); // keep full island::division key
         data = parsed
-          .filter(r => r[labelKey]?.trim().toLowerCase() === divName.trim().toLowerCase())
+          .filter(r => this.normalizeKey(r[labelKey] || '') === this.normalizeKey(div))
           .map(r => ({ month: r.month, value: r.value }));
+
       } else if (county) {
         data = parsed
           .filter(r => r[labelKey]?.trim().toLowerCase() === county.trim().toLowerCase())
@@ -762,11 +774,9 @@ export class ClimateDashboardComponent implements OnDestroy {
     Promise.all(requests).then(results => this.spiSeries.set(results));
   }
 
-
-
   pickDivision(d: string | null) {
     if (!d) {
-      // If no division was chosen, just fall back to county data
+      // If no division was chosen, fallback to county/statewide
       const county = this.selectedCounty();
       if (county && this.selectedDataset() === 'Drought') {
         const newSeries = this.spiSeries().map(s => {
@@ -784,74 +794,53 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
     this.selectedDivision.set(d);
-    const divName = d.includes("::") ? d.split("::")[1] : d;
+    const divKey = d.trim().toLowerCase(); 
     const scope = this.selectedScope();
+    const dataset = this.selectedDataset();
 
-    let key: 'division' | 'moku' | 'ahupuaa' | 'watershed' = 'division';
-    if (scope === 'moku') key = 'moku';
-    else if (scope === 'ahupuaa') key = 'ahupuaa';
+    // Map to label key
+    let labelKey: 'division' | 'moku' | 'ahupuaa' | 'watershed' = 'division';
+    if (scope === 'moku') labelKey = 'moku';
+    else if (scope === 'ahupuaa') labelKey = 'ahupuaa';
+    else if (scope === 'watershed') labelKey = 'watershed';
 
-    if (this.selectedDataset() === 'Drought') {
-      const newSeries = this.spiSeries().map(s => {
-        const parsed = this.divisionSPIByScale[s.scale] || [];
-        return {
-          scale: s.scale,
-          data: parsed
-            .filter((r: any) => r[key]?.trim().toLowerCase() === divName.trim().toLowerCase())
-            .map((r: any) => ({ month: r.month, value: r.value }))
-        };
-      });
-      this.spiSeries.set(newSeries);
+    if (dataset === 'Drought') {
+      // Drought — load all SPI scales
+      const scales = [1, 6, 12];
+      const promises = scales.map(scale =>
+        firstValueFrom(this.http.get(`${scope}_spi${scale}.csv`, { responseType: 'text' }))
+          .then(csv => {
+            const parsed = this.parseCsv(csv, labelKey);
+            this.divisionSPIByScale[scale] = parsed;
+            const data = parsed
+              .filter(r => this.normalizeKey(r[labelKey] || '') === this.normalizeKey(d))
+              .map(r => ({ month: r.month, value: r.value }));
+            return { scale, data };
+          })
+      );
+
+      Promise.all(promises).then(results => this.spiSeries.set(results));
       return;
     }
 
-    // Non-drought datasets
-    // --- Non-drought datasets ---
-    if (this.selectedDataset() !== 'Drought') {
-      const scope = this.selectedScope();
-      const dataset = this.selectedDataset();
-      const divName = d.includes("::") ? d.split("::")[1] : d;
+    // Rainfall / Temperature
+    const file = `${scope === 'divisions' ? 'climate' : scope}_${dataset.toLowerCase()}.csv`;
 
-      let file = '';
-      let labelKey: 'division' | 'moku' | 'ahupuaa' | 'watershed' = 'division';
+    this.http.get(file, { responseType: 'text' }).subscribe(csv => {
+      const parsed = this.parseCsv(csv, labelKey);
 
-      if (scope === 'divisions') {
-        file = 'climate_rainfall.csv';
-        labelKey = 'division';
-      } else if (scope === 'moku') {
-        file = 'moku_rainfall.csv';
-        labelKey = 'moku';
-      } else if (scope === 'ahupuaa') {
-        file = 'ahupuaa_rainfall.csv';
-        labelKey = 'ahupuaa';
-      } else if (scope === 'watershed') {
-        file = 'watershed_rainfall.csv';
-        labelKey = 'watershed';
-      }
+      const filtered = parsed
+        .filter(r => this.normalizeKey(r[labelKey] || '') === this.normalizeKey(d))
+        .map(r => ({ month: r.month, value: r.value }));
 
-      // Adjust if temperature dataset is selected
-      if (dataset === 'Temperature') {
-        file = file.replace('rainfall', 'temperature');
-      }
+      this.tsData.set(filtered);
+      console.log('Filtered records set to tsData:', this.tsData());
 
-      this.http.get(file, { responseType: 'text' }).subscribe(csv => {
-        const parsed = this.parseCsv(csv, labelKey);
-        const filtered = parsed
-          .filter(r => r[labelKey]?.trim().toLowerCase() === divName.trim().toLowerCase())
-          .map(r => ({ month: r.month, value: r.value }));
 
-        this.tsData.set(filtered);
-      });
-
-      return;
-    }
-
+    });
   }
 
-
-
-
-
+  
 
   reset() {
     this.selectedCounty.set(null);

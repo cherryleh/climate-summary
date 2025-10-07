@@ -84,35 +84,65 @@ def fetch_tifs(dataset, scale=None):
 
         date += relativedelta(months=1)
 
-def get_averages(scale, division, id_col):
+def get_averages(division, id_col, dataset="rainfall", scale=None):
     shp_path = f"../public/shapefiles/{division}.shp"
+    gdf = gpd.read_file(shp_path).reset_index(drop=True)
 
-    # Load shapefile
-    gdf = gpd.read_file(shp_path)
-    gdf = gdf.reset_index(drop=True)
+    # Detect island field if present
+    possible_island_cols = ["island", "ISLAND", "mokupuni", "Mokupuni"]
+    island_col = next((c for c in possible_island_cols if c in gdf.columns), None)
 
     # --- Handle duplicates depending on division type ---
-    if division in ["county", "climate"]:
-        gdf = gdf.dissolve(by=id_col, as_index=False)
+    if division == "county":
+        # unify all Maui County islands together
+        county_map = {
+            "Hawaiʻi": "Hawaiʻi",
+            "Maui": "Maui",
+            "Molokaʻi": "Maui",
+            "Lānaʻi": "Maui",
+            "Kahoʻolawe": "Maui",
+            "Oʻahu": "Honolulu",
+            "Kauaʻi": "Kauaʻi",
+            "Niʻihau": "Kauaʻi"
+        }
+        # Create a unified county column
+        if island_col:
+            gdf["county_name"] = gdf[island_col].map(county_map)
+        else:
+            gdf["county_name"] = gdf[id_col]
+
+        # Dissolve all features by the unified county name
+        gdf = gdf.dissolve(by="county_name", as_index=False)
+        gdf[id_col] = gdf["county_name"]
+        gdf["division_full"] = gdf[id_col]
+
     else:
-        # Make IDs unique by adding -1, -2, etc. for duplicates
-        counts = {}
-        unique_names = []
-        for name in gdf[id_col]:
-            if name in counts:
-                counts[name] += 1
-                unique_names.append(f"{name}-{counts[name]}")
-            else:
-                counts[name] = 0
-                unique_names.append(name)
-        gdf[id_col] = unique_names
+        # detect island column if available
+        possible_island_cols = ["island", "ISLAND", "mokupuni", "Mokupuni", "isle"]
+        island_col = next((c for c in possible_island_cols if c in gdf.columns), None)
 
-    # Collect rasters
-    tifs = sorted(glob.glob(os.path.join(RASTER_DIR, f"*.tif")))
+        if island_col:
+            # dissolve by both island + name — merges duplicates within same island only
+            gdf = gdf.dissolve(by=[island_col, id_col], as_index=False)
+            gdf["division_full"] = gdf.apply(
+                lambda r: f"{r[island_col]}::{r[id_col]}", axis=1
+            )
+        else:
+            # fallback if no island field exists
+            gdf = gdf.dissolve(by=id_col, as_index=False)
+            gdf["division_full"] = gdf[id_col]
+
+
+    # --- Collect rasters ---
+    if dataset == "drought":
+        tif_pattern = f"spi{int(scale):03d}_*.tif" if scale is not None else "spi*.tif"
+    else:
+        tif_pattern = f"{dataset}_*.tif"
+    tifs = sorted(glob.glob(os.path.join(RASTER_DIR, tif_pattern)))
     if not tifs:
-        raise FileNotFoundError("No rasters found")
+        raise FileNotFoundError(f"No rasters found for {tif_pattern}")
 
-    # Get raster metadata
+    # --- Metadata ---
     with rasterio.open(tifs[0]) as src:
         raster_crs = src.crs
         transform = src.transform
@@ -121,43 +151,42 @@ def get_averages(scale, division, id_col):
     if gdf.crs != raster_crs:
         gdf = gdf.to_crs(raster_crs)
 
-    # Rasterize polygons once
+    # Rasterize once
     shapes = [(geom, idx) for idx, geom in enumerate(gdf.geometry)]
     mask = rasterize(shapes, out_shape=shape, transform=transform, fill=-1, dtype="int32")
 
     records = []
-
     for tif in tifs:
         date = os.path.basename(tif).split("_")[1].replace(".tif", "")
         with rasterio.open(tif) as src:
             arr = src.read(1, masked=True)
 
-        for idx, div in enumerate(gdf[id_col]):
+        for idx, div in enumerate(gdf["division_full"]):
             poly_mask = mask == idx
             vals = arr[poly_mask]
-
-            # Drop masked values cleanly
             if np.ma.is_masked(vals):
                 vals = vals.compressed()
             mean_val = np.nan if vals.size == 0 else np.nanmean(vals)
-            records.append({"division": div, "date": date, "mean_spi": mean_val})
-
-    df = pd.DataFrame(records)
+            records.append({"division": div, "date": date, "mean_val": mean_val})
 
     df = (
-        df.groupby(["division", "date"])["mean_spi"]
+        pd.DataFrame(records)
+        .groupby(["division", "date"])["mean_val"]
         .mean()
         .reset_index()
+        .pivot(index="division", columns="date", values="mean_val")
     )
-
-    df = df.pivot(index="division", columns="date", values="mean_spi")
     df = df.reindex(sorted(df.columns), axis=1)
 
-    out_csv = f"../public/{division}_" \
-      f"{dataset if dataset != 'drought' else ''}" \
-      f"{f'spi{scale}' if scale else ''}.csv"
+    if dataset == "drought":
+        # Always include spi scale (e.g. spi1, spi6, spi12)
+        scale_str = f"spi{int(scale)}" if scale is not None else "spi"
+        out_csv = f"../public/{division}_{scale_str}.csv"
+    else:
+        out_csv = f"../public/{division}_{dataset}.csv"
+
     df.to_csv(out_csv)
-    print(f"Saved {out_csv}")
+    print(f"Saved {out_csv} ({len(df)} rows)")
 
 
 datasets = ["drought", "rainfall", "temperature"]
@@ -167,7 +196,8 @@ for dataset, cfg in DATASETS.items():
     for scale in cfg["scales"]:
         fetch_tifs(dataset, scale)
         for div, col in [("county", "county"), ("moku", "moku"), ("ahupuaa", "ahupuaa"), ("climate", "name"), ("watershed", "name")]:
-            get_averages(scale, div, col)
+            get_averages(div, col, dataset, scale)
+
         # clear downloaded rasters
         for f in glob.glob(f"{RASTER_DIR}/*.tif"):
             os.remove(f)
