@@ -274,6 +274,14 @@ export class ClimateDashboardComponent implements OnDestroy {
     if (this.selectedDataset() === 'Drought') {
       this.loadAllSPIData();
     }
+
+    if (this.selectedDataset() === 'Rainfall') {
+      this.loadRainfallData();
+    } else if (this.selectedDataset() === 'Temperature') {
+      this.loadTemperatureData();
+    } else if (this.selectedDataset() === 'Drought') {
+      this.loadAllSPIData();
+    }
   }
 
 
@@ -580,44 +588,48 @@ export class ClimateDashboardComponent implements OnDestroy {
     return data;
   }
 
-
-
   private loadRainfallData() {
-    this.http.get('statewide_rf.csv', { responseType: 'text' })
-      .subscribe(csv => {
-        const rows = csv.split('\n').map(r => r.split(','));
-        const headers = rows[0];
-        const data: { month: string; value: number }[] = [];
+    const county = this.selectedCounty();
+    const file = county ? 'county_rainfall.csv' : 'statewide_rf.csv';
 
-        for (let i = 1; i < rows.length; i++) {
-          if (!rows[i][0]) continue;
-          const label = rows[i][0].trim();
-          if (label.toLowerCase() !== 'statewide') continue; // only statewide
-          for (let j = 1; j < headers.length; j++) {
-            data.push({ month: headers[j], value: +rows[i][j] });
-          }
-        }
-        this.tsData.set(data);
-      });
+    this.http.get(file, { responseType: 'text' }).subscribe(csv => {
+      const data = this.parseCsv(csv, county ? 'county' : 'state');
+
+      if (county) {
+        const filtered = data
+          .filter(r => r.county?.trim().toLowerCase() === county.trim().toLowerCase())
+          .map(r => ({ month: r.month, value: r.value }));
+        this.tsData.set(filtered);
+      } else {
+        const statewide = data
+          .filter(r => r.state?.toLowerCase() === 'statewide')
+          .map(r => ({ month: r.month, value: r.value }));
+        this.tsData.set(statewide);
+      }
+    });
   }
 
   private loadTemperatureData() {
-    this.http.get('statewide_temp.csv', { responseType: 'text' })
-      .subscribe(csv => {
-        const rows = csv.split('\n').map(r => r.split(','));
-        const headers = rows[0];
-        const data: { month: string; value: number }[] = [];
-        for (let i = 1; i < rows.length; i++) {
-          if (!rows[i][0]) continue;
-          const label = rows[i][0].trim();
-          if (label.toLowerCase() !== 'statewide') continue; // only statewide
-          for (let j = 1; j < headers.length; j++) {
-            data.push({ month: headers[j], value: +rows[i][j] });
-          }
-        }
-        this.tsData.set(data);
-      });
+    const county = this.selectedCounty();
+    const file = county ? 'county_temperature.csv' : 'statewide_temp.csv';
+
+    this.http.get(file, { responseType: 'text' }).subscribe(csv => {
+      const data = this.parseCsv(csv, county ? 'county' : 'state');
+
+      if (county) {
+        const filtered = data
+          .filter(r => r.county?.trim().toLowerCase() === county.trim().toLowerCase())
+          .map(r => ({ month: r.month, value: r.value }));
+        this.tsData.set(filtered);
+      } else {
+        const statewide = data
+          .filter(r => r.state?.toLowerCase() === 'statewide')
+          .map(r => ({ month: r.month, value: r.value }));
+        this.tsData.set(statewide);
+      }
+    });
   }
+
 
 
   private loadSPIData(scale: number) {
@@ -794,10 +806,46 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
     // Non-drought datasets
-    const data = this.divisionSPI
-      .filter((r: any) => r[key]?.trim().toLowerCase() === divName.trim().toLowerCase())
-      .map((r: any) => ({ month: r.month, value: r.value }));
-    this.tsData.set(data);
+    // --- Non-drought datasets ---
+    if (this.selectedDataset() !== 'Drought') {
+      const scope = this.selectedScope();
+      const dataset = this.selectedDataset();
+      const divName = d.includes("::") ? d.split("::")[1] : d;
+
+      let file = '';
+      let labelKey: 'division' | 'moku' | 'ahupuaa' | 'watershed' = 'division';
+
+      if (scope === 'divisions') {
+        file = 'climate_rainfall.csv';
+        labelKey = 'division';
+      } else if (scope === 'moku') {
+        file = 'moku_rainfall.csv';
+        labelKey = 'moku';
+      } else if (scope === 'ahupuaa') {
+        file = 'ahupuaa_rainfall.csv';
+        labelKey = 'ahupuaa';
+      } else if (scope === 'watershed') {
+        file = 'watershed_rainfall.csv';
+        labelKey = 'watershed';
+      }
+
+      // Adjust if temperature dataset is selected
+      if (dataset === 'Temperature') {
+        file = file.replace('rainfall', 'temperature');
+      }
+
+      this.http.get(file, { responseType: 'text' }).subscribe(csv => {
+        const parsed = this.parseCsv(csv, labelKey);
+        const filtered = parsed
+          .filter(r => r[labelKey]?.trim().toLowerCase() === divName.trim().toLowerCase())
+          .map(r => ({ month: r.month, value: r.value }));
+
+        this.tsData.set(filtered);
+      });
+
+      return;
+    }
+
   }
 
 
