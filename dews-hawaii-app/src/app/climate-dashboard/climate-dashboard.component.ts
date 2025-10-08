@@ -741,14 +741,23 @@ export class ClimateDashboardComponent implements OnDestroy {
     const scope = this.selectedScope();
 
     const requests = scales.map(async scale => {
-      let file = 'statewide_spi' + scale + '.csv';
+      let file = '';
       let labelKey: 'state' | 'division' | 'moku' | 'ahupuaa' | 'watershed' | 'county' = 'state';
 
-      if (scope === 'divisions') { file = `climate_spi${scale}.csv`; labelKey = 'division'; }
-      else if (scope === 'moku') { file = `moku_spi${scale}.csv`; labelKey = 'moku'; }
-      else if (scope === 'ahupuaa') { file = `ahupuaa_spi${scale}.csv`; labelKey = 'ahupuaa'; }
-      else if (scope === 'watershed') { file = `watershed_spi${scale}.csv`; labelKey = 'watershed'; }
-      else if (county) { file = `county_spi${scale}.csv`; labelKey = 'county'; }
+      if (scope === 'divisions') {
+        file = `climate_spi${scale}.csv`; labelKey = 'division';
+      } else if (scope === 'moku') {
+        file = `moku_spi${scale}.csv`; labelKey = 'moku';
+      } else if (scope === 'ahupuaa') {
+        file = `ahupuaa_spi${scale}.csv`; labelKey = 'ahupuaa';
+      } else if (scope === 'watershed') {
+        file = `watershed_spi${scale}.csv`; labelKey = 'watershed';
+      } else if (county) {
+        file = `county_spi${scale}.csv`; labelKey = 'county';
+      } else {
+        file = `statewide_spi${scale}.csv`; labelKey = 'state';
+      }
+
 
       const csv = await firstValueFrom(this.http.get(file, { responseType: 'text' }));
       const parsed = this.parseCsv(csv, labelKey);
