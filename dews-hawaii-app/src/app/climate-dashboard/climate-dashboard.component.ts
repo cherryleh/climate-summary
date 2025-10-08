@@ -159,19 +159,32 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
   }
+  
   selectedDivisionName = computed(() => {
     const sel = this.selectedDivision();
     if (!sel) return null;
+
+    // split 'molokai::Kona' → ['molokai', 'Kona']
     const parts = sel.split('::');
-    return parts.length === 2 ? parts[1] : sel;
+    const name = parts.length === 2 ? parts[1].trim() : sel.trim();
+    const scope = this.selectedScope();
+
+    // append scope label for clarity
+    if (scope === 'moku') return `${name} Moku`;
+    if (scope === 'divisions') return `${name} Climate Division`;
+    if (scope === 'ahupuaa') return `${name} Ahupuaʻa`;
+    if (scope === 'watershed') return `${name} Watershed`;
+
+    // plain for 'divisions'
+    return name;
   });
 
   countyLabel = computed(() => {
     const county = this.selectedCounty();
     if (!county) return null;
-    const members = COUNTY_GROUPS[county] ?? [];
-    return members.length > 1 ? `${county} County` : county;
+    return `${county} County`;
   });
+
 
   private islandStubForCounty(county: string): Island | null {
     const members = COUNTY_GROUPS[county];

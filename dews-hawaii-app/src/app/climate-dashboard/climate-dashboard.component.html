@@ -15,7 +15,10 @@
           <div>
             <div class="eyebrow">Climate snapshot</div>
             <div class="title">
-              {{ selectedDataset() }} – {{ selectedDivision()|| 'Statewide' }}
+              August 2025 {{ selectedDataset() }} –
+              {{ selectedDivisionName() || countyLabel() || 'Statewide' }}
+
+
             </div>
           </div>
 
@@ -50,7 +53,7 @@
           <app-stat-box label="Value" value="2.0 in"></app-stat-box>
           <app-stat-box label="Anomaly" value="-3.2 in"></app-stat-box>
           <app-stat-box label="Rank" value="Driest" note="out of 35 years"></app-stat-box>
-          <app-stat-box label="Dry Coverage (%)" value="97%"></app-stat-box>
+          <app-stat-box label="Dry Area(%)" value="97%"></app-stat-box>
         </div>
 
         <!-- Temperature -->
