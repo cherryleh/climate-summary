@@ -10,7 +10,11 @@
     <div class="left-col">
       <!-- Map Panel -->
       <!-- Climate Snapshot — hero at the top-left -->
-      <section class="panel snapshot-hero">
+        <section
+          class="panel snapshot-hero"
+          [class.snapshot-hero-drought]="selectedDataset() === 'Drought'"
+        >
+
         <div class="panel-head">
           <div>
             <div class="eyebrow">Climate snapshot</div>
@@ -66,9 +70,11 @@
 
         <!-- Drought -->
         <div class="stats stats-drought" *ngIf="selectedDataset() === 'Drought'">
-          <app-stat-box label="Short-term" value="Moderate Drought"></app-stat-box>
-          <app-stat-box label="Medium-term" value="Severe Drought"></app-stat-box>
-          <app-stat-box label="Long-term" value="Extreme Drought"></app-stat-box>
+          <app-stat-box value="67%" note="of area abnormally dry or worse"></app-stat-box>
+          <app-stat-box value="50%" note="of area in moderate drought or worse"></app-stat-box>
+          <app-stat-box value="21%" note="of area in severe drought or worse"></app-stat-box>
+          <app-stat-box value="10%" note="of area in extreme drought or worse"></app-stat-box>
+          <app-stat-box value="3%" note="of area in exceptional drought"></app-stat-box>
         </div>
       </section>
 

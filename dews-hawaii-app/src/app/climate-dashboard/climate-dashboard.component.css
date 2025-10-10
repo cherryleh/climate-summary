@@ -92,11 +92,14 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
 .stats-drought {
   display: grid;
-  grid-template-columns: repeat(3, auto); /* let boxes size naturally */
+  grid-template-columns: repeat(5, 1fr); /* 5 equal-width boxes */
   gap: 12px;
-  justify-content: center; /* center the whole grid row */
+  width: 100%;              /* span full width of container */
+  align-items: stretch;     /* make all boxes equal height */
+  justify-items: stretch;   /* ensure each fills its grid cell */
 }
 
 
@@ -257,6 +260,17 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+}
+
+.snapshot-hero.snapshot-hero-drought {
+  grid-template-columns: repeat(5, minmax(0, 1fr)); /* 5 equal-width columns */
+}
+
+/* Optional: ensure the drought stat boxes stretch nicely */
+.snapshot-hero-drought .stats-drought {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  width: 100%;
 }
 
 /* Keep header/controls/statement spanning full width */
