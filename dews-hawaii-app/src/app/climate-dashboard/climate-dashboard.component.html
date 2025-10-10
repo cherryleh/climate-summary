@@ -56,7 +56,7 @@
         <div class="stats" *ngIf="selectedDataset() === 'Rainfall'">
           <app-stat-box label="Value" value="2.0 in"></app-stat-box>
           <app-stat-box label="Anomaly" value="-3.2 in" percent="-62%"></app-stat-box>
-          <app-stat-box label="Rank" value="Driest" note="out of 35 years"></app-stat-box>
+          <app-stat-box label="Rank" value="Driest" note="out of 35 years" ></app-stat-box>
           <app-stat-box label="Dry Area(%)" value="97%"></app-stat-box>
         </div>
 
@@ -64,8 +64,8 @@
         <div class="stats" *ngIf="selectedDataset() === 'Temperature'">
           <app-stat-box label="Value" value="78 °F"></app-stat-box>
           <app-stat-box label="Anomaly" value="+1.5 °F"></app-stat-box>
-          <app-stat-box label="Rank" value="Warmest" note="out of 35 years"></app-stat-box>
-          <app-stat-box label="Drought" value="Moderately Dry"></app-stat-box>
+          <app-stat-box label="Rank" value="7th" note="out of 35 years"></app-stat-box>
+          <app-stat-box label="Dry Area(%)" value="97%"></app-stat-box>
         </div>
 
         <!-- Drought -->
@@ -76,6 +76,7 @@
           <app-stat-box value="10%" note="of area in extreme drought or worse"></app-stat-box>
           <app-stat-box value="3%" note="of area in exceptional drought"></app-stat-box>
         </div>
+
       </section>
 
       <section class="panel panel-grow">

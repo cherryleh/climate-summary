@@ -1,4 +1,4 @@
-<div class="stat">
+<div class="stat" [class.drought]="note?.includes('area')">
   <div class="stat-label">{{ label }}</div>
   <div class="stat-value">
     <span class="main-value">{{ value }}</span>
