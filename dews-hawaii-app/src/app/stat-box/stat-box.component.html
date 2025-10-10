@@ -1,7 +1,8 @@
 <div class="stat">
   <div class="stat-label">{{ label }}</div>
   <div class="stat-value">
-    <span class="stat-value-text">{{ value }}</span>
+    <span class="main-value">{{ value }}</span>
+    <span *ngIf="percent" class="percent-value">{{ percent }}</span>
     <span *ngIf="note" class="stat-note-inline">{{ note }}</span>
   </div>
 </div>

@@ -11,5 +11,6 @@ import { CommonModule } from '@angular/common';
 export class StatBoxComponent {
   @Input() label!: string;
   @Input() value!: string;
+  @Input() percent?: string;
   @Input() note?: string;
 }

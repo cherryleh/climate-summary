@@ -189,7 +189,7 @@ def get_averages(division, id_col, dataset="rainfall", scale=None):
     print(f"Saved {out_csv} ({len(df)} rows)")
 
 
-datasets = ["drought", "rainfall", "temperature"]
+# datasets = ["drought", "rainfall", "temperature"]
 scales = [1, 6, 12]
 
 for dataset, cfg in DATASETS.items():
