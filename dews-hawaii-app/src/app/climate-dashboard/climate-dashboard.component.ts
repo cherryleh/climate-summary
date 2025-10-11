@@ -366,7 +366,7 @@ export class ClimateDashboardComponent implements OnDestroy {
         let file = '';
         if (dataset === 'Rainfall') file = 'tifs/rainfall_2025_08.tif';
         else if (dataset === 'Temperature') file = 'tifs/tmean_2025_08.tif';
-        else if (dataset === 'Drought') file = 'tifs/spi1_2025_08.tif';
+        else if (dataset === 'Drought') file = 'tifs/spi3_2025_08_category.tif';
 
         const tiff = await GeoTIFF.fromUrl(file);
         const image = await tiff.getImage();
@@ -396,7 +396,7 @@ export class ClimateDashboardComponent implements OnDestroy {
         !Number.isFinite(v) ||
         Math.abs(v) > 1e20;
 
-      // Auto-stretch min/max ignoring NoData
+      // --- Compute min/max normally ---
       let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
       for (let i = 0; i < band.length; i++) {
         const v = Number(band[i]);
@@ -406,11 +406,42 @@ export class ClimateDashboardComponent implements OnDestroy {
       }
       if (!Number.isFinite(min) || !Number.isFinite(max)) { min = 0; max = 1; }
 
+      // --- Flag categorical only for SPI3 drought map ---
+      let isCategorical = false;
       if (dataset === 'Drought') {
-        min = -3;
-        max = 3;
+        isCategorical = true;
+        min = 0;
+        max = 10;
       }
+
       
+      const droughtColors = [
+        "#730000",  // 0 D4 Exceptional Drought
+        "#FF0000",  // 1 D3 Extreme Drought
+        "#FF9900",  // 2 D2 Severe Drought
+        "#FFD37F",  // 3 D1 Moderate Drought
+        "#FFFF00",  // 4 D0 Abnormally Dry
+        "#FFFFFF",  // 5 Near Normal
+        "#99CCFF",  // 6 W0 Abnormally Wet
+        "#3399FF",  // 7 W1 Moderately Wet
+        "#0066CC",  // 8 W2 Very Wet
+        "#003366",  // 9 W3 Extremely Wet
+        "#001933",  // 10 W4 Exceptionally Wet
+      ];
+
+      const droughtLabels = [
+        "D4 Exceptional Drought",
+        "D3 Extreme Drought",
+        "D2 Severe Drought",
+        "D1 Moderate Drought",
+        "D0 Abnormally Dry",
+        "Near Normal",
+        "W0 Abnormally Wet",
+        "W1 Moderately Wet",
+        "W2 Very Wet",
+        "W3 Extremely Wet",
+        "W4 Exceptionally Wet"
+      ];
 
       if (dataset === 'Rainfall') {
         // Viridis reversed (high = dark purple, low = yellow)
@@ -438,11 +469,29 @@ export class ClimateDashboardComponent implements OnDestroy {
         const v = Number(band[i]);
         const idx = i * 4;
         if (isNoData(v)) { imgData.data[idx + 3] = 0; continue; }
-        const c = d3.rgb(this.colorScale(v));
-        imgData.data[idx + 0] = c.r;
-        imgData.data[idx + 1] = c.g;
-        imgData.data[idx + 2] = c.b;
-        imgData.data[idx + 3] = 220; // alpha
+        let r = 255, g = 255, b = 255, a = 220;
+
+        if (isCategorical) {
+          const cat = Math.round(v);
+          if (!isNoData(v) && cat >= 0 && cat < droughtColors.length) {
+            const c = d3.rgb(droughtColors[cat]);
+            r = c.r;
+            g = c.g;
+            b = c.b;
+
+          } else {
+            a = 0;
+          }
+        } else {
+          const c = d3.rgb(this.colorScale(v));
+          r = c.r; g = c.g; b = c.b;
+        }
+
+        imgData.data[idx + 0] = r;
+        imgData.data[idx + 1] = g;
+        imgData.data[idx + 2] = b;
+        imgData.data[idx + 3] = a;
+
       }
       ctx.putImageData(imgData, 0, 0);
 
