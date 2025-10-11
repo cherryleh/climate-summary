@@ -292,17 +292,28 @@
           </svg>
           <div class="colorbar legend" *ngIf="rasterHref()">
             <div class="colorbar-wrap">
-              <canvas id="colorbarCanvas" width="20" height="160"></canvas>
-              <div class="ticks">
+              <!-- Continuous colorbar for Rainfall & Temperature -->
+              <canvas
+                id="colorbarCanvas"
+                width="20"
+                height="150"
+                *ngIf="selectedDataset() !== 'Drought'">
+              </canvas>
+
+              <!-- Discrete legend container for Drought -->
+              <div
+                id="colorbarLegend"
+                *ngIf="selectedDataset() === 'Drought'">
+              </div>
+
+              <!-- Numeric ticks (hidden for categorical drought) -->
+              <div class="ticks" *ngIf="selectedDataset() !== 'Drought'">
                 <span>{{ colorbarMax | number:'1.1-1' }} {{ unit() }}</span>
                 <span *ngIf="colorbarMid !== null">{{ colorbarMid | number:'1.1-1' }} {{ unit() }}</span>
                 <span>{{ colorbarMin | number:'1.1-1' }} {{ unit() }}</span>
               </div>
             </div>
           </div>
-
-          <!-- Colorbar Legend -->
-
 
         </div>
       </section>
