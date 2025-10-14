@@ -1,0 +1,179 @@
+<div class="map">
+  <!-- === Selection Overlay === -->
+  <div class="selection-overlay">
+    <div class="eyebrow">Selection</div>
+
+    <div class="crumbs">
+      <span class="chip" (click)="reset()">Statewide</span>
+      <ng-container *ngIf="selectedCounty">
+        <span class="sep">›</span>
+        <button class="chip chip-active" (click)="divisionSelected.emit(null)">
+          {{ selectedCounty }} County
+        </button>
+      </ng-container>
+    </div>
+
+    <!-- === County quick picks === -->
+    <div class="mt-1">
+      <div class="label tiny">Select County:</div>
+      <div class="chips">
+        <button
+          class="chip chip-option"
+          [class.chip-selected]="selectedCounty === 'Kauaʻi'"
+          (click)="pickCounty('Kauaʻi')"
+        >Kauaʻi</button>
+
+        <button
+          class="chip chip-option"
+          [class.chip-selected]="selectedCounty === 'Honolulu'"
+          (click)="pickCounty('Honolulu')"
+        >Honolulu</button>
+
+        <button
+          class="chip chip-option"
+          [class.chip-selected]="selectedCounty === 'Maui'"
+          (click)="pickCounty('Maui')"
+        >Maui</button>
+
+        <button
+          class="chip chip-option"
+          [class.chip-selected]="selectedCounty === 'Hawaiʻi'"
+          (click)="pickCounty('Hawaiʻi')"
+        >Hawaiʻi</button>
+      </div>
+    </div>
+
+    <!-- === Scope selector === -->
+    <div class="scope-wrap">
+      <label class="label tiny">Select division:</label>
+      <div class="chips mt-1" role="tablist" aria-label="Scope">
+        <button
+          class="chip chip-option"
+          [class.chip-selected]="selectedScope === 'divisions'"
+          (click)="scopeSelected.emit('divisions')"
+        >Climate Divisions</button>
+
+        <button
+          class="chip chip-option"
+          [class.chip-selected]="selectedScope === 'moku'"
+          (click)="scopeSelected.emit('moku')"
+        >Moku</button>
+
+        <button
+          class="chip chip-option"
+          [class.chip-selected]="selectedScope === 'ahupuaa'"
+          (click)="scopeSelected.emit('ahupuaa')"
+        >Ahupuaʻa</button>
+
+        <button
+          class="chip chip-option"
+          [class.chip-selected]="selectedScope === 'watershed'"
+          (click)="scopeSelected.emit('watershed')"
+        >Watersheds</button>
+
+      </div>
+
+      <!-- Division dropdown -->
+      <div class="scope-wrap" *ngIf="viewMode === 'divisions' && selectedScope">
+        <label for="divisionSelect" class="label tiny">
+          {{ selectedScope | titlecase }}
+        </label>
+        <select
+          id="divisionSelect"
+          class="input mt-1"
+          [ngModel]="selectedDivision"
+          (ngModelChange)="pickDivision($event)"
+        >
+          <option *ngFor="let f of islands; trackBy: trackByIsle" [value]="f.key">
+            {{ f.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <svg viewBox="0 0 560 320" class="map-svg" role="img" aria-label="Hawaiʻi islands (abstract)">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+        <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(0,0,0,0.05)" stroke-width="1" />
+      </pattern>
+    </defs>
+
+    <!-- everything below is wrapped inside -->
+    <g class="map-content">
+      <rect x="0" y="0" width="560" height="320" fill="url(#grid)" />
+
+      <image
+        *ngIf="rasterHref && rasterRect"
+        [attr.href]="rasterHref"
+        [attr.x]="rasterRect.x"
+        [attr.y]="rasterRect.y"
+        [attr.width]="rasterRect.width"
+        [attr.height]="rasterRect.height"
+        preserveAspectRatio="none"
+        style="pointer-events:none"
+        opacity="0.9"
+      />
+
+      <path
+        *ngFor="let feature of islands; trackBy: trackByIsle"
+        [attr.d]="pathById[feature.id]"
+        fill="transparent"
+        [attr.stroke]="strokeColor(feature)"
+        [attr.stroke-width]="strokeWidth(feature)"
+        [attr.filter]="filterGlow(feature)"
+        (click)="
+          viewMode === 'islands'
+            ? pickCounty(getCountyForIsland(feature.name))
+            : pickDivision(feature.key)
+        "
+        (mouseenter)="onHover(feature, $event)"
+        (mouseleave)="onLeave()"
+      ></path>
+
+      <g class="labels">
+        <g *ngIf="viewMode === 'divisions' && (selectedScope === 'ahupuaa' || selectedScope === 'watershed') && hoveredLabel() as hl">
+          <text
+            [attr.x]="hl.x"
+            [attr.y]="hl.y - 6"
+            text-anchor="middle"
+            class="ahupuaa-label"
+          >
+            {{ hl.name }}
+          </text>
+        </g>
+
+        <ng-container *ngFor="let feature of islands; trackBy: trackByIsle">
+          <ng-container *ngIf="centroidById[feature.id] as c">
+            <text
+              *ngIf="!(viewMode === 'divisions' && (selectedScope === 'ahupuaa' || selectedScope === 'watershed'))"
+              [attr.x]="c[0]"
+              [attr.y]="c[1] + 12"
+              text-anchor="middle"
+              class="island-label"
+            >
+              {{ feature.short }}
+            </text>
+          </ng-container>
+        </ng-container>
+      </g>
+    </g>
+  </svg>
+
+
+  <div class="colorbar legend" *ngIf="rasterHref">
+    <div class="colorbar-wrap">
+      <canvas id="colorbarCanvas" width="20" height="150" *ngIf="selectedDataset !== 'Drought'"></canvas>
+      <div id="colorbarLabels" *ngIf="selectedDataset !== 'Drought'"></div>
+      <div id="colorbarLegend" *ngIf="selectedDataset === 'Drought'"></div>
+    </div>
+  </div>
+
+</div>

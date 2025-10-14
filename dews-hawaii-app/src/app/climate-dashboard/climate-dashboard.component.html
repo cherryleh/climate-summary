@@ -92,231 +92,24 @@
           <button *ngIf="selectedCounty()" class="btn" (click)="reset()">Reset</button>
 
         </div>
-        <div class="map">
-          <div class="selection-overlay">
-            <div class="eyebrow">Selection</div>
-            <div class="crumbs">
-              <span class="chip" (click)="reset()">Statewide</span>
-              <ng-container *ngIf="selectedCounty() as sc">
-                <span class="sep">›</span>
-                <button class="chip chip-active" (click)="selectedDivision.set(null)">
-                  {{ countyLabel() || sc }}
-                </button>
-              </ng-container>
-
-            </div>
-            <!-- County quick-picks (always visible) -->
-            <div class="mt-1">
-              <div class="label tiny">Select County:</div>
-              <div class="chips">
-                <button
-                  class="chip chip-option"
-                  [class.chip-selected]="selectedCounty() === 'Kauaʻi'"
-                  (click)="pickCounty('Kauaʻi')"
-                >Kauaʻi</button>
-
-                <button
-                  class="chip chip-option"
-                  [class.chip-selected]="selectedCounty() === 'Honolulu'"
-                  (click)="pickCounty('Honolulu')"
-                >Honolulu</button>
-
-                <button
-                  class="chip chip-option"
-                  [class.chip-selected]="selectedCounty() === 'Maui'"
-                  (click)="pickCounty('Maui')"
-                >Maui</button>
-
-                <button
-                  class="chip chip-option"
-                  [class.chip-selected]="selectedCounty() === 'Hawaiʻi'"
-                  (click)="pickCounty('Hawaiʻi')"
-                >Hawaiʻi</button>
-              </div>
-            </div>
-
-            <div class="scope-wrap">
-              <label for="scope" class="label tiny">Select division:</label>
-              <!-- Scope chips -->
-              <div class="chips mt-1" role="tablist" aria-label="Scope">
-                <button
-                  class="chip chip-option"
-                  [class.chip-selected]="selectedScope() === 'divisions'"
-                  (click)="setScope('divisions')"
-                  role="tab"
-                  [attr.aria-selected]="selectedScope() === 'divisions' ? 'true' : 'false'"
-                >
-                  Climate Divisions
-                </button>
-
-                <button
-                  class="chip chip-option"
-                  [class.chip-selected]="selectedScope() === 'moku'"
-                  (click)="setScope('moku')"
-                  role="tab"
-                  [attr.aria-selected]="selectedScope() === 'moku' ? 'true' : 'false'"
-                >
-                  Moku
-                </button>
-
-                <button
-                  class="chip chip-option"
-                  [class.chip-selected]="selectedScope() === 'ahupuaa'"
-                  (click)="setScope('ahupuaa')"
-                  role="tab"
-                  [attr.aria-selected]="selectedScope() === 'ahupuaa' ? 'true' : 'false'"
-                >
-                  Ahupuaʻa
-                </button>
-                <button
-                  class="chip chip-option"
-                  [class.chip-selected]="selectedScope() === 'watershed'"
-                  (click)="setScope('watershed')"
-                  role="tab"
-                  [attr.aria-selected]="selectedScope() === 'watershed' ? 'true' : 'false'"
-                >
-                  Watersheds
-                </button>
-              </div>
-                <div class="scope-wrap" *ngIf="viewMode() === 'divisions' && selectedScope()">
-                <label for="divisionSelect" class="label tiny">
-                  {{ selectedScope() | titlecase }}
-                </label>
-                <select id="divisionSelect"
-                        class="input mt-1"
-                        [ngModel]="selectedDivision()"
-                        (ngModelChange)="pickDivision($event)">
-                  <option *ngFor="let f of islands(); trackBy: trackByIsle" [value]="f.key">
-                    {{ f.name }}
-                  </option>
-
-                </select>
-              </div>
-
-              
-            </div>
-          </div>
-          
-          <svg viewBox="0 0 560 320" class="map-svg" role="img" aria-label="Hawaiʻi islands (abstract)">
-            <defs>
-              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-              <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(0,0,0,0.05)" stroke-width="1" />
-              </pattern>
-            </defs>
-            <rect x="0" y="0" width="560" height="320" fill="url(#grid)" />
-            <image
-              *ngIf="rasterHref() && rasterRect()"
-              [attr.href]="rasterHref()"
-              [attr.x]="rasterRect()!.x"
-              [attr.y]="rasterRect()!.y"
-              [attr.width]="rasterRect()!.width"
-              [attr.height]="rasterRect()!.height"
-              preserveAspectRatio="none"
-              style="pointer-events:none"
-              opacity="0.9"
-            />
+        <app-map-panel
+          [selectedDataset]="selectedDataset()"
+          [selectedScope]="selectedScope()"
+          [selectedCounty]="selectedCounty()"
+          [selectedDivision]="selectedDivision()"
+          [viewMode]="viewMode()"
+          [rasterHref]="rasterHref()"
+          [rasterRect]="rasterRect()"
+          [islands]="islands()"
+          [pathById]="pathById()"
+          [centroidById]="centroidById()"
+          (countySelected)="pickCounty($event)"
+          (scopeSelected)="setScope($event)"
+          (divisionSelected)="pickDivision($event)"
+          (resetSelection)="reset()"
+        ></app-map-panel>
 
 
-            <!-- Draw all island/division polygons first -->
-              <path
-                *ngFor="let feature of islands(); trackBy: trackByIsle"
-                [attr.d]="pathById()[feature.id]"
-                fill="transparent"
-                [attr.pointer-events]="'all'"
-                [attr.stroke]="
-                  (viewMode() === 'divisions' && selectedDivision() === feature.key) ||
-                  (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
-                    ? 'var(--primary)'
-                    : (hoveredFeature() === feature.name ? '#6b7280' : '#9ca3af')
-                "
-                [attr.stroke-width]="
-                  (viewMode() === 'divisions' && selectedDivision() === feature.key) ||
-                  (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
-                    ? 2
-                    : (hoveredFeature() === feature.name ? 2 : 1)
-                "
-                [attr.filter]="
-                  (viewMode() === 'divisions' && selectedDivision() === feature.key) ||
-                  (viewMode() === 'islands' && selectedCounty() === getCountyForIsland(feature.name))
-                    ? 'url(#glow)'
-                    : null
-                "
-                (click)="viewMode() === 'islands' ? pickCounty(getCountyForIsland(feature.name)) : pickDivision(feature.key)"
-                (mouseenter)="onHover(feature, $event)"
-                (mouseleave)="onLeave()"
-              ></path>
-
-
-
-
-
-            <!-- Draw all labels on top -->
-            <g class="labels">
-              <g *ngIf="viewMode() === 'divisions' && (selectedScope() === 'ahupuaa' || selectedScope() === 'watershed') && hoveredLabel() as hl">
-                <text
-                  [attr.x]="hl.x"
-                  [attr.y]="hl.y - 6"
-                  text-anchor="middle"
-                  class="ahupuaa-label"
-                >
-                  {{ hl.name }}
-                </text>
-              </g>
-
-
-              <ng-container *ngFor="let feature of islands(); trackBy: trackByIsle">
-                <ng-container *ngIf="centroidById()[feature.id] as c">
-                    <text
-                      *ngIf="!(viewMode() === 'divisions' && (selectedScope() === 'ahupuaa' || selectedScope() === 'watershed'))" 
-                      [attr.x]="c[0]"
-                      [attr.y]="c[1] + 12"
-                      text-anchor="middle"
-                      class="island-label"
-                    >
-                      {{ feature.short }}
-                    </text>
-
-                </ng-container>
-              </ng-container>
-            </g>
-
-
-
-
-          </svg>
-          <div class="colorbar legend" *ngIf="rasterHref()">
-            <div class="colorbar-wrap">
-              <!-- Continuous colorbar for Rainfall & Temperature -->
-              <canvas
-                id="colorbarCanvas"
-                width="20"
-                height="150"
-                *ngIf="selectedDataset() !== 'Drought'">
-              </canvas>
-
-              <!-- Discrete legend container for Drought -->
-              <div
-                id="colorbarLegend"
-                *ngIf="selectedDataset() === 'Drought'">
-              </div>
-
-              <!-- Numeric ticks (hidden for categorical drought) -->
-              <div class="ticks" *ngIf="selectedDataset() !== 'Drought'">
-                <span>{{ colorbarMax | number:'1.1-1' }} {{ unit() }}</span>
-                <span *ngIf="colorbarMid !== null">{{ colorbarMid | number:'1.1-1' }} {{ unit() }}</span>
-                <span>{{ colorbarMin | number:'1.1-1' }} {{ unit() }}</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
       </section>
 
     </div>

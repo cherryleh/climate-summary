@@ -14,9 +14,10 @@ import * as GeoTIFF from 'geotiff';
 import { Pool } from 'geotiff';
 import { interpolateViridis, interpolateRdBu } from 'd3-scale-chromatic';
 import { NgZone } from '@angular/core';
+import { MapPanelComponent } from '../map-panel/map-panel.component';
 
+export type Scope = 'divisions' | 'moku' | 'ahupuaa' | 'watershed';
 
-type Scope = 'divisions' | 'moku' | 'ahupuaa' | 'watershed';
 type Dataset = 'Rainfall' | 'Temperature' | 'Drought';
 
 interface Island {
@@ -89,7 +90,7 @@ function canonIsland(name: string): string {
 @Component({
   selector: 'app-climate-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, DataHighchartComponent, FooterComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, DataHighchartComponent, FooterComponent, MapPanelComponent],
   templateUrl: './climate-dashboard.component.html',
   styleUrls: ['./climate-dashboard.component.css']
 })
@@ -196,6 +197,7 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   pickCounty(county: string) {
     this.selectedCounty.set(county);
+
     this.selectedDivision.set(null);
 
     const members = COUNTY_GROUPS[county] || [county];
@@ -242,7 +244,6 @@ export class ClimateDashboardComponent implements OnDestroy {
     } else {
       // --- Scoped polygons (division/moku/ahupuaʻa) ---
       this.viewMode.set('divisions');
-
       const file = scope === 'moku'
       ? 'moku.geojson'
       : scope === 'ahupuaa'
