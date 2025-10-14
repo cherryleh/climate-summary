@@ -117,7 +117,7 @@ export class DataHighchartComponent implements OnChanges {
           ? [
               {
                 from: -3,
-                to: -1,
+                to: -0.8,
                 color: 'rgba(255,0,0,0.2)',
                 label: {
                   text: 'Drought',

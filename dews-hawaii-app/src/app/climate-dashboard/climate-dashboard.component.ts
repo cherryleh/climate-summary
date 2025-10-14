@@ -368,125 +368,103 @@ export class ClimateDashboardComponent implements OnDestroy {
   private colorScale: d3.ScaleSequential<string> | d3.ScaleDiverging<string> | null = null;
 
 
-  // Read & colorize TIFF once; reuse bitmap as projection changes
   private async loadRasterOnce(dataset: Dataset) {
-      try {
-        let file = '';
-        if (dataset === 'Rainfall') file = 'tifs/rainfall_2025_08.tif';
-        else if (dataset === 'Temperature') file = 'tifs/tmean_2025_08.tif';
-        else if (dataset === 'Drought') file = 'tifs/spi3_2025_08_category.tif';
+    try {
+      // --- Select file ---
+      let file = '';
+      if (dataset === 'Rainfall') file = 'tifs/rainfall_2025_08.tif';
+      else if (dataset === 'Temperature') file = 'tifs/tmean_2025_08.tif';
+      else if (dataset === 'Drought') file = 'tifs/spi3_2025_08_category.tif';
 
-        const tiff = await GeoTIFF.fromUrl(file);
-        const image = await tiff.getImage();
-        this.rasterBBox = image.getBoundingBox() as [number, number, number, number];
+      // --- Open the GeoTIFF ---
+      const tiff = await GeoTIFF.fromUrl(file);
+      const image = await tiff.getImage();
+      this.rasterBBox = image.getBoundingBox() as [number, number, number, number];
 
-      // Downsample target resolution based on SVG (560×320)
-      const baseW = 560;
-      const targetW = Math.round(baseW * this.rasterScaleFactor);
+      // --- Use full resolution (no resampling) ---
       const srcW = image.getWidth();
       const srcH = image.getHeight();
-      const targetH = Math.max(1, Math.round(targetW * (srcH / srcW)));
 
-      // Read first band with worker pool
+      const isCategorical = dataset === 'Drought';
+
       const band = await image.readRasters({
         samples: [0],
-        width: targetW,
-        height: targetH,
         interleave: true,
-        resampleMethod: 'nearest',
+        resampleMethod: 'nearest', // pixel-perfect; no bilinear blending
         pool: this.tiffPool
       }) as Float32Array | Uint16Array | Uint8Array;
 
-      // Robust NoData
+      // --- Create a canvas the same size as the source raster ---
+      const canvas = document.createElement('canvas');
+      canvas.width = srcW;
+      canvas.height = srcH;
+      const ctx = canvas.getContext('2d')!;
+      ctx.imageSmoothingEnabled = false;
+      ctx.imageSmoothingQuality = 'low';
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = srcW * dpr;
+      canvas.height = srcH * dpr;
+      ctx.scale(dpr, dpr);
+
+
+      // --- Handle NoData ---
       const nodata = this.getNoDataValue(image);
       const isNoData = (v: number) =>
         (nodata !== undefined && v === nodata) ||
         !Number.isFinite(v) ||
         Math.abs(v) > 1e20;
 
-      // --- Compute min/max normally ---
-      let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
+      // --- Compute min/max ---
+      let min = Number.POSITIVE_INFINITY;
+      let max = Number.NEGATIVE_INFINITY;
       for (let i = 0; i < band.length; i++) {
         const v = Number(band[i]);
         if (isNoData(v)) continue;
         if (v < min) min = v;
         if (v > max) max = v;
       }
-      if (!Number.isFinite(min) || !Number.isFinite(max)) { min = 0; max = 1; }
+      if (!Number.isFinite(min) || !Number.isFinite(max)) {
+        min = 0; max = 1;
+      }
 
-      // --- Flag categorical only for SPI3 drought map ---
-      let isCategorical = false;
-      if (dataset === 'Drought') {
-        isCategorical = true;
+      // --- Override for categorical drought ---
+      if (isCategorical) {
         min = 0;
         max = 10;
       }
 
-      
+      // --- Define drought palette ---
       const droughtColors = [
-        "#730000",  // 0 D4 Exceptional Drought
-        "#FF0000",  // 1 D3 Extreme Drought
-        "#FF9900",  // 2 D2 Severe Drought
-        "#FFD37F",  // 3 D1 Moderate Drought
-        "#FFFF00",  // 4 D0 Abnormally Dry
-        "#FFFFFF",  // 5 Near Normal
-        "#99CCFF",  // 6 W0 Abnormally Wet
-        "#3399FF",  // 7 W1 Moderately Wet
-        "#0066CC",  // 8 W2 Very Wet
-        "#003366",  // 9 W3 Extremely Wet
-        "#001933",  // 10 W4 Exceptionally Wet
+        "#730000", "#FF0000", "#FF9900", "#FFD37F", "#FFFF00",
+        "#FFFFFF", "#99CCFF", "#3399FF", "#0066CC", "#003366", "#001933"
       ];
 
-      const droughtLabels = [
-        "D4 Exceptional Drought",
-        "D3 Extreme Drought",
-        "D2 Severe Drought",
-        "D1 Moderate Drought",
-        "D0 Abnormally Dry",
-        "Near Normal",
-        "W0 Abnormally Wet",
-        "W1 Moderately Wet",
-        "W2 Very Wet",
-        "W3 Extremely Wet",
-        "W4 Exceptionally Wet"
-      ];
-
+      // --- Color scale for continuous datasets ---
       if (dataset === 'Rainfall') {
-        // Viridis reversed (high = dark purple, low = yellow)
         this.colorScale = d3.scaleSequential(interpolateViridis).domain([max, min]);
       } else if (dataset === 'Temperature') {
-        // Regular Viridis (low = purple, high = yellow)
         this.colorScale = d3.scaleSequential(interpolateViridis).domain([min, max]);
       } else if (dataset === 'Drought') {
-        // Blue → White → Red, centered at 0
         const absMax = Math.max(Math.abs(min), Math.abs(max));
         this.colorScale = d3.scaleDiverging(interpolateRdBu).domain([-absMax, 0, absMax]);
       } else {
-        // Fallback
         this.colorScale = d3.scaleSequential(interpolateViridis).domain([min, max]);
       }
 
-      // Paint to canvas → Blob URL
-      const canvas = document.createElement('canvas');
-      canvas.width = targetW;
-      canvas.height = targetH;
-      const ctx = canvas.getContext('2d')!;
-      const imgData = ctx.createImageData(targetW, targetH);
-
+      // --- Draw image pixel by pixel ---
+      const imgData = ctx.createImageData(srcW, srcH);
       for (let i = 0; i < band.length; i++) {
         const v = Number(band[i]);
         const idx = i * 4;
         if (isNoData(v)) { imgData.data[idx + 3] = 0; continue; }
-        let r = 255, g = 255, b = 255, a = 220;
+
+        let r = 255, g = 255, b = 255, a = 255;
 
         if (isCategorical) {
           const cat = Math.round(v);
           if (!isNoData(v) && cat >= 0 && cat < droughtColors.length) {
             const c = d3.rgb(droughtColors[cat]);
-            r = c.r;
-            g = c.g;
-            b = c.b;
-
+            r = c.r; g = c.g; b = c.b;
           } else {
             a = 0;
           }
@@ -499,36 +477,30 @@ export class ClimateDashboardComponent implements OnDestroy {
         imgData.data[idx + 1] = g;
         imgData.data[idx + 2] = b;
         imgData.data[idx + 3] = a;
-
       }
       ctx.putImageData(imgData, 0, 0);
 
+      // --- Export image blob ---
       const blob: Blob = await new Promise(resolve => {
-        // Try webp; fall back to png if needed
-        canvas.toBlob(b => {
-          if (b) return resolve(b);
-          canvas.toBlob(b2 => resolve(b2 as Blob), 'image/png');
-        }, 'image/webp', 0.9);
+        canvas.toBlob(b => resolve(b || new Blob()), 'image/webp', 0.95);
       });
 
+      // --- Apply to app ---
       this.colorbarMin = min;
       this.colorbarMax = max;
-      this.colorbarMid = dataset === 'Drought' ? 0 : (min + max) / 2;
+      this.colorbarMid = isCategorical ? 0 : (min + max) / 2;
       this.drawColorbar(dataset);
 
-
-      // Cleanup previous URL if any
       if (this.objectUrl) URL.revokeObjectURL(this.objectUrl);
       this.objectUrl = URL.createObjectURL(blob);
       this.rasterHref.set(this.objectUrl);
       this.updateRasterRect();
+
     } catch (err) {
       console.error(`Failed to load raster for ${dataset}`, err);
     }
 
     this.drawColorbar(dataset);
-
-
   }
 
   private getNoDataValue(image: any): number | undefined {

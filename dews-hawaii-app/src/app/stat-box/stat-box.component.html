@@ -3,6 +3,7 @@
   <div class="stat-value">
     <span class="main-value">{{ value }}</span>
     <span *ngIf="percent" class="percent-value">{{ percent }}</span>
-    <span *ngIf="note" class="stat-note-inline">{{ note }}</span>
+    <span *ngIf="note" class="stat-note-inline" [innerHTML]="note"></span>
+
   </div>
 </div>
