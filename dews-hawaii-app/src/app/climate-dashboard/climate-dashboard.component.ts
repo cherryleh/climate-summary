@@ -401,10 +401,9 @@ export class ClimateDashboardComponent implements OnDestroy {
       const ctx = canvas.getContext('2d')!;
       ctx.imageSmoothingEnabled = false;
       ctx.imageSmoothingQuality = 'low';
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = srcW * dpr;
-      canvas.height = srcH * dpr;
-      ctx.scale(dpr, dpr);
+      canvas.width = srcW;
+      canvas.height = srcH;
+
 
 
       // --- Handle NoData ---
