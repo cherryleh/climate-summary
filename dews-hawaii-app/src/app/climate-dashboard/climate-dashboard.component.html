@@ -52,23 +52,57 @@
           Statewide saw exceptionally dry conditions in August (short term).
         </div>
 
-        <!-- Tiles -->
-        <div class="stats" *ngIf="selectedDataset() === 'Rainfall'">
-          <app-stat-box label="Value" value="2.0 in"></app-stat-box>
-          <app-stat-box label="Anomaly" value="-3.2 in" percent="-62%"></app-stat-box>
-          <app-stat-box label="Rank" value="Driest" note="out of 35 years" ></app-stat-box>
-          <app-stat-box label="Dry Area(%)" value="97%"></app-stat-box>
+        <!-- Rainfall -->
+        <div class="stats" *ngIf="selectedDataset() === 'Rainfall' && stats()">
+          <app-stat-box
+            label="Average"
+            [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' in'">
+          </app-stat-box>
+
+          <app-stat-box
+            label="Anomaly"
+            [value]="((stats()?.anomaly | number:'1.1-1') ?? '') + ' in'"
+            [percent]="((stats()?.pchange | number:'1.0-0') ?? '') + '%'">
+          </app-stat-box>
+
+          <app-stat-box
+            label="Rank"
+            [value]="((stats()?.rank | number:'1.0-0') ?? '') + ''"
+            note="out of 35 years">
+          </app-stat-box>
+
+          <app-stat-box
+            label="Dry Area (%)"
+            [value]="((stats()?.dry_pct | number:'1.0-0') ?? '') + '%'">
+          </app-stat-box>
         </div>
 
         <!-- Temperature -->
-        <div class="stats" *ngIf="selectedDataset() === 'Temperature'">
-          <app-stat-box label="Value" value="78 °F"></app-stat-box>
-          <app-stat-box label="Anomaly" value="+1.5 °F"></app-stat-box>
-          <app-stat-box label="Rank" value="7th" note="out of 35 years"></app-stat-box>
-          <app-stat-box label="Dry Area(%)" value="97%"></app-stat-box>
+        <div class="stats" *ngIf="selectedDataset() === 'Temperature' && stats()">
+          <app-stat-box
+            label="Mean"
+            [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' °F'">
+          </app-stat-box>
+
+          <app-stat-box
+            label="Anomaly"
+            [value]="((stats()?.anomaly | number:'1.1-1') ?? '') + ' °F'">
+          </app-stat-box>
+
+          <app-stat-box
+            label="Rank"
+            [value]="((stats()?.rank | number:'1.0-0') ?? '') + ''"
+            note="out of 35 years">
+          </app-stat-box>
+
+          <app-stat-box
+            label="Dry Area (%)"
+            [value]="((stats()?.dry_pct | number:'1.0-0') ?? '') + '%'">
+          </app-stat-box>
         </div>
 
-        <!-- Drought -->
+
+        <!-- Drought (static for now) -->
         <div class="stats stats-drought" *ngIf="selectedDataset() === 'Drought'">
           <app-stat-box value="67%" note="of area <strong>abnormally dry</strong> or worse"></app-stat-box>
           <app-stat-box value="50%" note="of area in <strong>moderate drought</strong> or worse"></app-stat-box>

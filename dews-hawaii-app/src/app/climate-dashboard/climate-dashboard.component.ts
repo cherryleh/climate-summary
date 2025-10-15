@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { geoIdentity, geoPath } from 'd3-geo';
-import type { FeatureCollection} from 'geojson';
+import type { FeatureCollection } from 'geojson';
 import * as d3 from 'd3';
 import { firstValueFrom } from 'rxjs';
 import { StatBoxComponent } from '../stat-box/stat-box.component';
@@ -95,7 +95,7 @@ function canonIsland(name: string): string {
   styleUrls: ['./climate-dashboard.component.css']
 })
 export class ClimateDashboardComponent implements OnDestroy {
-  constructor(private http: HttpClient, private ngZone: NgZone) {}
+  constructor(private http: HttpClient, private ngZone: NgZone) { }
 
   // ===== Map data/state =====
   islands = signal<Island[]>([]);
@@ -109,6 +109,7 @@ export class ClimateDashboardComponent implements OnDestroy {
   selectedDivision = signal<string | null>(null);
   viewMode = signal<'islands' | 'divisions'>('islands');
   selectedCounty = signal<string | null>(null);
+  stats = signal<{ mean?: number; anomaly?: number; pchange?: number; rank?: number; dry_pct?: number } | null>(null);
 
   getCountyForIsland = getCountyForIsland;
 
@@ -118,13 +119,14 @@ export class ClimateDashboardComponent implements OnDestroy {
   pickDataset(d: Dataset) {
     this.dataset.set(d);
     this.loadRasterOnce(d);
+    this.loadStats();
 
     if (d === 'Rainfall') {
       this.loadRainfallData();
     } else if (d === 'Temperature') {
       this.loadTemperatureData();
     } else if (d === 'Drought') {
-      this.loadAllSPIData();  
+      this.loadAllSPIData();
     }
   }
 
@@ -156,11 +158,15 @@ export class ClimateDashboardComponent implements OnDestroy {
   setScope(scope: Scope | null) {
     this.selectedScope.set(scope);
     if (this.selectedCounty()) {
-      this.pickCounty(getCountyForIsland(this.selectedCounty()!));
+      // Redraw boundaries but don't refresh stats unless a division is already selected
+      const county = this.selectedCounty()!;
+      const prevDivision = this.selectedDivision();
+      this.pickCounty(county);
+      if (prevDivision) this.loadStats();
     }
-
   }
-  
+
+
   selectedDivisionName = computed(() => {
     const sel = this.selectedDivision();
     if (!sel) return null;
@@ -197,8 +203,10 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   pickCounty(county: string) {
     this.selectedCounty.set(county);
-
     this.selectedDivision.set(null);
+    if (!this.selectedScope() || this.selectedDivision()) {
+      this.loadStats();
+    }
 
     const members = COUNTY_GROUPS[county] || [county];
     const groupCanon = new Set(members.map(canonIsland));
@@ -211,7 +219,7 @@ export class ClimateDashboardComponent implements OnDestroy {
         const fcCounty: FeatureCollection = {
           type: 'FeatureCollection',
           features: fc.features.filter((f: any) => {
-            const name = this.getProp(f.properties, ['isle','island','name']) || '';
+            const name = this.getProp(f.properties, ['isle', 'island', 'name']) || '';
             return groupCanon.has(canonIsland(name));
           })
         };
@@ -226,7 +234,7 @@ export class ClimateDashboardComponent implements OnDestroy {
         this.updateRasterRect();
 
         const features = fcCounty.features.map((f: any) => {
-          const name = this.getProp(f.properties, ['isle','island','name']) || county;
+          const name = this.getProp(f.properties, ['isle', 'island', 'name']) || county;
           const id = canonIsland(name);
           return { id, key: id, name, short: name, divisions: DIVISIONS[name] || [], feature: f } as Island;
         });
@@ -245,19 +253,19 @@ export class ClimateDashboardComponent implements OnDestroy {
       // --- Scoped polygons (division/moku/ahupuaʻa) ---
       this.viewMode.set('divisions');
       const file = scope === 'moku'
-      ? 'moku.geojson'
-      : scope === 'ahupuaa'
-        ? 'ahupuaa.geojson'
-        : scope === 'watershed'
-          ? 'watershed.geojson'
-          : 'hawaii_islands_divisions.geojson';
+        ? 'moku.geojson'
+        : scope === 'ahupuaa'
+          ? 'ahupuaa.geojson'
+          : scope === 'watershed'
+            ? 'watershed.geojson'
+            : 'hawaii_islands_divisions.geojson';
 
 
       this.http.get<any>(file).subscribe(fc => {
         const fcCounty: FeatureCollection = {
           type: 'FeatureCollection',
           features: fc.features.filter((f: any) => {
-            const featureIslandRaw = this.getProp(f.properties, ['mokupuni','island','isle','Island','ISLAND']);
+            const featureIslandRaw = this.getProp(f.properties, ['mokupuni', 'island', 'isle', 'Island', 'ISLAND']);
             return groupCanon.has(canonIsland(String(featureIslandRaw)));
           })
         };
@@ -274,19 +282,19 @@ export class ClimateDashboardComponent implements OnDestroy {
         const features = fcCounty.features.map((f: any) => {
           const p = f.properties || {};
           const name =
-          scope === 'ahupuaa'
-            ? (this.getProp(p, ['ahupuaa','Ahupuaʻa','Ahupuaa','AHUPUAA','AHUPUAA_N']) || 'Ahupuaʻa')
-            : scope === 'moku'
-              ? (this.getProp(p, ['moku','Moku','MOKU']) || 'Moku')
-              : scope === 'watershed'
-                ? (this.getProp(p, ['watershed','Watershed','WATERSHED','name']) || 'Watershed')
-                : (this.getProp(p, ['division','Division','name','NAME']) || 'Division');
+            scope === 'ahupuaa'
+              ? (this.getProp(p, ['ahupuaa', 'Ahupuaʻa', 'Ahupuaa', 'AHUPUAA', 'AHUPUAA_N']) || 'Ahupuaʻa')
+              : scope === 'moku'
+                ? (this.getProp(p, ['moku', 'Moku', 'MOKU']) || 'Moku')
+                : scope === 'watershed'
+                  ? (this.getProp(p, ['watershed', 'Watershed', 'WATERSHED', 'name']) || 'Watershed')
+                  : (this.getProp(p, ['division', 'Division', 'name', 'NAME']) || 'Division');
 
 
-          const islandRaw = this.getProp(p, ['mokupuni','island','isle','Island','ISLAND']) || county;
+          const islandRaw = this.getProp(p, ['mokupuni', 'island', 'isle', 'Island', 'ISLAND']) || county;
           const islandCanon = canonIsland(String(islandRaw));
           const key = `${islandCanon}::${name}`;
-          const id  = `${islandCanon}-${name}`.toLowerCase().replace(/\s+/g, '-');
+          const id = `${islandCanon}-${name}`.toLowerCase().replace(/\s+/g, '-');
 
           return { id, key, name, short: name, island: islandCanon, divisions: [], feature: f } as Island;
         });
@@ -367,6 +375,87 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
   private colorScale: d3.ScaleSequential<string> | d3.ScaleDiverging<string> | null = null;
+
+  private async loadStats(divisionArg?: string | null){
+    const dataset = this.selectedDataset();
+    const county = this.selectedCounty();
+    const division = divisionArg || this.selectedDivision();
+    const scope = this.selectedScope();
+
+    // --- Determine which CSV file to load ---
+    let prefix = 'statewide'; // default fallback
+
+    if (scope === 'ahupuaa') prefix = 'ahupuaa';
+    else if (scope === 'moku') prefix = 'moku';
+    else if (scope === 'watershed') prefix = 'watershed';
+    else if (scope === 'divisions') prefix = 'climate';   // climate divisions
+    else if (this.selectedCounty()) prefix = 'county';    // county level
+
+    const suffix = dataset.toLowerCase(); // rainfall | temperature
+    const file = `${prefix}_${suffix}_stats.csv`;
+
+    console.log(`Fetching stats CSV: ${file}`);
+
+    if (!file) return;
+
+    const csv = await firstValueFrom(this.http.get(`/${file}`, { responseType: 'text' }));
+
+    const rows = d3.csvParse(csv);
+    console.log('CSV headers:', rows.columns);
+
+    // --- Determine which record to show ---
+    let record: any = null;
+
+    const normalize = (str: string) =>
+      (str || '')
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .replace(/['’ʻ`]/g, '')
+        .toLowerCase()
+        .trim();
+
+    if (division) {
+      // === Division / Moku / Ahupuaʻa ===
+      const [divIslandRaw, divNameRaw] = division.split('::').map(normalize);
+
+      record = rows.find(r => {
+        const full = r['division_full'] || r['Division'] || r['name'] || '';
+        const [csvIslandRaw, csvNameRaw] = full.split('::').map(normalize);
+        return csvIslandRaw === divIslandRaw && csvNameRaw === divNameRaw;
+      });
+    }
+
+    if (!record && county) {
+      record = rows.find(r => {
+        const full = r['division_full'] || r['Division'] || '';
+        const [csvIsland, csvCounty] = full.split('::').map(normalize);
+        const cty = normalize(county);
+
+        // Match either island or county name equal to the selected county
+        return csvIsland === cty || csvCounty === cty;
+      });
+    }
+
+    if (!record) {
+      // === Statewide ===
+      record = rows.find(r => normalize(r['division_full'] || '') === 'statewide');
+    }
+
+    console.log('Resolved level:', division ? 'division' : county ? 'county' : 'statewide');
+    console.log('Matched record:', record);
+
+    if (record) {
+      this.stats.set({
+        mean: +record.mean,
+        anomaly: +record.anomaly,
+        pchange: +record.pchange,
+        rank: +record.rank,
+        dry_pct: +record.dry_pct || +record.pct_drought,
+      });
+    }
+
+
+  }
 
 
   private async loadRasterOnce(dataset: Dataset) {
@@ -565,6 +654,8 @@ export class ClimateDashboardComponent implements OnDestroy {
     } else if (d === 'Drought') {
       this.loadAllSPIData();
     }
+
+    this.loadStats();
   }
 
   // ===== Chart time-range filter =====
@@ -899,7 +990,10 @@ export class ClimateDashboardComponent implements OnDestroy {
     Promise.all(requests).then(results => this.spiSeries.set(results));
   }
 
-  pickDivision(d: string | null) {
+    pickDivision(d: string | null) {
+    this.selectedDivision.set(d);
+    this.loadStats(d);
+
     if (!d) {
       // If no division was chosen, fallback to county/statewide
       const county = this.selectedCounty();
@@ -919,7 +1013,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
     this.selectedDivision.set(d);
-    const divKey = d.trim().toLowerCase(); 
+    const divKey = d.trim().toLowerCase();
     const scope = this.selectedScope();
     const dataset = this.selectedDataset();
 
@@ -959,7 +1053,6 @@ export class ClimateDashboardComponent implements OnDestroy {
         .map(r => ({ month: r.month, value: r.value }));
 
       this.tsData.set(filtered);
-      console.log('Filtered records set to tsData:', this.tsData());
 
 
     });
@@ -969,7 +1062,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.selectedCounty.set(null);
     this.selectedDivision.set(null);
     this.viewMode.set('islands');
-
+    this.loadStats();
     // reload map outlines
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
       const projection = geoIdentity().reflectY(true).fitExtent([[-130, 10], [560, 310]], fc);
@@ -997,10 +1090,18 @@ export class ClimateDashboardComponent implements OnDestroy {
 
     const dataset = this.selectedDataset();
 
-    // reload data normally
-    if (dataset === 'Drought') this.loadAllSPIData();
-    else if (dataset === 'Rainfall') this.loadRainfallData();
-    else if (dataset === 'Temperature') this.loadTemperatureData();
+    // Reload data normally
+    if (dataset === 'Drought') {
+      this.loadAllSPIData();
+    } else if (dataset === 'Rainfall') {
+      this.loadRainfallData();
+    } else if (dataset === 'Temperature') {
+      this.loadTemperatureData();
+    }
+
+    // --- Force statewide stats reload ---
+    setTimeout(() => this.loadStats(null), 0);
+
 
     // === smooth transition ===
     // small helper to animate once data is ready
@@ -1033,6 +1134,15 @@ export class ClimateDashboardComponent implements OnDestroy {
         if (applyStatewide()) clearInterval(check);
       }, 100);
     }
+    // --- Force statewide stats reload explicitly ---
+    setTimeout(() => {
+      this.selectedScope.set(null);
+      this.selectedCounty.set(null);
+      this.selectedDivision.set(null);
+      console.log('Reset: fetching statewide stats');
+      this.loadStats(null);
+    }, 50);
+
   }
 
 
