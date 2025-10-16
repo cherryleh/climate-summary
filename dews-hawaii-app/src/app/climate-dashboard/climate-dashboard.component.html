@@ -67,8 +67,8 @@
 
           <app-stat-box
             label="Rank"
-            [value]="((stats()?.rank | number:'1.0-0') ?? '') + ''"
-            note="out of 35 years">
+            [value]="formatRank(stats()?.rank)"
+            note="Driest out of 35 years">
           </app-stat-box>
 
           <app-stat-box
@@ -91,8 +91,8 @@
 
           <app-stat-box
             label="Rank"
-            [value]="((stats()?.rank | number:'1.0-0') ?? '') + ''"
-            note="out of 35 years">
+            [value]="formatRank(stats()?.rank)"
+            note="Warmest out of 35 years">
           </app-stat-box>
 
           <app-stat-box

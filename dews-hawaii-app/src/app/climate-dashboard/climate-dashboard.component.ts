@@ -1145,6 +1145,15 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   }
 
+  formatRank(rank: number | undefined): string {
+    if (rank == null || isNaN(rank)) return '';
+    const j = rank % 10, k = rank % 100;
+    let suffix = 'th';
+    if (j === 1 && k !== 11) suffix = 'st';
+    else if (j === 2 && k !== 12) suffix = 'nd';
+    else if (j === 3 && k !== 13) suffix = 'rd';
+    return `${rank}${suffix}`;
+  }
 
 
 }
