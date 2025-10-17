@@ -70,6 +70,17 @@ def fetch_tifs(dataset, start_year=1991, end_year=datetime.now().year, month=8):
         else:
             print(f"{res.status_code} for {url}")
 
+def convert_units(value, dataset):
+    """Convert rainfall mm→inches and temperature °C→°F."""
+    if value is None or np.isnan(value):
+        return np.nan
+    if dataset == "rainfall":
+        return value / 25.4  # mm → inches
+    elif dataset == "temperature":
+        return (value * 9/5) + 32  # °C → °F
+    return value
+
+
 def get_stats(division, dataset="rainfall"):
     """Compute rainfall or temperature statistics for a division shapefile."""
     shapefile = f"../public/shapefiles/{division}.shp"
@@ -109,10 +120,10 @@ def get_stats(division, dataset="rainfall"):
 
     climo_stats = zonal_stats(vectors=gdf, raster=climo_file, stats=["mean"], nodata=None)
     gdf["climo_mean"] = [
-        (c["mean"] / 25.4) if (dataset == "rainfall" and c["mean"] is not None) else
-        (c["mean"] if c["mean"] is not None else np.nan)
+        convert_units(c["mean"], dataset) if c["mean"] is not None else np.nan
         for c in climo_stats
     ]
+
 
     all_records = []
     for tif in sorted(glob.glob(os.path.join(raster_folder, f"{dataset}_*_08.tif"))):
@@ -129,8 +140,8 @@ def get_stats(division, dataset="rainfall"):
             if mean_raw is None or np.isnan(mean_raw):
                 mean_val, anomaly, pchange = np.nan, np.nan, np.nan
             else:
-                mean_val = mean_raw / 25.4 if dataset == "rainfall" else mean_raw
-                climo_mean = row["climo_mean"]
+                mean_val = convert_units(mean_raw, dataset)
+                climo_mean = convert_units(row["climo_mean"], dataset)
                 if np.isnan(climo_mean):
                     anomaly, pchange = np.nan, np.nan
                 else:
@@ -179,10 +190,72 @@ def get_stats(division, dataset="rainfall"):
     latest_df.to_csv(out_csv, index=False)
     print(f"Saved {out_csv}")
 
+def get_statewide_stats(dataset="rainfall"):
+    """Compute statewide mean, anomaly, percent change, and drought percentage."""
+    raster_folder = f"{RASTER_DIR}/"
+    climo_file = DATASETS[dataset]["climo_url"]
+    tif_path = "/Users/cherryleheu/Documents/HCDP/Data/monthly/SPI_historical/SPI_historical_new/spi1_2025_08.tif"
 
-# ---------------------------------------------------------------------
-# CLI entry point
-# ---------------------------------------------------------------------
+    print(f"\n--- Processing statewide ({dataset}) ---")
+
+    # --- Load climatology ---
+    with rasterio.open(climo_file) as src:
+        clim = src.read(1).astype(float)
+        clim = np.where(src.nodata == src.read(1), np.nan, clim)
+        climo_mean = convert_units(np.nanmean(clim), dataset)
+
+    # --- Loop through all historical rasters to get mean and anomaly ---
+    all_records = []
+    for tif in sorted(glob.glob(os.path.join(raster_folder, f"{dataset}_*_08.tif"))):
+        parts = os.path.basename(tif).replace(".tif", "").split("_")
+        year, month = parts[1], parts[2]
+        date = f"{year}-{month}"
+
+        with rasterio.open(tif) as src:
+            arr = src.read(1).astype(float)
+            arr = np.where(arr == src.nodata, np.nan, arr)
+            mean_val = convert_units(np.nanmean(arr), dataset)
+
+        anomaly = mean_val - climo_mean
+        pchange = ((mean_val - climo_mean) / climo_mean) * 100 if dataset == "rainfall" else anomaly
+
+        all_records.append({
+            "date": date,
+            "year": int(year),
+            "mean": mean_val,
+            "anomaly": anomaly,
+            "pchange": pchange,
+        })
+
+    df = pd.DataFrame(all_records)
+
+    # --- Rank logic (dry for rainfall, warm for temperature) ---
+    ascending = True if dataset == "rainfall" else False
+    df["rank"] = df["anomaly"].rank(method="min", ascending=ascending)
+
+    # --- Extract 2025-08 record ---
+    latest = df[df["date"] == "2025-08"].copy()
+    if latest.empty:
+        print("No data found for 2025-08")
+        return
+
+    # --- Compute drought percentage ---
+    if os.path.exists(tif_path):
+        with rasterio.open(tif_path) as src:
+            spi = src.read(1).astype(float)
+            spi = np.where(spi == src.nodata, np.nan, spi)
+            dry_pct = (np.sum(spi < -0.5) / np.isfinite(spi).sum()) * 100
+    else:
+        dry_pct = np.nan
+
+    latest["division_full"] = "Statewide"
+    latest["dry_pct"] = dry_pct
+
+    out_csv = f"../public/statewide_{dataset}_stats.csv"
+    latest.to_csv(out_csv, index=False)
+    print(f"Saved {out_csv}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compute rainfall and temperature stats for all divisions")
     parser.add_argument("--fetch", action="store_true", help="Download GeoTIFFs before computing stats")
@@ -194,7 +267,11 @@ if __name__ == "__main__":
     if args.fetch:
         for dataset in datasets:
             fetch_tifs(dataset, start_year=1991, end_year=2025, month=8)
-
+    for dataset in datasets:
+        try:
+            get_statewide_stats(dataset)
+        except Exception as e:
+            print(f"Error processing statewide ({dataset}): {e}")
     for division in divisions:
         for dataset in datasets:
             try:

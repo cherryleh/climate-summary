@@ -1155,5 +1155,18 @@ export class ClimateDashboardComponent implements OnDestroy {
     return `${rank}${suffix}`;
   }
 
+  formatAnomaly(value?: number | null, dataset?: 'Rainfall' | 'Temperature' | 'Drought'): string {
+    if (value == null || isNaN(value)) return '';
+    const sign = value > 0 ? '+' : '';
+    const unit =
+      dataset === 'Rainfall'
+        ? 'in'
+        : dataset === 'Temperature'
+        ? '°F'
+        : ''; // no units for drought
+    return `${sign}${value.toFixed(1)} ${unit}`.trim();
+  }
+
+
 
 }

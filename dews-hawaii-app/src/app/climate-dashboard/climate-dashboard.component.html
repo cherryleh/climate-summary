@@ -58,10 +58,9 @@
             label="Average"
             [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' in'">
           </app-stat-box>
-
           <app-stat-box
             label="Anomaly"
-            [value]="((stats()?.anomaly | number:'1.1-1') ?? '') + ' in'"
+            [value]="formatAnomaly(stats()?.anomaly, selectedDataset())"
             [percent]="((stats()?.pchange | number:'1.0-0') ?? '') + '%'">
           </app-stat-box>
 
@@ -83,12 +82,10 @@
             label="Mean"
             [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' °F'">
           </app-stat-box>
-
           <app-stat-box
             label="Anomaly"
-            [value]="((stats()?.anomaly | number:'1.1-1') ?? '') + ' °F'">
+            [value]="formatAnomaly(stats()?.anomaly)">
           </app-stat-box>
-
           <app-stat-box
             label="Rank"
             [value]="formatRank(stats()?.rank)"
