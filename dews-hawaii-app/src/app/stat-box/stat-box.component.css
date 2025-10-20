@@ -47,11 +47,22 @@
   top: -2px;
 }
 
-/* --- Inline note (Rainfall, Temperature) --- */
+
+:host ::ng-deep .main-value sup {
+  font-size: 0.6em;        /* use 0.6em — 0.2em is usually too tiny to see */
+  vertical-align: super;
+  line-height: 0;
+  opacity: 0.8;            /* optional: softens the tone */
+}
+
+
+/* Allow wrapping by default */
 .stat-note-inline {
   font-size: 14px;
   font-weight: 400;
   color: var(--sub);
+  white-space: normal;       /* allow wrapping for most stats */
+  line-height: 1.2;
 }
 
 .stat.drought .stat-value {
@@ -62,12 +73,4 @@
 
 .stat.drought .main-value {
   font-size: 26px;
-  font-weight: 700;
-}
-
-.stat.drought .stat-note-inline {
-  font-size: 13px;
-  text-align: center;
-  line-height: 1.2;
-}
-
+  font-weight: 700;}
