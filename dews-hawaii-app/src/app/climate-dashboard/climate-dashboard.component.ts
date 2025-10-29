@@ -462,7 +462,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     try {
       // --- Select file ---
       let file = '';
-      if (dataset === 'Rainfall') file = 'tifs/rainfall_2025_08.tif';
+      if (dataset === 'Rainfall') file = 'tifs/rf_pdiff_cat_08.tif';
       else if (dataset === 'Temperature') file = 'tifs/tmean_2025_08.tif';
       else if (dataset === 'Drought') file = 'tifs/spi3_2025_08_category.tif';
 
@@ -475,7 +475,8 @@ export class ClimateDashboardComponent implements OnDestroy {
       const srcW = image.getWidth();
       const srcH = image.getHeight();
 
-      const isCategorical = dataset === 'Drought';
+      const isCategorical = dataset === 'Drought' || dataset === 'Rainfall';
+
 
       const band = await image.readRasters({
         samples: [0],
@@ -516,19 +517,31 @@ export class ClimateDashboardComponent implements OnDestroy {
         min = 0; max = 1;
       }
 
-      // --- Override for categorical drought ---
-      if (isCategorical) {
+      if (dataset === 'Drought') {
         min = 0;
         max = 10;
+      } else if (dataset === 'Rainfall') {
+        min = 0;
+        max = 6; 
       }
 
-      // --- Define drought palette ---
       const droughtColors = [
         "#730000", "#FF0000", "#FF9900", "#FFD37F", "#FFFF00",
         "#FFFFFF", "#99CCFF", "#3399FF", "#0066CC", "#003366", "#001933"
       ];
 
-      // --- Color scale for continuous datasets ---
+      const rainfallColors = [
+        "#730000", 
+        "#FF0000", 
+        "#FF6600", 
+        "#FFCC66", 
+        "#FFFFFF", 
+        "#CCE5FF", 
+        "#99CCFF", 
+        "#0066CC", 
+        "#001933"  
+      ];
+
       if (dataset === 'Rainfall') {
         this.colorScale = d3.scaleSequential(interpolateViridis).domain([max, min]);
       } else if (dataset === 'Temperature') {
@@ -551,16 +564,15 @@ export class ClimateDashboardComponent implements OnDestroy {
 
         if (isCategorical) {
           const cat = Math.round(v);
-          if (!isNoData(v) && cat >= 0 && cat < droughtColors.length) {
-            const c = d3.rgb(droughtColors[cat]);
+          const palette = dataset === 'Rainfall' ? rainfallColors : droughtColors;
+          if (!isNoData(v) && cat >= 0 && cat < palette.length) {
+            const c = d3.rgb(palette[cat]);
             r = c.r; g = c.g; b = c.b;
           } else {
             a = 0;
           }
-        } else {
-          const c = d3.rgb(this.colorScale(v));
-          r = c.r; g = c.g; b = c.b;
         }
+
 
         imgData.data[idx + 0] = r;
         imgData.data[idx + 1] = g;
@@ -590,6 +602,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
     this.drawColorbar(dataset);
+    
   }
 
   private getNoDataValue(image: any): number | undefined {
@@ -742,6 +755,64 @@ export class ClimateDashboardComponent implements OnDestroy {
 
         return;
       }
+
+      if (dataset === 'Rainfall') {
+        if (canvas) canvas.style.display = 'none';
+        if (!legendDiv) return;
+
+        legendDiv.innerHTML = '';
+        const rainfallColors = [
+          "#730000", 
+          "#FF0000", 
+          "#FF6600", 
+          "#FFCC66", 
+          "#FFFFFF", 
+          "#CCE5FF", 
+          "#99CCFF", 
+          "#0066CC", 
+          "#001933"  
+        ];
+
+        const rainfallLabels = [
+          "< -70%",
+          "-70% to -50%",
+          "-50% to -30%",
+          "-30% to -10%",
+          "-10% to +10%",
+          "+10% to +30%",
+          "+30% to +50%",
+          "+50% to +70%",
+          "> +70%"
+        ];
+
+        rainfallColors.forEach((color, i) => {
+          const item = document.createElement('div');
+          item.style.display = 'flex';
+          item.style.alignItems = 'center';
+          item.style.gap = '6px';
+          item.style.marginBottom = '4px';
+
+          const swatch = document.createElement('span');
+          swatch.style.display = 'inline-block';
+          swatch.style.width = '18px';
+          swatch.style.height = '18px';
+          swatch.style.border = '1px solid #ccc';
+          swatch.style.backgroundColor = color;
+          swatch.style.flexShrink = '0';
+
+          const label = document.createElement('span');
+          label.textContent = rainfallLabels[i];
+          label.style.fontSize = '0.85rem';
+          label.style.color = '#333';
+
+          item.appendChild(swatch);
+          item.appendChild(label);
+          legendDiv.appendChild(item);
+        });
+
+        return; // ← THIS is crucial
+      }
+
 
       // === Default continuous gradient for rainfall/temperature ===
       if (!canvas || !this.colorScale) return;
