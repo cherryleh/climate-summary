@@ -398,7 +398,7 @@ export class ClimateDashboardComponent implements OnDestroy {
 
     if (!file) return;
 
-    const csv = await firstValueFrom(this.http.get(`/${file}`, { responseType: 'text' }));
+    const csv = await firstValueFrom(this.http.get(`${file}`, { responseType: 'text' }));
 
     const rows = d3.csvParse(csv);
     console.log('CSV headers:', rows.columns);
