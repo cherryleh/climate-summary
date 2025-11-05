@@ -12,7 +12,6 @@ import { FooterComponent } from '../footer/footer.component';
 
 import * as GeoTIFF from 'geotiff';
 import { Pool } from 'geotiff';
-import { interpolateViridis, interpolateRdBu } from 'd3-scale-chromatic';
 import { NgZone } from '@angular/core';
 import { MapPanelComponent } from '../map-panel/map-panel.component';
 
@@ -138,12 +137,6 @@ export class ClimateDashboardComponent implements OnDestroy {
       .toLowerCase()
       .trim();
   }
-
-
-  colorbarMin = 0;
-  colorbarMax = 1;
-  colorbarMid: number | null = null;
-
 
   allDivisions: any;
   statewideSPI: any[] = [];
@@ -374,7 +367,6 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.rasterRect.set({ x, y, width, height });
   }
 
-  private colorScale: d3.ScaleSequential<string> | d3.ScaleDiverging<string> | null = null;
 
   private async loadStats(divisionArg?: string | null){
     const dataset = this.selectedDataset();
@@ -463,7 +455,7 @@ export class ClimateDashboardComponent implements OnDestroy {
       // --- Select file ---
       let file = '';
       if (dataset === 'Rainfall') file = 'tifs/rf_pdiff_cat_08.tif';
-      else if (dataset === 'Temperature') file = 'tifs/tmean_2025_08.tif';
+      else if (dataset === 'Temperature') file = 'tifs/tmean_diff_cat_08.tif';
       else if (dataset === 'Drought') file = 'tifs/spi3_2025_08_category.tif';
 
       // --- Open the GeoTIFF ---
@@ -474,9 +466,6 @@ export class ClimateDashboardComponent implements OnDestroy {
       // --- Use full resolution (no resampling) ---
       const srcW = image.getWidth();
       const srcH = image.getHeight();
-
-      const isCategorical = dataset === 'Drought' || dataset === 'Rainfall';
-
 
       const band = await image.readRasters({
         samples: [0],
@@ -504,26 +493,6 @@ export class ClimateDashboardComponent implements OnDestroy {
         !Number.isFinite(v) ||
         Math.abs(v) > 1e20;
 
-      // --- Compute min/max ---
-      let min = Number.POSITIVE_INFINITY;
-      let max = Number.NEGATIVE_INFINITY;
-      for (let i = 0; i < band.length; i++) {
-        const v = Number(band[i]);
-        if (isNoData(v)) continue;
-        if (v < min) min = v;
-        if (v > max) max = v;
-      }
-      if (!Number.isFinite(min) || !Number.isFinite(max)) {
-        min = 0; max = 1;
-      }
-
-      if (dataset === 'Drought') {
-        min = 0;
-        max = 10;
-      } else if (dataset === 'Rainfall') {
-        min = 0;
-        max = 6; 
-      }
 
       const droughtColors = [
         "#730000", "#FF0000", "#FF9900", "#FFD37F", "#FFFF00",
@@ -542,16 +511,6 @@ export class ClimateDashboardComponent implements OnDestroy {
         "#001933"  
       ];
 
-      if (dataset === 'Rainfall') {
-        this.colorScale = d3.scaleSequential(interpolateViridis).domain([max, min]);
-      } else if (dataset === 'Temperature') {
-        this.colorScale = d3.scaleSequential(interpolateViridis).domain([min, max]);
-      } else if (dataset === 'Drought') {
-        const absMax = Math.max(Math.abs(min), Math.abs(max));
-        this.colorScale = d3.scaleDiverging(interpolateRdBu).domain([-absMax, 0, absMax]);
-      } else {
-        this.colorScale = d3.scaleSequential(interpolateViridis).domain([min, max]);
-      }
 
       // --- Draw image pixel by pixel ---
       const imgData = ctx.createImageData(srcW, srcH);
@@ -562,15 +521,29 @@ export class ClimateDashboardComponent implements OnDestroy {
 
         let r = 255, g = 255, b = 255, a = 255;
 
-        if (isCategorical) {
-          const cat = Math.round(v);
-          const palette = dataset === 'Rainfall' ? rainfallColors : droughtColors;
-          if (!isNoData(v) && cat >= 0 && cat < palette.length) {
-            const c = d3.rgb(palette[cat]);
-            r = c.r; g = c.g; b = c.b;
-          } else {
-            a = 0;
-          }
+        const palettes: Record<Dataset, string[]> = {
+          Drought: [
+            "#730000", "#FF0000", "#FF9900", "#FFD37F", "#FFFF00",
+            "#FFFFFF", "#99CCFF", "#3399FF", "#0066CC", "#003366", "#001933"
+          ],
+          Rainfall: [
+            "#730000", "#FF0000", "#FF6600", "#FFCC66", "#FFFFFF",
+            "#CCE5FF", "#99CCFF", "#0066CC", "#001933"
+          ],
+          Temperature: [
+            "#001933", "#0066CC", "#99CCFF", "#FFFFFF",
+            "#FF9900", "#FF0000", "#730000"
+          ]
+        };
+
+        const palette = palettes[dataset];
+        const cat = Math.round(v);
+
+        if (!isNoData(v) && cat >= 0 && cat < palette.length) {
+          const c = d3.rgb(palette[cat]);
+          r = c.r; g = c.g; b = c.b;
+        } else {
+          a = 0;
         }
 
 
@@ -586,10 +559,6 @@ export class ClimateDashboardComponent implements OnDestroy {
         canvas.toBlob(b => resolve(b || new Blob()), 'image/webp', 0.95);
       });
 
-      // --- Apply to app ---
-      this.colorbarMin = min;
-      this.colorbarMax = max;
-      this.colorbarMid = isCategorical ? 0 : (min + max) / 2;
       this.drawColorbar(dataset);
 
       if (this.objectUrl) URL.revokeObjectURL(this.objectUrl);
@@ -691,158 +660,90 @@ export class ClimateDashboardComponent implements OnDestroy {
     requestAnimationFrame(() => {
       const canvas = document.getElementById('colorbarCanvas') as HTMLCanvasElement | null;
       const legendDiv = document.getElementById('colorbarLegend') as HTMLDivElement | null;
+      if (!legendDiv) return;
 
-      // If categorical (Drought)
+      // --- Drought ---
       if (dataset === 'Drought') {
-        if (canvas) canvas.style.display = 'none'; // hide gradient
-        if (!legendDiv) return;
-
-        // Clear existing legend
+        if (canvas) canvas.style.display = 'none';
         legendDiv.innerHTML = '';
-
         const droughtColors = [
-          "#730000",  // 0 D4 Exceptional Drought
-          "#FF0000",  // 1 D3 Extreme Drought
-          "#FF9900",  // 2 D2 Severe Drought
-          "#FFD37F",  // 3 D1 Moderate Drought
-          "#FFFF00",  // 4 D0 Abnormally Dry
-          "#FFFFFF",  // 5 Near Normal
-          "#99CCFF",  // 6 W0 Abnormally Wet
-          "#3399FF",  // 7 W1 Moderately Wet
-          "#0066CC",  // 8 W2 Very Wet
-          "#003366",  // 9 W3 Extremely Wet
-          "#001933",  // 10 W4 Exceptionally Wet
+          "#730000", "#FF0000", "#FF9900", "#FFD37F", "#FFFF00",
+          "#FFFFFF", "#99CCFF", "#3399FF", "#0066CC", "#003366", "#001933"
         ];
-
         const droughtLabels = [
-          "D4 Exceptional Drought",
-          "D3 Extreme Drought",
-          "D2 Severe Drought",
-          "D1 Moderate Drought",
-          "D0 Abnormally Dry",
-          "Near Normal",
-          "W0 Abnormally Wet",
-          "W1 Moderately Wet",
-          "W2 Very Wet",
-          "W3 Extremely Wet",
-          "W4 Exceptionally Wet"
+          "D4 Exceptional Drought", "D3 Extreme Drought", "D2 Severe Drought",
+          "D1 Moderate Drought", "D0 Abnormally Dry", "Near Normal",
+          "W0 Abnormally Wet", "W1 Moderately Wet", "W2 Very Wet",
+          "W3 Extremely Wet", "W4 Exceptionally Wet"
         ];
-
-        droughtColors.forEach((color, i) => {
-          const item = document.createElement('div');
-          item.style.display = 'flex';
-          item.style.alignItems = 'center';
-          item.style.gap = '6px';
-          item.style.marginBottom = '4px';
-
-          const swatch = document.createElement('span');
-          swatch.style.display = 'inline-block';
-          swatch.style.width = '18px';
-          swatch.style.height = '18px';
-          swatch.style.border = '1px solid #ccc';
-          swatch.style.backgroundColor = color;
-          swatch.style.flexShrink = '0';
-
-          const label = document.createElement('span');
-          label.textContent = droughtLabels[i];
-          label.style.fontSize = '0.85rem';
-          label.style.color = '#333';
-
-          item.appendChild(swatch);
-          item.appendChild(label);
-          legendDiv.appendChild(item);
-        });
-
+        this.buildLegend(legendDiv, droughtColors, droughtLabels);
         return;
       }
 
+      // --- Rainfall ---
       if (dataset === 'Rainfall') {
         if (canvas) canvas.style.display = 'none';
-        if (!legendDiv) return;
-
         legendDiv.innerHTML = '';
         const rainfallColors = [
-          "#730000", 
-          "#FF0000", 
-          "#FF6600", 
-          "#FFCC66", 
-          "#FFFFFF", 
-          "#CCE5FF", 
-          "#99CCFF", 
-          "#0066CC", 
-          "#001933"  
+          "#730000", "#FF0000", "#FF6600", "#FFCC66", "#FFFFFF",
+          "#CCE5FF", "#99CCFF", "#0066CC", "#001933"
         ];
-
         const rainfallLabels = [
-          "< -70%",
-          "-70% to -50%",
-          "-50% to -30%",
-          "-30% to -10%",
-          "-10% to +10%",
-          "+10% to +30%",
-          "+30% to +50%",
-          "+50% to +70%",
-          "> +70%"
+          "< -70%", "-70% to -50%", "-50% to -30%", "-30% to -10%",
+          "-10% to +10%", "+10% to +30%", "+30% to +50%", "+50% to +70%", "> +70%"
         ];
-
-        rainfallColors.forEach((color, i) => {
-          const item = document.createElement('div');
-          item.style.display = 'flex';
-          item.style.alignItems = 'center';
-          item.style.gap = '6px';
-          item.style.marginBottom = '4px';
-
-          const swatch = document.createElement('span');
-          swatch.style.display = 'inline-block';
-          swatch.style.width = '18px';
-          swatch.style.height = '18px';
-          swatch.style.border = '1px solid #ccc';
-          swatch.style.backgroundColor = color;
-          swatch.style.flexShrink = '0';
-
-          const label = document.createElement('span');
-          label.textContent = rainfallLabels[i];
-          label.style.fontSize = '0.85rem';
-          label.style.color = '#333';
-
-          item.appendChild(swatch);
-          item.appendChild(label);
-          legendDiv.appendChild(item);
-        });
-
-        return; // ← THIS is crucial
+        this.buildLegend(legendDiv, rainfallColors, rainfallLabels);
+        return;
       }
 
-
-      // === Default continuous gradient for rainfall/temperature ===
-      if (!canvas || !this.colorScale) return;
-      canvas.style.display = 'block';
-      if (legendDiv) legendDiv.innerHTML = '';
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const w = canvas.width;
-      const h = canvas.height;
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      const steps = 50;
-      for (let i = 0; i <= steps; i++) {
-        const t = i / steps;
-        const reversed =
-          this.selectedDataset() === 'Rainfall' ||
-          this.selectedDataset() === 'Temperature';
-
-        const val = reversed
-          ? this.colorbarMax - t * (this.colorbarMax - this.colorbarMin)
-          : this.colorbarMin + t * (this.colorbarMax - this.colorbarMin);
-
-        grad.addColorStop(t, this.colorScale(val));
+      // --- Temperature ---
+      if (dataset === 'Temperature') {
+        if (canvas) canvas.style.display = 'none';
+        legendDiv.innerHTML = '';
+        const tempColors = [
+          "#001933", "#0066CC", "#99CCFF", "#FFFFFF",
+          "#FF9900", "#FF0000", "#730000"
+        ];
+        const tempLabels = [
+          "< -1", "-1 to -0.6", "-0.6 to -0.2",
+          "-0.2 to 0.2", "0.2 to 0.6", "0.6 to 1", "> 1"
+        ];
+        this.buildLegend(legendDiv, tempColors, tempLabels);
+        return;
       }
 
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
     });
   }
+
+  // Helper to draw categorical legends consistently
+  private buildLegend(container: HTMLDivElement, colors: string[], labels: string[]) {
+    container.innerHTML = '';
+    colors.forEach((color, i) => {
+      const item = document.createElement('div');
+      item.style.display = 'flex';
+      item.style.alignItems = 'center';
+      item.style.gap = '6px';
+      item.style.marginBottom = '4px';
+
+      const swatch = document.createElement('span');
+      swatch.style.display = 'inline-block';
+      swatch.style.width = '18px';
+      swatch.style.height = '18px';
+      swatch.style.border = '1px solid #ccc';
+      swatch.style.backgroundColor = color;
+      swatch.style.flexShrink = '0';
+
+      const label = document.createElement('span');
+      label.textContent = labels[i];
+      label.style.fontSize = '0.85rem';
+      label.style.color = '#333';
+
+      item.appendChild(swatch);
+      item.appendChild(label);
+      container.appendChild(item);
+    });
+  }
+
 
 
 
