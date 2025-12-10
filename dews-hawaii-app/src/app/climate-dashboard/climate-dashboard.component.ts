@@ -40,13 +40,13 @@ const COUNTY_BY_ISLAND: Record<string, string> = {
   'Hawaiʻi': 'Hawaiʻi'
 };
 
-interface County {
-  id: string;
-  name: string;   // e.g. "Maui"
-  short: string;  // e.g. "Maui"
-  feature: any;
-  key: string;
-}
+// interface County {
+//   id: string;
+//   name: string;  
+//   short: string;
+//   feature: any;
+//   key: string;
+// }
 
 
 // County → list of islands
@@ -71,10 +71,10 @@ function getCountyForIsland(islandName: string): string {
   return COUNTY_BY_ISLAND[islandName] ?? islandName;
 }
 
-function getIslandsInSameCounty(islandName: string): string[] {
-  const c = getCountyForIsland(islandName);
-  return COUNTY_GROUPS[c] ?? [islandName];
-}
+// function getIslandsInSameCounty(islandName: string): string[] {
+//   const c = getCountyForIsland(islandName);
+//   return COUNTY_GROUPS[c] ?? [islandName];
+// }
 
 function canonIsland(name: string): string {
   if (!name) return '';
@@ -696,7 +696,7 @@ export class ClimateDashboardComponent implements OnDestroy {
         return;
       }
 
-      // --- Temperature ---
+      //Temperature
       if (dataset === 'Temperature') {
         if (canvas) canvas.style.display = 'none';
         legendDiv.innerHTML = '';
@@ -705,8 +705,8 @@ export class ClimateDashboardComponent implements OnDestroy {
           "#FF9900", "#FF0000", "#730000"
         ];
         const tempLabels = [
-          "< -1", "-1 to -0.6", "-0.6 to -0.2",
-          "-0.2 to 0.2", "0.2 to 0.6", "0.6 to 1", "> 1"
+          "< -1°F", "-1 to -0.6°F", "-0.6 to -0.2°F",
+          "-0.2 to 0.2°F", "0.2 to 0.6°F", "0.6 to 1°F", "> 1°F"
         ];
         this.buildLegend(legendDiv, tempColors, tempLabels);
         return;
@@ -1138,11 +1138,11 @@ export class ClimateDashboardComponent implements OnDestroy {
     const sign = value > 0 ? '+' : '';
     const unit =
       dataset === 'Rainfall'
-        ? 'in'
+        ? ' in'
         : dataset === 'Temperature'
         ? '°F'
-        : ''; // no units for drought
-    return `${sign}${value.toFixed(1)} ${unit}`.trim();
+        : ''; 
+    return `${sign}${value.toFixed(1)}${unit}`.trim();
   }
 
 

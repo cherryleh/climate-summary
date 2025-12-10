@@ -48,9 +48,18 @@
         </div>
 
         <!-- Statement -->
-        <div class="info-box">
-          Statewide saw exceptionally dry conditions in August (short term).
+        <div class="info-box" *ngIf="selectedDataset() === 'Rainfall'">
+          Hawai‘i received 2.0 inches of rainfall statewide — 3.2 inches (62%) below the August average, marking the driest August in the last 30 years.
         </div>
+
+        <div class="info-box" *ngIf="selectedDataset() === 'Temperature'">
+          Hawai‘i averaged 70°F statewide — 0.5°F above the August average, ranking as the 11th warmest August in the last 30 years.
+        </div>
+
+        <div class="info-box" *ngIf="selectedDataset() === 'Drought'">
+          Hawai‘i saw dry conditions with 67% of land area seeing at least abnormally dry conditions, and 21% seeing severe drought or worse conditions.
+        </div>
+
 
         <!-- Rainfall -->
         <div class="stats" *ngIf="selectedDataset() === 'Rainfall' && stats()">
@@ -80,11 +89,11 @@
         <div class="stats" *ngIf="selectedDataset() === 'Temperature' && stats()">
           <app-stat-box
             label="Mean"
-            [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' °F'">
+            [value]="((stats()?.mean | number:'1.1-1') ?? '') + '°F'">
           </app-stat-box>
           <app-stat-box
             label="Anomaly"
-            [value]="formatAnomaly(stats()?.anomaly)">
+            [value]="formatAnomaly(stats()?.anomaly, selectedDataset())">
           </app-stat-box>
           <app-stat-box
             label="Rank"
@@ -145,7 +154,7 @@
 
     </div>
 
-    <!-- RIGHT SIDEBAR -->
+    <!-- Right sidebar -->
     <aside class="aside">
       <section class="panel panel-grow" [class.fullscreen]="chartFullscreen()">
         <div class="panel-head">
