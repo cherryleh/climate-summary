@@ -1,11 +1,12 @@
 import { Routes } from '@angular/router';
+import { ClimateDashboardComponent } from './climate-dashboard/climate-dashboard.component';
+import { ClimateSummary2025Component} from './climate-summary-2025/climate-summary-2025.component';
 
 export const routes: Routes = [
   {
-    path: '',
-    loadComponent: () =>
-      import('./climate-dashboard/climate-dashboard.component').then(
-        (m) => m.ClimateDashboardComponent
-      ),
+    path: '', component: ClimateDashboardComponent
   },
+  {
+    path: 'climate-summary-2025', component: ClimateSummary2025Component
+  }
 ];
