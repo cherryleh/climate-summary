@@ -145,12 +145,18 @@
       </aside>
     </div>
     <h1 class="title">Monthly Breakdown</h1>
+    <section class="card chart-card" aria-label="Monthly breakdown chart">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="monthlyChartOptions"
+        style="width: 100%; height: 420px; display: block;"
+      ></highcharts-chart>
+    </section>
+
+    
 
     <h1 class="title">Extremes and Records</h1>
     <section class="section extremes" aria-labelledby="extremes-title">
-      <header class="section-head">
-        <h2 class="section-title" id="extremes-title">Extremes &amp; records</h2>
-      </header>
 
       <div class="extremes-grid">
         <article class="card mini-card">
@@ -227,8 +233,86 @@
       </div>
     </section>
 
-    <h1 class="title">Climate News</h1> 
-    
+    <h1 class="title">Climate Impacts on the News</h1> 
+    <p class="subtitle">News-style cards with thumbnails. Links are placeholders — replace with the real articles you want to cite.</p>
+    <section class="highlights" aria-labelledby="highlights-title">
+      
+
+      <div class="highlights__grid">
+        <a class="card" href="https://www.hawaiinewsnow.com/2025/09/16/kapalua-resort-maui-will-no-longer-host-pga-tours-season-opener-due-drought/" target="_blank" rel="noopener">
+          <div class="card__thumb card__thumb--peach" aria-hidden="true">
+
+          </div>
+
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__time">Spring 2025</span>
+              <span class="card__cta">Open <span aria-hidden="true">→</span></span>
+            </div>
+
+            <h3 class="card__title">PGA Tour pulls Sentry tournament from Maui’s Kapalua Resort over drought</h3>
+            <p class="card__desc">
+              Short summary + a “climate context” line: rainfall deficits and elevated evapotranspiration.
+            </p>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a class="card" href="#" target="_blank" rel="noopener">
+          <div class="card__thumb card__thumb--smoke" aria-hidden="true">
+          </div>
+
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__time">Summer–Fall 2025</span>
+              <span class="card__cta">Open <span aria-hidden="true">→</span></span>
+            </div>
+
+            <h3 class="card__title">Fire weather elevated during prolonged dryness</h3>
+            <p class="card__desc">
+              Brief context: wind + low humidity + dry fuels; add a KBDI/SPI snapshot link.
+            </p>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a class="card" href="#" target="_blank" rel="noopener">
+          <div class="card__thumb card__thumb--sky" aria-hidden="true">
+          </div>
+
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__time">Late 2025</span>
+              <span class="card__cta">Open <span aria-hidden="true">→</span></span>
+            </div>
+
+            <h3 class="card__title">Short-duration heavy rainfall events</h3>
+            <p class="card__desc">
+              Highlight a key event with totals, localized flooding impacts, and how it compares to typical extremes.
+            </p>
+          </div>
+        </a>
+
+        <!-- Card 4 -->
+        <a class="card" href="https://www.hawaiipublicradio.org/local-news/2025-11-12/whats-causing-hamakuas-extraordinary-fire-season" target="_blank" rel="noopener">
+          <div class="card__thumb card__thumb--mint" aria-hidden="true">
+          </div>
+
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__time">Year-round</span>
+              <span class="card__cta">Open <span aria-hidden="true">→</span></span>
+            </div>
+
+            <h3 class="card__title">What's causing Hāmākua's extraordinary fire season?</h3>
+            <p class="card__desc">
+              Stakeholder summary: irrigation demand, soil moisture stress, and decision support tools.
+            </p>
+          </div>
+        </a>
+      </div>
+    </section>
+
     <h1 class="title">HCDP Highlights</h1> 
 
     <h1 class="title">Coming Soon to HCDP</h1>
