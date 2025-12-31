@@ -4,192 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rainfall in 2025</title>
-  <style>
-    :root{
-      --bg: #f3f6fb;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e6edf7;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      --radius: 18px;
 
-      --tab-bg: #f1f5ff;
-      --tab-border: #dbe6ff;
-      --tab-text: #1f3b8a;
-      --tab-active-bg: #e8f0ff;
-      --tab-active-border: #2b57d9;
-    }
-
-    *{ box-sizing: border-box; }
-    body{
-      margin:0 !important;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color: var(--text);
-      background: linear-gradient(180deg, #f6f8fe 0%, #eef3fb 100%);
-    }
-
-    .page{
-      max-width: 80% ;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .title{
-      font-size: 30px;
-      line-height: 1.15;
-      margin: 0 0 6px 0;
-      letter-spacing: -0.02em;
-    }
-    .subtitle{
-      margin: 0 0 16px 0;
-      color: var(--muted);
-      font-size: 15px;
-    }
-
-    .tabs{
-      display: inline-flex;
-      gap: 10px;
-      padding: 6px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.7);
-      border-radius: 999px;
-      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
-      margin-bottom: 16px;
-    }
-    .tab{
-      border: 1px solid var(--tab-border);
-      background: var(--tab-bg);
-      color: var(--tab-text);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      user-select: none;
-    }
-    .tab.active{
-      background: var(--tab-active-bg);
-      border-color: var(--tab-active-border);
-      box-shadow: inset 0 0 0 1px rgba(43, 87, 217, 0.08);
-    }
-
-    .grid{
-      display: grid;
-      grid-template-columns: 2.1fr 1fr;
-      gap: 16px;
-      align-items: stretch;
-    }
-
-    .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    /* Map card */
-    .map-card{
-      padding: 14px;
-    }
-    .map-stage{
-      position: relative;
-      border-radius: calc(var(--radius) - 6px);
-      overflow: hidden;
-      height: 340px;                  /* keep fixed height if you want */
-      background: #eef3fb;            /* letterbox color */
-      border: 1px solid rgba(230, 237, 247, 0.9);
-    }
-
-    .map-img{
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;            /* key change: no crop */
-      object-position: center;        /* center it */
-      display: block;
-      background-color: white;
-      border-radius: 10px;
-    }
-
-
-    /* Optional: if you want the overlay image to be semi-transparent */
-    .map-img.overlay{
-      mix-blend-mode: multiply;
-      opacity: 0.85;
-      pointer-events: none;
-    }
-
-    /* Legend overlay */
-    .legend{
-      position: absolute;
-      left: 16px;
-      bottom: 16px;
-      width: 260px;
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(230, 237, 247, 0.9);
-      border-radius: 14px;
-      padding: 12px 12px 10px 12px;
-      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.10);
-      backdrop-filter: blur(8px);
-    }
-    .legend h4{
-      margin: 0 0 10px 0;
-      font-size: 13px;
-      font-weight: 800;
-      color: #0b1220;
-    }
-    .legend-bar{
-      height: 12px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #0b1f6b 0%, #2b6cff 45%, #ffd36a 78%, #e96a2b 100%);
-      border: 1px solid rgba(15, 23, 42, 0.10);
-      margin-bottom: 10px;
-    }
-    .legend-scale{
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #334155;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .legend-mode{
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .legend-mode b{ color: #0f172a; }
-
-    /* Takeaways card */
-    .takeaways{
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      height: 100%;
-    }
-    .takeaways h3{
-      margin: 0;
-      font-size: 16px;
-      letter-spacing: -0.01em;
-    }
-    .takeaways ul{
-      margin: 0;
-      padding-left: 18px;
-      color: #22324a;
-      line-height: 1.55;
-    }
-    .takeaways li{ margin: 8px 0; }
-
-
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-      .map-stage{ height: 320px; }
-      .legend{ width: min(260px, calc(100% - 32px)); }
-    }
-  </style>
 </head>
 
 <body>
@@ -197,26 +12,68 @@
     <h1 class="title">Rainfall in 2025</h1>
     <p class="subtitle">Explore annual rainfall totals, percent of normal, and departures from climatology.</p>
 
-    <div class="tabs" role="tablist" aria-label="Map mode">
-      <button class="tab active" type="button" role="tab" aria-selected="true">Total rainfall</button>
-      <button class="tab" type="button" role="tab" aria-selected="false">Percent of normal</button>
-      <button class="tab" type="button" role="tab" aria-selected="false">Anomaly</button>
+    <div class="tabs" role="tablist" aria-label="Rainfall map mode">
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="rainfallMode === 'total'"
+        [attr.aria-selected]="rainfallMode === 'total'"
+        (click)="setRainfallMode('total')"
+      >
+        Total rainfall
+      </button>
+
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="rainfallMode === 'pon'"
+        [attr.aria-selected]="rainfallMode === 'pon'"
+        (click)="setRainfallMode('pon')"
+      >
+        Percent of normal
+      </button>
+
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="rainfallMode === 'anom'"
+        [attr.aria-selected]="rainfallMode === 'anom'"
+        (click)="setRainfallMode('anom')"
+      >
+        Anomaly
+      </button>
     </div>
 
     <div class="grid">
-      <!-- LEFT: MAP -->
       <section class="card map-card">
         <div class="map-stage">
-          <img class="map-img base" src="/climate-summary/annual_rainfall_2024_agg.png" alt="Rainfall map base" />
+          <img
+            class="map-img base"
+            [src]="rainfallSrc[rainfallMode]"
+            [attr.alt]="'Rainfall map: ' + modeLabel[rainfallMode]"
+          />
+
 
           <div class="legend" aria-label="Legend">
-            <h4>Legend (mock)</h4>
-            <div class="legend-bar" aria-hidden="true"></div>
+            <h4>{{ rainfallLegendTitle[rainfallMode] }}</h4>
+
+            <div
+              class="legend-bar"
+              aria-hidden="true"
+              [style.background]="rainfallLegendGradient[rainfallMode]"
+            ></div>
+
             <div class="legend-scale">
-              <span>Low</span>
-              <span>High</span>
+              <span *ngFor="let t of rainfallLegendTicks[rainfallMode]">
+                {{ t }}{{ rainfallLegendUnit[rainfallMode] }}
+              </span>
             </div>
           </div>
+
+
         </div>
       </section>
 
@@ -227,22 +84,43 @@
           <li>Short-duration heavy rainfall events contributed a large share of annual totals in some locations.</li>
           <li>Spatial contrasts remained strong across island microclimates.</li>
         </ul>
-
       </aside>
     </div>
     <h1 class="title">Temperature in 2025</h1>
     <p class="subtitle">Explore annual temperature totals, percent of normal, and departures from climatology.</p>
 
     <div class="tabs" role="tablist" aria-label="Map mode">
-      <button class="tab active" type="button" role="tab" aria-selected="true">Total rainfall</button>
-      <button class="tab" type="button" role="tab" aria-selected="false">Percent of normal</button>
-      <button class="tab" type="button" role="tab" aria-selected="false">Anomaly</button>
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="temperatureMode === 'total'"
+        [attr.aria-selected]="temperatureMode === 'total'"
+        (click)="setTemperatureMode('total')"
+      >
+        Average temperature
+      </button>
+
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="temperatureMode === 'pon'"
+        [attr.aria-selected]="temperatureMode === 'pon'"
+        (click)="setTemperatureMode('pon')"
+      >
+        Anomaly
+      </button>
     </div>
 
     <div class="grid">
       <section class="card map-card">
         <div class="map-stage">
-          <img class="map-img base" src="/climate-summary/annual_rainfall_2024_agg.png" alt="Rainfall map base" />
+          <img
+            class="map-img base"
+            [src]="temperatureSrc[temperatureMode]"
+            [attr.alt]="'Temperature map: ' + modeLabel[temperatureMode]"
+          />
 
           <div class="legend" aria-label="Legend">
             <h4>Legend (mock)</h4>
@@ -269,6 +147,85 @@
     <h1 class="title">Monthly Breakdown</h1>
 
     <h1 class="title">Extremes and Records</h1>
+    <section class="section extremes" aria-labelledby="extremes-title">
+      <header class="section-head">
+        <h2 class="section-title" id="extremes-title">Extremes &amp; records</h2>
+      </header>
+
+      <div class="extremes-grid">
+        <article class="card mini-card">
+          <div class="mini-top">
+            <h3 class="mini-kicker">Driest month</h3>
+          </div>
+
+          <div class="mini-value">August</div>
+          <p class="mini-desc">August saw the lowest rainfall in the year. In fact, it was the driest August Hawaii has seen in the last 35 years</p>
+
+          <details class="mini-detail">
+            <summary>Show detail</summary>
+            <div class="detail-body">
+              <div><b>Where:</b> Statewide</div>
+              <div><b>Metric:</b> Percent of normal (monthly)</div>
+              <div><b>Note:</b> Replace with your computed month + value.</div>
+            </div>
+          </details>
+        </article>
+
+        <article class="card mini-card">
+          <div class="mini-top">
+            <h3 class="mini-kicker">Wettest Day</h3>
+          </div>
+
+          <div class="mini-value">Sep 14</div>
+          <p class="mini-desc">One event accounted for a large share of annual totals in select locations.</p>
+
+          <details class="mini-detail">
+            <summary>Show detail</summary>
+            <div class="detail-body">
+              <div><b>Date:</b> 2025-09-14</div>
+              <div><b>Top station:</b> (Station name) — (value)</div>
+              <div><b>Islands impacted:</b> (list)</div>
+            </div>
+          </details>
+        </article>
+
+        <article class="card mini-card">
+          <div class="mini-top">
+            <h3 class="mini-kicker">Highest temperature</h3>
+          </div>
+
+          <div class="mini-value">XX°F</div>
+          <p class="mini-desc">Statewide maximum (mock); include station + date in detail.</p>
+
+          <details class="mini-detail">
+            <summary>Show detail</summary>
+            <div class="detail-body">
+              <div><b>Station:</b> (Station name / ID)</div>
+              <div><b>Date:</b> (YYYY-MM-DD)</div>
+              <div><b>Value:</b> (max temp) °F</div>
+            </div>
+          </details>
+        </article>
+
+        <article class="card mini-card">
+          <div class="mini-top">
+            <h3 class="mini-kicker">Longest dry spell</h3>
+          </div>
+
+          <div class="mini-value">XX days</div>
+          <p class="mini-desc">Longest consecutive days below a rainfall threshold (define threshold).</p>
+
+          <details class="mini-detail">
+            <summary>Show detail</summary>
+            <div class="detail-body">
+              <div><b>Threshold:</b> (e.g., &lt; 0.01")</div>
+              <div><b>Where:</b> (Station / region)</div>
+              <div><b>Date range:</b> (start) → (end)</div>
+            </div>
+          </details>
+        </article>
+      </div>
+    </section>
 
     <h1 class="title">Climate News</h1> 
     
