@@ -36,9 +36,10 @@
 .title{
   font-size: 30px;
   line-height: 1.15;
-  margin: 0 0 6px 0;
+  margin: 12px 0 12px 0;
   letter-spacing: -0.02em;
 }
+
 .subtitle{
   margin: 0 0 16px 0;
   color: var(--muted);
@@ -49,12 +50,9 @@
   display: inline-flex;
   gap: 10px;
   padding: 6px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.7);
-  border-radius: 999px;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
   margin-bottom: 16px;
 }
+
 .tab{
   border: 1px solid var(--tab-border);
   background: var(--tab-bg);
@@ -308,4 +306,11 @@
 }
 @media (max-width: 640px){
   .extremes-grid{ grid-template-columns: 1fr; }
+}
+
+
+highcharts-chart{
+  display: block;
+  width: 100%;
+  height: 360px;
 }
