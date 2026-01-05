@@ -9,6 +9,7 @@
 
 <body>
   <div class="page">
+    <div class="section">
     <h1 class="title">Rainfall in 2025</h1>
     <p class="subtitle">Explore annual rainfall totals, percent of normal, and departures from climatology.</p>
 
@@ -34,17 +35,6 @@
       >
         Percent of normal
       </button>
-
-      <button
-        class="tab"
-        type="button"
-        role="tab"
-        [class.active]="rainfallMode === 'anom'"
-        [attr.aria-selected]="rainfallMode === 'anom'"
-        (click)="setRainfallMode('anom')"
-      >
-        Anomaly
-      </button>
     </div>
 
     <div class="grid">
@@ -53,7 +43,7 @@
           <img
             class="map-img base"
             [src]="rainfallSrc[rainfallMode]"
-            [attr.alt]="'Rainfall map: ' + modeLabel[rainfallMode]"
+            [attr.alt]="'Rainfall map: ' + rainfallModeLabel[rainfallMode]"
           />
 
 
@@ -86,6 +76,8 @@
         </ul>
       </aside>
     </div>
+    </div>
+    <div class="section">
     <h1 class="title">Temperature in 2025</h1>
     <p class="subtitle">Explore annual temperature totals, percent of normal, and departures from climatology.</p>
 
@@ -105,9 +97,9 @@
         class="tab"
         type="button"
         role="tab"
-        [class.active]="temperatureMode === 'pon'"
-        [attr.aria-selected]="temperatureMode === 'pon'"
-        (click)="setTemperatureMode('pon')"
+        [class.active]="temperatureMode === 'anom'"
+        [attr.aria-selected]="temperatureMode === 'anom'"
+        (click)="setTemperatureMode('anom')"
       >
         Anomaly
       </button>
@@ -119,15 +111,22 @@
           <img
             class="map-img base"
             [src]="temperatureSrc[temperatureMode]"
-            [attr.alt]="'Temperature map: ' + modeLabel[temperatureMode]"
+            [attr.alt]="'Temperature map: ' + temperatureModeLabel[temperatureMode]"
           />
 
           <div class="legend" aria-label="Legend">
-            <h4>Legend (mock)</h4>
-            <div class="legend-bar" aria-hidden="true"></div>
+            <h4>{{ temperatureLegendTitle[temperatureMode] }}</h4>
+
+            <div
+              class="legend-bar"
+              aria-hidden="true"
+              [style.background]="temperatureLegendGradient[temperatureMode]"
+            ></div>
+
             <div class="legend-scale">
-              <span>Low</span>
-              <span>High</span>
+              <span *ngFor="let t of temperatureLegendTicks[temperatureMode]">
+                {{ t }}{{ rainfallLegendUnit[rainfallMode] }}
+              </span>
             </div>
           </div>
         </div>
@@ -144,6 +143,8 @@
 
       </aside>
     </div>
+    </div>
+    <div class="section">
     <h1 class="title">Monthly Breakdown</h1>
     <section class="card chart-card" aria-label="Monthly breakdown chart">
       <highcharts-chart
@@ -152,12 +153,11 @@
         style="width: 100%; height: 420px; display: block;"
       ></highcharts-chart>
     </section>
-
+    </div>
     
-
+    <div class="section">
     <h1 class="title">Extremes and Records</h1>
     <section class="section extremes" aria-labelledby="extremes-title">
-
       <div class="extremes-grid">
         <article class="card mini-card">
           <div class="mini-top">
@@ -182,7 +182,7 @@
             <h3 class="mini-kicker">Wettest Day</h3>
           </div>
 
-          <div class="mini-value">Sep 14</div>
+          <div class="mini-value">Jan 31</div>
           <p class="mini-desc">One event accounted for a large share of annual totals in select locations.</p>
 
           <details class="mini-detail">
@@ -197,7 +197,7 @@
 
         <article class="card mini-card">
           <div class="mini-top">
-            <h3 class="mini-kicker">Highest temperature</h3>
+            <h3 class="mini-kicker">Highest temperature (or hot nights?)</h3>
           </div>
 
           <div class="mini-value">XX°F</div>
@@ -232,14 +232,15 @@
         </article>
       </div>
     </section>
-
+    </div>
+    <div class="section">
     <h1 class="title">Climate Impacts on the News</h1> 
     <p class="subtitle">News-style cards with thumbnails. Links are placeholders — replace with the real articles you want to cite.</p>
     <section class="highlights" aria-labelledby="highlights-title">
       
 
       <div class="highlights__grid">
-        <a class="card" href="https://www.hawaiinewsnow.com/2025/09/16/kapalua-resort-maui-will-no-longer-host-pga-tours-season-opener-due-drought/" target="_blank" rel="noopener">
+        <a class="news card" href="https://www.hawaiinewsnow.com/2025/09/16/kapalua-resort-maui-will-no-longer-host-pga-tours-season-opener-due-drought/" target="_blank" rel="noopener">
           <div class="card__thumb card__thumb--peach" aria-hidden="true">
 
           </div>
@@ -258,7 +259,7 @@
         </a>
 
         <!-- Card 2 -->
-        <a class="card" href="#" target="_blank" rel="noopener">
+        <a class="news card" href="#" target="_blank" rel="noopener">
           <div class="card__thumb card__thumb--smoke" aria-hidden="true">
           </div>
 
@@ -276,7 +277,7 @@
         </a>
 
         <!-- Card 3 -->
-        <a class="card" href="#" target="_blank" rel="noopener">
+        <a class="news card" href="#" target="_blank" rel="noopener">
           <div class="card__thumb card__thumb--sky" aria-hidden="true">
           </div>
 
@@ -294,7 +295,7 @@
         </a>
 
         <!-- Card 4 -->
-        <a class="card" href="https://www.hawaiipublicradio.org/local-news/2025-11-12/whats-causing-hamakuas-extraordinary-fire-season" target="_blank" rel="noopener">
+        <a class="news card" href="https://www.hawaiipublicradio.org/local-news/2025-11-12/whats-causing-hamakuas-extraordinary-fire-season" target="_blank" rel="noopener">
           <div class="card__thumb card__thumb--mint" aria-hidden="true">
           </div>
 
@@ -312,10 +313,44 @@
         </a>
       </div>
     </section>
-
-    <h1 class="title">HCDP Highlights</h1> 
-
+    </div>
+    <div class="section">
+    <h1 class="title">HCDP in 2025</h1> 
+    </div>
+    <div class="section">
     <h1 class="title">Coming Soon to HCDP</h1>
+      <div class="hcdp-comingsoon-grid">
+        <article class="card mini-card">
+          <div class="mini-top">
+            <h3 class="mini-kicker">New Map Products</h3>
+          </div>
+          <div class="mini-value">Gridded Datasets</div>
+          <p class="mini-desc">We are expanding our gridded datasets to include new climate variables such as solar radiation, wind, and KBDI.</p>
+        </article>
+
+        <article class="card mini-card">
+          <div class="mini-top">
+            <h3 class="mini-kicker">New Website</h3>
+          </div>
+
+          <div class="mini-value">State of the Climate</div>
+          <p class="mini-desc">One event accounted for a large share of annual totals in select locations.</p>
+        </article>
+
+        <article class="card mini-card">
+          <div class="mini-top">
+            <h3 class="mini-kicker">Downscaled Products</h3>
+          </div>
+
+          <div class="mini-value">X</div>
+          <p class="mini-desc">X</p>
+
+        </article>
+        
+      </div>
+      <div> <h3>Subscribe to our newsletter to get the latest HCDP updates!</h3></div>
+            To subscribe, please email...
+    </div>
   </div>
 </body>
 </html>

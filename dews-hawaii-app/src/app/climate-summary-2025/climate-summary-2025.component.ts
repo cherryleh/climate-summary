@@ -5,7 +5,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 
-type MapMode = 'total' | 'pon' | 'anom';
+type rainfallMode = 'total' | 'pon' ;
+type temperatureMode = 'total' | 'anom';
 
 @Component({
   selector: 'app-climate-summary-2025',
@@ -18,61 +19,80 @@ export class ClimateSummary2025Component implements OnInit {
   constructor(private http: HttpClient) {}
 
   // --- your existing stuff ---
-  readonly tabs: { key: MapMode; label: string }[] = [
+  readonly tabs: { key: rainfallMode; label: string }[] = [
     { key: 'total', label: 'Total rainfall' },
-    { key: 'pon', label: 'Percent of normal' },
-    { key: 'anom', label: 'Anomaly' },
+    { key: 'pon', label: 'Percent of normal' }
   ];
 
-  rainfallMode: MapMode = 'total';
-  temperatureMode: MapMode = 'total';
+  rainfallMode: rainfallMode = 'total';
+  temperatureMode: temperatureMode = 'total';
 
-  readonly modeLabel: Record<MapMode, string> = {
+  readonly rainfallModeLabel: Record<rainfallMode, string> = {
     total: 'Total',
     pon: 'Percent of normal',
+  };
+
+  readonly temperatureModeLabel: Record<temperatureMode, string> = {
+    total: 'Total',
     anom: 'Anomaly',
   };
 
-  readonly rainfallSrc: Record<MapMode, string> = {
+  readonly rainfallSrc: Record<rainfallMode, string> = {
     total: '/climate-summary/annual_rainfall_2024_agg.png',
-    pon: '/climate-summary/annual_rainfall_2024_pnormal.png',
-    anom: '/climate-summary/annual_rainfall_2024_anomaly.png',
+    pon: '/climate-summary/annual_rainfall_2024_pnormal.png'
   };
 
-  readonly rainfallLegendTitle: Record<MapMode, string> = {
+  readonly rainfallLegendTitle: Record<rainfallMode, string> = {
     total: 'Total rainfall (in)',
-    pon: 'Percent of normal (%)',
-    anom: 'Anomaly (in)',
+    pon: 'Percent of normal (%)'
   };
 
-  readonly rainfallLegendTicks: Record<MapMode, string[]> = {
+  readonly rainfallLegendTicks: Record<rainfallMode, string[]> = {
     total: ['0', '300'],
-    pon: ['0', '100', '200'],
+    pon: ['0', '100', '200']
+  };
+
+   readonly temperatureLegendTitle: Record<temperatureMode, string> = {
+    total: 'Average temperature (°F)',
+    anom: 'Anomaly (°F)',
+  };
+
+  readonly temperatureLegendTicks: Record<temperatureMode, string[]> = {
+    total: ['0', '300'],
     anom: ['-120', '0', '120'],
   };
 
-  readonly rainfallLegendUnit: Record<MapMode, string> = {
+  readonly rainfallLegendUnit: Record<rainfallMode, string> = {
     total: 'in',
-    pon: '%',
-    anom: 'in',
+    pon: '%'
   };
 
-  readonly rainfallLegendGradient: Record<MapMode, string> = {
+  readonly temperatureLegendUnit: Record<temperatureMode, string> = {
+    total: '°F',
+    anom: '°F',
+  };
+
+  readonly rainfallLegendGradient: Record<rainfallMode, string> = {
     total:
       'linear-gradient(90deg, #440154 0%, #3b528b 25%, #21918c 50%, #5ec962 75%, #fde725 100%)',
-    pon: 'linear-gradient(90deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)',
+    pon: 'linear-gradient(90deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)'
+  };
+
+  readonly temperatureLegendGradient: Record<temperatureMode, string> = {
+    total:
+      'linear-gradient(90deg, #440154 0%, #3b528b 25%, #21918c 50%, #5ec962 75%, #fde725 100%)',
     anom: 'linear-gradient(90deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)',
   };
 
-  readonly temperatureSrc: Partial<Record<MapMode, string>> = {
+  readonly temperatureSrc: Partial<Record<temperatureMode, string>> = {
     total: '/climate-summary/annual_tmean_2024_agg.png',
     anom: '/climate-summary/annual_tmean_2024_anomaly.png',
   };
 
-  setRainfallMode(mode: MapMode) {
+  setRainfallMode(mode: rainfallMode) {
     this.rainfallMode = mode;
   }
-  setTemperatureMode(mode: MapMode) {
+  setTemperatureMode(mode: temperatureMode) {
     this.temperatureMode = mode;
   }
 

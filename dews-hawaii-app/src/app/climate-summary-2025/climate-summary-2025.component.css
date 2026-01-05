@@ -217,6 +217,13 @@
   align-items: stretch;
 }
 
+.hcdp-comingsoon-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
 .mini-card{
   padding: 16px;
 }
@@ -349,7 +356,7 @@ highcharts-chart{
 }
 
 /* Card */
-.card{
+.news{
   display: block;
   background: var(--card);
   border: 1px solid var(--border);
@@ -361,13 +368,13 @@ highcharts-chart{
   transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
 }
 
-.card:hover{
+.news:hover{
   transform: translateY(-2px);
   border-color: rgba(43, 87, 217, 0.25);
   box-shadow: 0 18px 46px rgba(15, 23, 42, 0.14);
 }
 
-.card:focus-visible{
+.news:focus-visible{
   outline: 3px solid rgba(43, 87, 217, 0.35);
   outline-offset: 3px;
 }
@@ -480,4 +487,17 @@ highcharts-chart{
   font-size: 13px;
   color: var(--muted);
   line-height: 1.45;
+}
+
+.grid {
+  align-items: stretch;
+}
+
+.section {
+  margin-bottom: 5%
+}
+
+.map-card,
+.takeaways {
+  height: 95%;
 }
