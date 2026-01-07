@@ -125,7 +125,7 @@
 
             <div class="legend-scale">
               <span *ngFor="let t of temperatureLegendTicks[temperatureMode]">
-                {{ t }}{{ rainfallLegendUnit[rainfallMode] }}
+                {{ t }}{{ temperatureLegendUnit[temperatureMode] }}
               </span>
             </div>
           </div>
@@ -161,20 +161,11 @@
       <div class="extremes-grid">
         <article class="card mini-card">
           <div class="mini-top">
-            <h3 class="mini-kicker">Driest month</h3>
+            <h3 class="mini-kicker">New Records</h3>
           </div>
 
           <div class="mini-value">August</div>
-          <p class="mini-desc">August saw the lowest rainfall in the year. In fact, it was the driest August Hawaii has seen in the last 35 years</p>
-
-          <details class="mini-detail">
-            <summary>Show detail</summary>
-            <div class="detail-body">
-              <div><b>Where:</b> Statewide</div>
-              <div><b>Metric:</b> Percent of normal (monthly)</div>
-              <div><b>Note:</b> Replace with your computed month + value.</div>
-            </div>
-          </details>
+          <p class="mini-desc">August 2025 marked the driest August Hawaii has seen in the last 35 years</p>
         </article>
 
         <article class="card mini-card">
@@ -183,16 +174,7 @@
           </div>
 
           <div class="mini-value">Jan 31</div>
-          <p class="mini-desc">One event accounted for a large share of annual totals in select locations.</p>
-
-          <details class="mini-detail">
-            <summary>Show detail</summary>
-            <div class="detail-body">
-              <div><b>Date:</b> 2025-09-14</div>
-              <div><b>Top station:</b> (Station name) — (value)</div>
-              <div><b>Islands impacted:</b> (list)</div>
-            </div>
-          </details>
+          <p class="mini-desc">Hawaiʻi recorded its highest single-day rainfall total of the year on January 31, 2025, during a winter storm system that impacted the entire state from January 30–31. The event alone was enough to fill over 471,000 Olympic-sized pools.</p>
         </article>
 
         <article class="card mini-card">
@@ -202,15 +184,6 @@
 
           <div class="mini-value">XX°F</div>
           <p class="mini-desc">Statewide maximum (mock); include station + date in detail.</p>
-
-          <details class="mini-detail">
-            <summary>Show detail</summary>
-            <div class="detail-body">
-              <div><b>Station:</b> (Station name / ID)</div>
-              <div><b>Date:</b> (YYYY-MM-DD)</div>
-              <div><b>Value:</b> (max temp) °F</div>
-            </div>
-          </details>
         </article>
 
         <article class="card mini-card">
@@ -218,17 +191,8 @@
             <h3 class="mini-kicker">Longest dry spell</h3>
           </div>
 
-          <div class="mini-value">XX days</div>
-          <p class="mini-desc">Longest consecutive days below a rainfall threshold (define threshold).</p>
-
-          <details class="mini-detail">
-            <summary>Show detail</summary>
-            <div class="detail-body">
-              <div><b>Threshold:</b> (e.g., &lt; 0.01")</div>
-              <div><b>Where:</b> (Station / region)</div>
-              <div><b>Date range:</b> (start) → (end)</div>
-            </div>
-          </details>
+          <div class="mini-value">158 days</div>
+          <p class="mini-desc">South Molokaʻi experienced 158 consecutive days with rainfall below 0.04 inches, spanning from May 1 to October 5, 2025.</p>
         </article>
       </div>
     </section>
