@@ -31,7 +31,7 @@
 
 
 .page{
-  max-width: 80% ;
+  max-width: 70% ;
   margin-left: auto;
   margin-right: auto;
 }
@@ -220,7 +220,7 @@
 
 /* Takeaways card */
 .takeaways{
-  padding: 16px;
+  padding: 25px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -545,4 +545,73 @@ highcharts-chart{
 .map-card,
 .takeaways {
   height: 95%;
+}
+
+
+
+.hero{
+background:
+radial-gradient(1200px 420px at 18% -12%, #eef3ff 0%, transparent 60%),
+radial-gradient(900px 360px at 88% 0%, #f1fbff 0%, transparent 55%),
+linear-gradient(180deg, #fbfcff 0%, #eef2fb 100%);
+border-bottom: 1px solid var(--border);
+position: relative; 
+
+}
+
+
+
+.hero-title{
+margin: 0;
+font-size: clamp(2.1rem, 4vw, 3.1rem);
+font-weight: 760;
+line-height: 1.05;
+color: var(--text);
+}
+
+
+.hero-subtitle{
+margin: 12px 0 0;
+max-width: 820px;
+font-size: 1.05rem;
+line-height: 1.55;
+color: var(--muted);
+}
+
+.hero-inner{
+  max-width: 70%;
+  margin: 0 auto;
+  padding: 46px 18px 34px;
+  position: relative;
+}
+
+/* anchor bottom-right */
+.hero-logos{
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  z-index: 5;
+}
+
+/* set the size HERE (not height:auto) */
+.hero-logos img{
+  display: block;
+  height: 64px;          /* pick your “appropriate” size */
+  width: auto;
+
+  max-height: none !important; /* defeat global caps */
+  max-width: none !important;
+
+  object-fit: contain;
+}
+
+/* optional: slightly smaller on small screens */
+@media (max-width: 760px){
+  .hero-inner{ padding: 34px 16px 74px; }
+  .hero-logos{ right: 16px; bottom: 14px; }
+  .hero-logos img{ height: 40px; }
 }
