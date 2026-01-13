@@ -614,7 +614,7 @@ color: var(--text);
 
 .hero-subtitle{
 margin: 12px 0 0;
-max-width: 820px;
+max-width: 70%;
 font-size: 1.05rem;
 line-height: 1.55;
 color: var(--muted);
@@ -623,20 +623,21 @@ color: var(--muted);
 .hero-inner{
   max-width: 70%;
   margin: 0 auto;
-  padding: 46px 18px 34px;
+  padding: 46px 18px clamp(18px, 3vw, 34px);
   position: relative;
 }
 
 /* anchor bottom-right */
 .hero-logos{
   position: absolute;
-  right: 18px;
-  bottom: 18px;
+  right: 0px;
+  bottom: clamp(18px, 3vw, 34px);
 
   display: flex;
   align-items: flex-end;
   gap: 14px;
   z-index: 5;
+  margin-right: 10%;
 }
 
 /* set the size HERE (not height:auto) */
