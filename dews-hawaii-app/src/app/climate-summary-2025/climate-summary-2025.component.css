@@ -19,8 +19,10 @@
 
   --pill-indigo-bg: #eef0ff;
   --pill-indigo-text: #2a2f8a;
+
+  --mapH: 300px;      
+  --mapPad: 14px;
 }
-/* don’t rely on vars only */
 .card{
   background: var(--card, #ffffff);
   border: 1px solid var(--border, #e6edf7);
@@ -145,18 +147,6 @@
   overflow: hidden;
 }
 
-/* Map card */
-.map-card{
-  padding: 14px;
-}
-.map-stage{
-  position: relative;
-  border-radius: calc(var(--radius) - 6px);
-  overflow: hidden;
-  height: 340px;                  /* keep fixed height if you want */
-  background: #eef3fb;            /* letterbox color */
-  border: 1px solid rgba(230, 237, 247, 0.9);
-}
 
 .map-img{
   position: absolute;
@@ -217,27 +207,6 @@
   color: var(--muted);
 }
 .legend-mode b{ color: #0f172a; }
-
-/* Takeaways card */
-.takeaways{
-  padding: 25px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100%;
-}
-.takeaways h3{
-  margin: 0;
-  font-size: 16px;
-  letter-spacing: -0.01em;
-}
-.takeaways ul{
-  margin: 0;
-  padding-left: 18px;
-  color: #22324a;
-  line-height: 1.55;
-}
-.takeaways li{ margin: 8px 0; }
 
 
 @media (max-width: 980px){
@@ -534,19 +503,92 @@ highcharts-chart{
   line-height: 1.45;
 }
 
-.grid {
-  align-items: stretch;
-}
 
 .section {
   margin-bottom: 5%
 }
 
-.map-card,
-.takeaways {
-  height: 95%;
+
+
+.callout--primary{
+  border-color: rgba(43, 87, 217, 0.22);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.10);
 }
 
+/* More subtle supporting box */
+.callout--secondary{
+  background: rgba(255, 255, 255, 0.88);
+}
+
+/* Typography */
+.callout-kicker{
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.callout-value{
+  font-size: clamp(26px, 2.2vw, 34px);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.callout-text{
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #22324a;
+}
+
+/* If your grid collapses to 1 column, keep nice spacing */
+@media (max-width: 980px){
+  .callouts{ grid-template-rows: auto auto; }
+}
+
+
+/* Keep your 2-column layout */
+.grid{
+  align-items: start;  /* don't stretch the row */
+}
+
+/* Left map card */
+.map-card{
+  padding: var(--mapPad);
+}
+
+/* Map height is the driver */
+.map-stage{
+  height: var(--mapH);
+  position: relative;
+  border-radius: calc(var(--radius) - 6px);
+  overflow: hidden;
+  background: #eef3fb;
+  border: 1px solid rgba(230, 237, 247, 0.9);
+}
+
+/* Right column: match map-card height and split into 2 equal boxes */
+.callouts{
+  display: grid;
+  gap: 16px;
+  grid-template-rows: 1fr 1fr;
+
+  /* Match total visible height of the left map card:
+     map height + top/bottom padding (14*2) */
+  height: calc(var(--mapH) + (var(--mapPad) * 2));
+}
+
+/* Boxes fill their half cleanly */
+.callout{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 18px 16px;
+  min-height: 0;
+}
 
 
 .hero{
@@ -614,4 +656,27 @@ color: var(--muted);
   .hero-inner{ padding: 34px 16px 74px; }
   .hero-logos{ right: 16px; bottom: 14px; }
   .hero-logos img{ height: 40px; }
+}
+
+.subsection-title{
+  margin: 18px 0 8px 0;
+  font-size: 22px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Wettest Day 3-up grid */
+.wettest-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 1100px){
+  .wettest-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px){
+  .wettest-grid{ grid-template-columns: 1fr; }
 }

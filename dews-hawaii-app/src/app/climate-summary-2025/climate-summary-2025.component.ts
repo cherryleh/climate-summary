@@ -5,7 +5,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 
-type rainfallMode = 'total' | 'pon' ;
+type rainfallMode = 'total' | 'pdiff' ;
 type temperatureMode = 'total' | 'anom';
 
 @Component({
@@ -21,7 +21,7 @@ export class ClimateSummary2025Component implements OnInit {
   // --- your existing stuff ---
   readonly tabs: { key: rainfallMode; label: string }[] = [
     { key: 'total', label: 'Total rainfall' },
-    { key: 'pon', label: 'Percent of normal' }
+    { key: 'pdiff', label: 'Percent Difference' }
   ];
 
   rainfallMode: rainfallMode = 'total';
@@ -29,7 +29,7 @@ export class ClimateSummary2025Component implements OnInit {
 
   readonly rainfallModeLabel: Record<rainfallMode, string> = {
     total: 'Total',
-    pon: 'Percent of normal',
+    pdiff: 'Percent difference',
   };
 
   readonly temperatureModeLabel: Record<temperatureMode, string> = {
@@ -38,18 +38,18 @@ export class ClimateSummary2025Component implements OnInit {
   };
 
   readonly rainfallSrc: Record<rainfallMode, string> = {
-    total: '/climate-summary/annual_rainfall_2024_agg.png',
-    pon: '/climate-summary/annual_rainfall_2024_pnormal.png'
+    total: '/climate-summary/annual_rainfall_2025_agg.png',
+    pdiff: '/climate-summary/annual_rainfall_2025_pdiff.png'
   };
 
   readonly rainfallLegendTitle: Record<rainfallMode, string> = {
     total: 'Total rainfall (in)',
-    pon: 'Percent of normal (%)'
+    pdiff: 'Percent difference (%)'
   };
 
   readonly rainfallLegendTicks: Record<rainfallMode, string[]> = {
     total: ['0', '300'],
-    pon: ['0', '100', '200']
+    pdiff: ['-100', '0', '100']
   };
 
    readonly temperatureLegendTitle: Record<temperatureMode, string> = {
@@ -64,7 +64,7 @@ export class ClimateSummary2025Component implements OnInit {
 
   readonly rainfallLegendUnit: Record<rainfallMode, string> = {
     total: 'in',
-    pon: '%'
+    pdiff: '%'
   };
 
   readonly temperatureLegendUnit: Record<temperatureMode, string> = {
@@ -75,7 +75,7 @@ export class ClimateSummary2025Component implements OnInit {
   readonly rainfallLegendGradient: Record<rainfallMode, string> = {
     total:
       'linear-gradient(90deg, #440154 0%, #3b528b 25%, #21918c 50%, #5ec962 75%, #fde725 100%)',
-    pon: 'linear-gradient(90deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)'
+    pdiff: 'linear-gradient(90deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)'
   };
 
   readonly temperatureLegendGradient: Record<temperatureMode, string> = {
@@ -99,7 +99,10 @@ export class ClimateSummary2025Component implements OnInit {
   Highcharts: typeof Highcharts = Highcharts;
 
   monthlyChartOptions: Highcharts.Options = {
-    title: { text: 'Monthly rainfall and temperature' },
+    title: { text: '' },
+    chart: {
+      marginTop: 50,
+    },
     credits: { enabled: false },
     xAxis: { categories: [] },
     yAxis: [

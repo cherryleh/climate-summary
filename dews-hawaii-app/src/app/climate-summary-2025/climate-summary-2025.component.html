@@ -41,11 +41,11 @@
         class="tab"
         type="button"
         role="tab"
-        [class.active]="rainfallMode === 'pon'"
-        [attr.aria-selected]="rainfallMode === 'pon'"
-        (click)="setRainfallMode('pon')"
+        [class.active]="rainfallMode === 'pdiff'"
+        [attr.aria-selected]="rainfallMode === 'pdiff'"
+        (click)="setRainfallMode('pdiff')"
       >
-        Percent of normal
+        Percent difference
       </button>
     </div>
 
@@ -79,14 +79,23 @@
         </div>
       </section>
 
-      <aside class="card takeaways">
-        <h3>Key takeaways</h3>
-        <ul>
-          <li>...</li>
-          <li>...</li>
-          <li>...</li>
-        </ul>
+      <aside class="callouts" aria-label="Rainfall takeaways">
+        <article class="card callout callout--primary">
+          <div class="callout-kicker">Rainfall ranking</div>
+          <div class="callout-value">2nd driest year</div>
+          <p class="callout-text">
+            In 2025, statewide rainfall ranked 2nd driest on record in the last 106 years at 42 inches, compared to the 30-year average of 62 inches.
+          </p>
+        </article>
+
+        <article class="card callout callout--secondary">
+          <div class="callout-kicker">Highlights</div>
+          <p class="callout-text">
+            
+          </p>
+        </article>
       </aside>
+
     </div>
     </div>
     <div class="section">
@@ -144,15 +153,20 @@
         </div>
       </section>
 
-      <!-- RIGHT: TAKEAWAYS -->
-      <aside class="card takeaways">
-        <h3>Key takeaways</h3>
-        <ul>
-          <li>...</li>
-          <li>...</li>
-          <li>...</li>
-        </ul>
+      <aside class="callouts" aria-label="Rainfall takeaways">
+        <article class="card callout callout--primary">
+          <div class="callout-kicker">Temperature ranking</div>
+          <div class="callout-value">6th warmest year</div>
+          <p class="callout-text">
+            In 2025, statewide temperature ranked 6th warmest on record in the last 35 years at 67 degrees, compared to the 30-year average of 66 degrees.
+          </p>
+        </article>
 
+        <article class="card callout callout--secondary">
+          <div class="callout-kicker">Highlights</div>
+          <p class="callout-text">
+          </p>
+        </article>
       </aside>
     </div>
     </div>
@@ -169,6 +183,81 @@
     
     <div class="section">
     <h1 class="title">Extremes and Records</h1>
+    <h2 class="subsection-title">Wettest Day</h2>
+    <p class="subtitle">
+      Wettest single-day rainfall in 2025 summarized statewide, by county, and by pixel.
+    </p>
+
+    <div class="wettest-grid">
+      <!-- Statewide -->
+      <article class="card mini-card">
+        <div class="mini-top">
+          <h3 class="mini-kicker">Statewide</h3>
+        </div>
+
+        <div class="mini-value">Jan 31</div>
+        <p class="mini-desc">
+          Hawaiʻi recorded the highest statewide single-day rainfall total of the year on January 31, 2025,
+          during a winter storm system that impacted the entire state from January 30–31.
+        </p>
+
+        <details class="mini-detail">
+          <summary>Details</summary>
+          <div class="detail-body">
+            <div><b>Metric:</b> statewide mean (or sum) rainfall</div>
+            <div><b>Value:</b> XX in</div>
+            <div><b>Notes:</b> computed from gridded daily rainfall</div>
+          </div>
+        </details>
+      </article>
+
+      <!-- By county -->
+      <article class="card mini-card">
+        <div class="mini-top">
+          <h3 class="mini-kicker">By county</h3>
+        </div>
+
+        <div class="mini-value">Top county: Maui</div>
+        <p class="mini-desc">
+          Wettest day for each county based on that county’s gridded-area rainfall statistic.
+        </p>
+
+        <details class="mini-detail">
+          <summary>Show county list</summary>
+          <div class="detail-body">
+            <div><b>Honolulu:</b> Jan 30 — 2.96 in</div>
+            <div><b>Maui:</b> Jan 30 — 4.49 in</div>
+            <div><b>Hawaiʻi:</b> Jan 31 — 1.95 in</div>
+            <div><b>Kauaʻi:</b> Apr 18 — 1.85 in</div>
+            <div><b>Kahoolawe:</b> Jan 30 — 2.33 in</div>
+            <div><b>Lanai:</b> Jan 30 — 1.68 in</div>
+            <div><b>Molokai:</b> Jan 30 — 2.14 in</div>
+          </div>
+        </details>
+      </article>
+
+      <!-- Pixel -->
+      <article class="card mini-card">
+        <div class="mini-top">
+          <h3 class="mini-kicker">Pixel</h3>
+        </div>
+
+        <div class="mini-value">MMM DD</div>
+        <p class="mini-desc">
+          The single wettest pixel-day anywhere in the statewide grid, including the location of that pixel.
+        </p>
+
+        <details class="mini-detail">
+          <summary>Details</summary>
+          <div class="detail-body">
+            <div><b>Value:</b> XX in</div>
+            <div><b>Location:</b> Lat XX.XXXX, Lon -XXX.XXXX (or place name)</div>
+            <div><b>Island/region:</b> Example</div>
+            <div><b>Grid:</b> daily rainfall production “new”</div>
+          </div>
+        </details>
+      </article>
+    </div>
     <section class="section extremes" aria-labelledby="extremes-title">
       <div class="extremes-grid">
         <article class="card mini-card">
@@ -307,7 +396,7 @@
           </div>
 
           <div class="mini-value">State of the Climate</div>
-          <p class="mini-desc">One event accounted for a large share of annual totals in select locations.</p>
+          <p class="mini-desc">We are developing a new "State of the Climate" website, where...</p>
         </article>
 
         <article class="card mini-card">
