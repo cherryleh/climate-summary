@@ -109,7 +109,7 @@ export class ClimateSummary2025Component implements OnInit {
       { title: { text: 'Rainfall (in)' } },
       { title: { text: 'Temperature (°F)' }, opposite: true },
     ],
-    tooltip: { shared: true },
+    tooltip: { shared: true,valueDecimals: 2,  },
     legend: { enabled: true },
     series: [
       { type: 'column', name: 'Rainfall', data: [], yAxis: 0 },
