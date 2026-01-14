@@ -38,8 +38,8 @@ export class ClimateSummary2025Component implements OnInit {
   };
 
   readonly rainfallSrc: Record<rainfallMode, string> = {
-    total: '/climate-summary/annual_rainfall_2025_agg.png',
-    pdiff: '/climate-summary/annual_rainfall_2025_pdiff.png'
+    total: 'climate-summary/annual_rainfall_2025_agg.png',
+    pdiff: 'climate-summary/annual_rainfall_2025_pdiff.png'
   };
 
   readonly rainfallLegendTitle: Record<rainfallMode, string> = {
@@ -75,7 +75,7 @@ export class ClimateSummary2025Component implements OnInit {
   readonly rainfallLegendGradient: Record<rainfallMode, string> = {
     total:
       'linear-gradient(90deg, #440154 0%, #3b528b 25%, #21918c 50%, #5ec962 75%, #fde725 100%)',
-    pdiff: 'linear-gradient(90deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)'
+    pdiff: 'linear-gradient(90deg, #b2182b 0%, #f7f7f7 50%, #2166ac 100%)'
   };
 
   readonly temperatureLegendGradient: Record<temperatureMode, string> = {
@@ -85,8 +85,8 @@ export class ClimateSummary2025Component implements OnInit {
   };
 
   readonly temperatureSrc: Partial<Record<temperatureMode, string>> = {
-    total: '/climate-summary/annual_tmean_2024_agg.png',
-    anom: '/climate-summary/annual_tmean_2024_anomaly.png',
+    total: 'climate-summary/annual_tmean_2024_agg.png',
+    anom: 'climate-summary/annual_tmean_2024_anomaly.png',
   };
 
   setRainfallMode(mode: rainfallMode) {
@@ -119,7 +119,7 @@ export class ClimateSummary2025Component implements OnInit {
 
   ngOnInit(): void {
     this.http
-      .get('/climate-summary/monthly_summary.csv', { responseType: 'text' })
+      .get('climate-summary/monthly_summary.csv', { responseType: 'text' })
       .subscribe((csv) => {
         const parsed = this.parseMonthlyCsv(csv);
 
