@@ -100,8 +100,8 @@ export class ClimateSummary2025Component implements OnInit {
   };
 
   readonly temperatureSrc: Partial<Record<temperatureMode, string>> = {
-    total: 'climate-summary/annual_tmean_2024_agg.png',
-    anom: 'climate-summary/annual_tmean_2024_anomaly.png',
+    total: 'climate-summary/annual_tmean_2025_agg.png',
+    anom: 'climate-summary/annual_tmean_2025_anomaly.png',
   };
 
   setRainfallMode(mode: rainfallMode) {
