@@ -59,21 +59,24 @@
           />
 
 
-          <div class="legend" aria-label="Legend">
+          <div class="legend legend--v" aria-label="Legend">
             <h4>{{ rainfallLegendTitle[rainfallMode] }}</h4>
 
-            <div
-              class="legend-bar"
-              aria-hidden="true"
-              [style.background]="rainfallLegendGradient[rainfallMode]"
-            ></div>
+            <div class="legend-v">
+              <div
+                class="legend-bar"
+                aria-hidden="true"
+                [style.background]="rainfallLegendGradient[rainfallMode]"
+              ></div>
 
-            <div class="legend-scale">
-              <span *ngFor="let t of rainfallLegendTicks[rainfallMode]">
-                {{ t }}{{ rainfallLegendUnit[rainfallMode] }}
-              </span>
+              <div class="legend-ticks">
+                <span *ngFor="let t of rainfallLegendTicks[rainfallMode]">
+                  {{ t }}{{ rainfallLegendUnit[rainfallMode] }}
+                </span>
+              </div>
             </div>
           </div>
+
 
 
         </div>
@@ -111,19 +114,21 @@
           />
 
 
-          <div class="legend" aria-label="Legend">
+          <div class="legend legend--v" aria-label="Legend">
             <h4>{{ droughtLegendTitle }}</h4>
 
-            <div
-              class="legend-bar"
-              aria-hidden="true"
-              [style.background]="droughtLegendGradient"
-            ></div>
+            <div class="legend-v">
+              <div
+                class="legend-bar"
+                aria-hidden="true"
+                [style.background]="droughtLegendGradient"
+              ></div>
 
-            <div class="legend-scale">
-              <span *ngFor="let t of droughtLegendTicks">
-                {{ t }}{{ droughtLegendUnit }}
-              </span>
+              <div class="legend-ticks">
+                <span *ngFor="let t of droughtLegendTicks">
+                  {{ t }}{{ droughtLegendUnit }}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -186,19 +191,21 @@
             [attr.alt]="'Temperature map: ' + temperatureModeLabel[temperatureMode]"
           />
 
-          <div class="legend" aria-label="Legend">
+          <div class="legend legend--v" aria-label="Legend">
             <h4>{{ temperatureLegendTitle[temperatureMode] }}</h4>
 
-            <div
-              class="legend-bar"
-              aria-hidden="true"
-              [style.background]="temperatureLegendGradient[temperatureMode]"
-            ></div>
+            <div class="legend-v">
+              <div
+                class="legend-bar"
+                aria-hidden="true"
+                [style.background]="temperatureLegendGradient[temperatureMode]"
+              ></div>
 
-            <div class="legend-scale">
-              <span *ngFor="let t of temperatureLegendTicks[temperatureMode]">
-                {{ t }}{{ temperatureLegendUnit[temperatureMode] }}
-              </span>
+              <div class="legend-ticks">
+                <span *ngFor="let t of temperatureLegendTicks[temperatureMode]">
+                  {{ t }}{{ temperatureLegendUnit[temperatureMode] }}
+                </span>
+              </div>
             </div>
           </div>
         </div>

@@ -55,7 +55,7 @@ export class ClimateSummary2025Component implements OnInit {
   readonly droughtLegendTicks = ['-3.0', '0', '3.0'];
   readonly droughtLegendUnit = '';
   readonly droughtLegendGradient =
-  'linear-gradient(90deg, #b2182b 0%, #f7f7f7 50%, #2166ac 100%)';
+  'linear-gradient(180deg, #b2182b 0%, #f7f7f7 50%, #2166ac 100%)';
 
   readonly rainfallLegendTitle: Record<rainfallMode, string> = {
     total: 'Total rainfall (in)',
@@ -89,14 +89,15 @@ export class ClimateSummary2025Component implements OnInit {
 
   readonly rainfallLegendGradient: Record<rainfallMode, string> = {
     total:
-      'linear-gradient(90deg, #fde725 0%, #5ec962 25%, #21918c 50%, #3b528b 75%, #440154 100%)',
-    pdiff: 'linear-gradient(90deg, #b2182b 0%, #f7f7f7 50%, #2166ac 100%)'
+      'linear-gradient(180deg, #fde725 0%, #5ec962 25%, #21918c 50%, #3b528b 75%, #440154 100%)',
+    pdiff:
+      'linear-gradient(180deg, #b2182b 0%, #f7f7f7 50%, #2166ac 100%)',
   };
 
   readonly temperatureLegendGradient: Record<temperatureMode, string> = {
     total:
-      'linear-gradient(90deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)',
-    anom: 'linear-gradient(90deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)',
+      'linear-gradient(180deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)',
+    anom: 'linear-gradient(180deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)',
   };
 
   readonly temperatureSrc: Partial<Record<temperatureMode, string>> = {
