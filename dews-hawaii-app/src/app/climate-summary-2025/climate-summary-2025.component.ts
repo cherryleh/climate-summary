@@ -8,6 +8,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 type rainfallMode = 'total' | 'pdiff' ;
 type temperatureMode = 'total' | 'anom';
 type monthMode = 'monthly' | 'anomaly';
+type LegendItem = { color: string; label: string };
 
 @Component({
   selector: 'app-climate-summary-2025',
@@ -19,14 +20,14 @@ type monthMode = 'monthly' | 'anomaly';
 export class ClimateSummary2025Component implements OnInit {
   constructor(private http: HttpClient) {}
 
-  // --- your existing stuff ---
   readonly tabs: { key: rainfallMode; label: string }[] = [
     { key: 'total', label: 'Total rainfall' },
     { key: 'pdiff', label: 'Percent Difference' }
   ];
 
+  //Defaults
   rainfallMode: rainfallMode = 'pdiff';
-  temperatureMode: temperatureMode = 'total';
+  temperatureMode: temperatureMode = 'anom';
   monthMode: monthMode = 'monthly';
 
   readonly rainfallModeLabel: Record<rainfallMode, string> = {
@@ -51,11 +52,11 @@ export class ClimateSummary2025Component implements OnInit {
 
   readonly droughtSrc = 'climate-summary/spi12.png';
 
-  readonly droughtLegendTitle = 'Standardized Precipitation Index (SPI-12)';
-  readonly droughtLegendTicks = ['-3.0', '0', '3.0'];
+  readonly droughtLegendTitle = 'Drought (SPI-12)';
+  readonly droughtLegendTicks = ['3.0', '0', '-3.0'];
   readonly droughtLegendUnit = '';
   readonly droughtLegendGradient =
-  'linear-gradient(180deg, #b2182b 0%, #f7f7f7 50%, #2166ac 100%)';
+  'linear-gradient(180deg, #2166ac 0%, #f7f7f7 50%,  #b2182b 100%)';
 
   readonly rainfallLegendTitle: Record<rainfallMode, string> = {
     total: 'Total rainfall (in)',
@@ -63,9 +64,47 @@ export class ClimateSummary2025Component implements OnInit {
   };
 
   readonly rainfallLegendTicks: Record<rainfallMode, string[]> = {
-    total: ['0', '300'],
+    total: ['300', '0'],
     pdiff: ['-100', '0', '100']
   };
+
+  
+
+  readonly temperatureLegendItems: Record<temperatureMode, LegendItem[] | null> = {
+    total: null,
+    anom: [
+      { color: '#730000', label: '> 2.25°F' },
+      { color: '#FF0000', label: '1.75 to 2.25°F' },
+      { color: '#FF4d00', label: '1.25 to 1.75°F' },
+      { color: '#FF9900', label: '0.75 to 1.25°F' },
+      { color: '#ffe1c2', label: '0.25 to 0.75°F' },
+      { color: '#FFFFFF', label: '-0.25 to 0.25°F' },
+      { color: '#cfe8ff', label: '-0.75 to -0.25°F' },
+      { color: '#66a3ff', label: '-1.25 to -0.75°F' },
+      { color: '#0066CC', label: '-1.75 to -1.25°F' },
+      { color: '#003d80', label: '-2.25 to -1.75°F' },
+      { color: '#001933', label: '< -2.25°F' },
+    ],
+  };
+
+  readonly rainfallLegendItems: Record<rainfallMode, LegendItem[] | null> = {
+    total: null,
+    pdiff: [
+      { color: '#001933', label: '> 90%' },
+      { color: '#0066cc', label: '70 to 90%' },
+      { color: '#4d94ff', label: '50 to 70%' },
+      { color: '#99ccff', label: '30 to 50%' },
+      { color: '#d6f0ff', label: '15 to 30%' },
+      { color: '#ffffff', label: '-15 to 15%' },
+      { color: '#ff9900', label: '-30 to -15%' },
+      { color: '#ff4d00', label: '-50 to -30%' },
+      { color: '#b30000', label: '-70 to -50%' },
+      { color: '#7a0000', label: '-90 to -70%' },
+      { color: '#4a0000', label: '< -90%' },
+    ],
+  };
+
+
 
    readonly temperatureLegendTitle: Record<temperatureMode, string> = {
     total: 'Average temperature (°F)',
@@ -73,8 +112,8 @@ export class ClimateSummary2025Component implements OnInit {
   };
 
   readonly temperatureLegendTicks: Record<temperatureMode, string[]> = {
-    total: ['40', '90'],
-    anom: ['-1.5', '0', '1.5'],
+    total: ['90', '40'],
+    anom: ['-2.25', '0', '2.25'],
   };
 
   readonly rainfallLegendUnit: Record<rainfallMode, string> = {
@@ -96,7 +135,7 @@ export class ClimateSummary2025Component implements OnInit {
 
   readonly temperatureLegendGradient: Record<temperatureMode, string> = {
     total:
-      'linear-gradient(180deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)',
+      'linear-gradient(180deg, #b2182b 0%, #f7f7f7 50%, #2166ac 100%)',
     anom: 'linear-gradient(180deg, #2166ac 0%, #f7f7f7 50%, #b2182b 100%)',
   };
 

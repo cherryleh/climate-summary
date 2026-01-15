@@ -1,17 +1,8 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rainfall in 2025</title>
 
-</head>
-
-<body>
   <header class="hero" aria-label="Header">
   <div class="hero-inner">
-  <h1 class="hero-title">Hawaiʻi Climate in 2025</h1>
-  <p class="hero-subtitle">A statewide summary of rainfall, temperature, extremes, and climate impacts across Hawaiʻi in 2025.</p>
+  <h1 class="hero-title">2025 Hawaiʻi Annual Climate Report</h1>
+  <p class="hero-subtitle">A statewide summary of rainfall, drought, temperature and extremes across Hawaiʻi in 2025.</p>
 
     <div class="hero-logos" aria-label="Logos">
       <img class="hero-logo-img hcdp-logo" src="logos/hcdp.png" alt="HCDP logo" />
@@ -59,26 +50,36 @@
           />
 
 
-          <div class="legend legend--v" aria-label="Legend">
+          <div class="legend" aria-label="Legend">
             <h4>{{ rainfallLegendTitle[rainfallMode] }}</h4>
 
-            <div class="legend-v">
-              <div
-                class="legend-bar"
-                aria-hidden="true"
-                [style.background]="rainfallLegendGradient[rainfallMode]"
-              ></div>
-
-              <div class="legend-ticks">
-                <span *ngFor="let t of rainfallLegendTicks[rainfallMode]">
-                  {{ t }}{{ rainfallLegendUnit[rainfallMode] }}
-                </span>
+            <!-- DISCRETE (pdiff categories) -->
+            <div *ngIf="rainfallLegendItems[rainfallMode] as items; else continuousLegend"
+                 class="legend-discrete">
+              <div class="legend-row" *ngFor="let it of items">
+                <span class="swatch" [style.background]="it.color" aria-hidden="true"></span>
+                <span class="lbl">{{ it.label }}</span>
               </div>
             </div>
+
+            <ng-template #continuousLegend>
+              <div class="legend--v">
+                <div class="legend-v">
+                  <div
+                    class="legend-bar"
+                    aria-hidden="true"
+                    [style.background]="rainfallLegendGradient[rainfallMode]"
+                  ></div>
+
+                  <div class="legend-ticks">
+                    <span *ngFor="let t of rainfallLegendTicks[rainfallMode]">
+                      {{ t }}{{ rainfallLegendUnit[rainfallMode] }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
           </div>
-
-
-
         </div>
       </section>
 
@@ -163,6 +164,16 @@
         class="tab"
         type="button"
         role="tab"
+        [class.active]="temperatureMode === 'anom'"
+        [attr.aria-selected]="temperatureMode === 'anom'"
+        (click)="setTemperatureMode('anom')"
+      >
+        Anomaly
+      </button>
+      <button
+        class="tab"
+        type="button"
+        role="tab"
         [class.active]="temperatureMode === 'total'"
         [attr.aria-selected]="temperatureMode === 'total'"
         (click)="setTemperatureMode('total')"
@@ -170,16 +181,7 @@
         Average temperature
       </button>
 
-      <button
-        class="tab"
-        type="button"
-        role="tab"
-        [class.active]="temperatureMode === 'anom'"
-        [attr.aria-selected]="temperatureMode === 'anom'"
-        (click)="setTemperatureMode('anom')"
-      >
-        Anomaly
-      </button>
+      
     </div>
 
     <div class="grid">
@@ -191,22 +193,34 @@
             [attr.alt]="'Temperature map: ' + temperatureModeLabel[temperatureMode]"
           />
 
-          <div class="legend legend--v" aria-label="Legend">
+          <div class="legend" aria-label="Legend">
             <h4>{{ temperatureLegendTitle[temperatureMode] }}</h4>
 
-            <div class="legend-v">
-              <div
-                class="legend-bar"
-                aria-hidden="true"
-                [style.background]="temperatureLegendGradient[temperatureMode]"
-              ></div>
-
-              <div class="legend-ticks">
-                <span *ngFor="let t of temperatureLegendTicks[temperatureMode]">
-                  {{ t }}{{ temperatureLegendUnit[temperatureMode] }}
-                </span>
+            <div *ngIf="temperatureLegendItems[temperatureMode] as items; else continuousLegend"
+                 class="legend-discrete">
+              <div class="legend-row" *ngFor="let it of items">
+                <span class="swatch" [style.background]="it.color" aria-hidden="true"></span>
+                <span class="lbl">{{ it.label }}</span>
               </div>
             </div>
+
+            <ng-template #continuousLegend>
+              <div class="legend--v">
+                <div class="legend-v">
+                  <div
+                    class="legend-bar"
+                    aria-hidden="true"
+                    [style.background]="temperatureLegendGradient[temperatureMode]"
+                  ></div>
+
+                  <div class="legend-ticks">
+                    <span *ngFor="let t of temperatureLegendTicks[temperatureMode]">
+                      {{ t }}{{ temperatureLegendUnit[temperatureMode] }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
           </div>
         </div>
       </section>
@@ -275,7 +289,7 @@
     <h1 class="title">Extremes and Records</h1>
     <h2 class="subsection-title">Wettest Day</h2>
     <p class="subtitle">
-      Wettest single-day rainfall in 2025 summarized statewide, by county, and by pixel.
+      Wettest single-day rainfall in 2025 summarized statewide, by island, and by location.
     </p>
 
     <div class="wettest-grid">
@@ -293,7 +307,7 @@
       </article>
       <article class="card mini-card">
         <div class="mini-top">
-          <h3 class="mini-kicker">By county</h3>
+          <h3 class="mini-kicker">By island</h3>
         </div>
 
         <div class="mini-value">Maui had the highest county-average day</div>
@@ -302,7 +316,7 @@
         </p>
 
         <details class="mini-detail">
-          <summary>Show county list</summary>
+          <summary>Show island list</summary>
           <div class="detail-body">
             <div><b>Honolulu:</b> Jan 30 — 2.96 in</div>
             <div><b>Maui:</b> Jan 30 — 4.49 in</div>
@@ -317,7 +331,7 @@
 
       <article class="card mini-card">
         <div class="mini-top">
-          <h3 class="mini-kicker">Most Rain by Pixel</h3>
+          <h3 class="mini-kicker">Most Rain by Location</h3>
         </div>
 
         <div class="mini-value">November 02</div>
@@ -376,7 +390,7 @@
       </div> -->
       <h2 class="subsection-title">Hot and Cool Day</h2>
       <p class="subtitle">
-        Hottest and coolest temperatures in 2025 summarized statewide, by county, and by pixel.
+        Hottest and coolest temperatures in 2025 summarized statewide, by county, and location.
       </p>
 
       <div class="wettest-grid">
@@ -393,16 +407,16 @@
         </article>
         <article class="card mini-card">
           <div class="mini-top">
-            <h3 class="mini-kicker">By county</h3>
+            <h3 class="mini-kicker">By island</h3>
           </div>
 
-          <div class="mini-value">Warmest county: Maui</div>
+          <div class="mini-value">Warmest island: Maui</div>
           <p class="mini-desc">
             
           </p>
 
           <details class="mini-detail">
-            <summary>Show county list</summary>
+            <summary>Show island list</summary>
             <div class="detail-body">
               <div><b>Honolulu:</b> Jan 30 — 2.96 in</div>
               <div><b>Maui:</b> Jan 30 — 4.49 in</div>
@@ -417,7 +431,7 @@
 
         <article class="card mini-card">
           <div class="mini-top">
-            <h3 class="mini-kicker">Hottest by Pixel</h3>
+            <h3 class="mini-kicker">Hottest by Location</h3>
           </div>
 
           <div class="mini-value">September 30</div>
@@ -462,7 +476,7 @@
 
         <article class="card mini-card">
           <div class="mini-top">
-            <h3 class="mini-kicker">Coolest by Pixel</h3>
+            <h3 class="mini-kicker">Coolest by Location</h3>
           </div>
 
           <div class="mini-value">March 11</div>
@@ -551,5 +565,3 @@
             To subscribe, please email...
     </div>
   </div>
-</body>
-</html>
