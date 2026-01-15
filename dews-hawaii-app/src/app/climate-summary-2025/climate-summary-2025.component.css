@@ -622,7 +622,7 @@ color: var(--text);
 
 
 .hero-subtitle{
-margin: 12px 0 0;
+margin: 20px 0 0;
 max-width: 70%;
 font-size: 1.05rem;
 line-height: 1.55;
@@ -646,7 +646,7 @@ color: var(--muted);
   align-items: flex-end;
   gap: 14px;
   z-index: 5;
-  margin-right: 10%;
+  margin-right: 5%;
 }
 
 /* set the size HERE (not height:auto) */
@@ -689,4 +689,109 @@ color: var(--muted);
 }
 @media (max-width: 640px){
   .wettest-grid{ grid-template-columns: 1fr; }
+}
+
+
+
+
+/* Overlay sits on top of the map image */
+.island-overlay{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2; /* map image is z=1, legend is z=3 */
+  pointer-events: none; /* enable events only on paths */
+}
+
+/* Make island shapes interactive */
+.island-overlay .island{
+  pointer-events: all;
+
+  fill: rgba(43, 87, 217, 0.00);  /* invisible by default */
+  stroke: rgba(43, 87, 217, 0.00);
+  stroke-width: 2;
+
+  cursor: pointer;
+  transition: fill 120ms ease, stroke 120ms ease, stroke-width 120ms ease;
+}
+
+/* Hover/focus state */
+.island-overlay .island:hover,
+.island-overlay .island:focus{
+  fill: rgba(43, 87, 217, 0.12);
+  stroke: rgba(43, 87, 217, 0.55);
+  stroke-width: 2.5;
+  outline: none;
+}
+
+/* “Pinned” active class while hovered */
+.island-overlay .island.active{
+  fill: rgba(43, 87, 217, 0.10);
+  stroke: rgba(43, 87, 217, 0.50);
+}
+
+.muted-inline{
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  margin-left: 6px;
+}
+
+/* Overlay sits on top of the map image */
+.island-overlay{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ALWAYS visible outlines (no hover needed) */
+.island-overlay .island{
+  pointer-events: all;
+
+  /* outline always on */
+  fill: rgba(255, 255, 255, 0.06);          
+  stroke: rgba(0, 0, 0, 0.55);              
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;        
+  stroke-linejoin: round;
+  stroke-linecap: round;
+
+  cursor: pointer;
+}
+
+/* Optional: make hover just a little stronger (but not required) */
+.island-overlay .island:hover,
+.island-overlay .island:focus{
+  fill: rgba(43, 87, 217, 0.12);
+  stroke: rgba(0, 0, 0, 0.75);
+  stroke-width: 3;
+  outline: none;
+}
+
+/* Optional: while active */
+.island-overlay .island.active{
+  fill: rgba(43, 87, 217, 0.10);
+}
+
+.map-svg{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+}
+
+.map-svg .island{
+  pointer-events: all;
+  fill: none;
+  stroke: none;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
 }

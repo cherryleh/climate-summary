@@ -42,12 +42,39 @@
 
     <div class="grid">
       <section class="card map-card">
-        <div class="map-stage">
-          <img
-            class="map-img base"
-            [src]="rainfallSrc[rainfallMode]"
-            [attr.alt]="'Rainfall map: ' + rainfallModeLabel[rainfallMode]"
-          />
+          <div class="map-stage">
+
+          <!-- SVG map + hover overlay -->
+          <svg
+            class="map-svg"
+            [attr.viewBox]="mapW && mapH ? ('0 0 ' + mapW + ' ' + mapH) : '0 0 1 1'"
+            preserveAspectRatio="xMidYMid meet"
+            aria-label="Rainfall map with island hover regions"
+          >
+            <image
+              [attr.href]="rainfallSrc[rainfallMode]"
+              x="0"
+              y="0"
+              [attr.width]="mapW || 1"
+              [attr.height]="mapH || 1"
+              preserveAspectRatio="xMidYMid meet"
+            ></image>
+
+            <path
+              *ngFor="let isl of islandPaths"
+              class="island"
+              [class.active]="hoverIsland === isl.id"
+              [attr.d]="isl.d"
+              (mouseenter)="setHoverIsland(isl.id)"
+              (mouseleave)="clearHoverIsland()"
+              (focus)="setHoverIsland(isl.id)"
+              (blur)="clearHoverIsland()"
+              (click)="setHoverIsland(isl.id)"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="isl.label"
+            ></path>
+          </svg>
 
 
           <div class="legend" aria-label="Legend">
@@ -93,11 +120,16 @@
         </article>
 
         <article class="card callout callout--secondary">
-          <div class="callout-kicker">Highlights</div>
+          <div class="callout-kicker">
+            Highlights
+            <span class="muted-inline" *ngIf="hoverIslandLabel as lbl">— {{ lbl }}</span>
+          </div>
+
           <p class="callout-text">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            {{ rainfallHighlightsText }}
           </p>
         </article>
+
       </aside>
 
     </div>

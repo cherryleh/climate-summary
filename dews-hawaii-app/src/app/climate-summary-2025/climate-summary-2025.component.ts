@@ -10,6 +10,9 @@ type temperatureMode = 'total' | 'anom';
 type monthMode = 'monthly' | 'anomaly';
 type LegendItem = { color: string; label: string };
 
+type IslandKey = 'kauai'|'oahu'|'molokai'|'lanai'|'maui'|'kahoolawe'|'hawaii';
+
+
 @Component({
   selector: 'app-climate-summary-2025',
   standalone: true,
@@ -154,6 +157,10 @@ export class ClimateSummary2025Component implements OnInit {
     this.monthMode = mode;
   }
 
+   mapW = 0;
+  mapH = 0;
+
+
   Highcharts: typeof Highcharts = Highcharts;
 
   monthlyChartOptions: Highcharts.Options = {
@@ -236,29 +243,15 @@ export class ClimateSummary2025Component implements OnInit {
       });
 
     // Monthly Anomaly
-    this.http
-    .get('climate-summary/monthly_anomaly_summary.csv', { responseType: 'text' })
-    .subscribe({
-      next: (csv) => {
-        const parsed = this.parseMonthlyAnomalyCsv(csv);
-
-        const categories = parsed.map((r) => r.monthName);
-        const rfAnom = parsed.map((r) => r.rf_anomaly);
-        const tAnom = parsed.map((r) => r.t_anomaly);
-
-        this.anomalyChartOptions = {
-          ...this.anomalyChartOptions,
-          xAxis: {
-            ...(this.anomalyChartOptions.xAxis as Highcharts.XAxisOptions),
-            categories,
-          },
-          series: [
-            { type: 'column', name: 'Rainfall anomaly', data: rfAnom, yAxis: 0 },
-            { type: 'spline', name: 'Temperature anomaly', data: tAnom, yAxis: 1 },
-          ],
-        };
+    this.http.get('hawaii_islands_overlay.svg', { responseType: 'text' }).subscribe({
+      next: (svgText) => {
+        const parsed = this.parseIslandSvg(svgText);
+        this.islandPaths = parsed.paths;
+        this.mapW = parsed.w;
+        this.mapH = parsed.h;
+        console.log('overlay viewBox:', this.mapW, this.mapH, 'paths:', this.islandPaths.length);
       },
-      error: (err) => console.error('Failed to load monthly_anomaly_summary.csv', err),
+      error: (err) => console.error('Failed to load hawaii_islands_overlay.svg', err),
     });
 
 
@@ -313,6 +306,79 @@ export class ClimateSummary2025Component implements OnInit {
         };
       })
       .filter((r) => Number.isFinite(r.rf_anomaly) && Number.isFinite(r.t_anomaly));
+  }
+
+  islandPaths: Array<{ id: IslandKey; label: string; d: string }> = [];
+
+  private readonly islandLabel: Record<IslandKey, string> = {
+    kauai: 'Kauaʻi',
+    oahu: 'Oʻahu',
+    molokai: 'Molokaʻi',
+    lanai: 'Lānaʻi',
+    maui: 'Maui',
+    kahoolawe: 'Kahoʻolawe',
+    hawaii: 'Hawaiʻi Island',
+  };
+
+  private parseIslandSvg(svgText: string): { w: number; h: number; paths: Array<{ id: IslandKey; label: string; d: string }> } {
+    const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+
+    const svg = doc.querySelector('svg');
+    const vb = (svg?.getAttribute('viewBox') || '').trim(); // "0 0 W H"
+    const parts = vb.split(/\s+/).map(Number);
+
+    const w = parts.length === 4 ? parts[2] : 0;
+    const h = parts.length === 4 ? parts[3] : 0;
+
+    const out: Array<{ id: IslandKey; label: string; d: string }> = [];
+
+    for (const p of Array.from(doc.querySelectorAll('path'))) {
+      const raw = (p.getAttribute('data-island') || '').trim().toLowerCase();
+
+      // normalize Kauaʻi -> kauai, Hawaiʻi -> hawaii, etc.
+      const id = raw
+        .replace(/[ʻ’']/g, '')
+        .replace(/[^a-z]/g, '') as IslandKey;
+
+      const d = p.getAttribute('d') || '';
+      if (!d) continue;
+      if (!Object.prototype.hasOwnProperty.call(this.islandLabel, id)) continue;
+
+      out.push({ id, label: this.islandLabel[id], d });
+    }
+
+    return { w, h, paths: out };
+  }
+
+
+  hoverIsland: IslandKey | null = null;
+
+  setHoverIsland(k: IslandKey) {
+    this.hoverIsland = k;
+  }
+
+  clearHoverIsland() {
+    this.hoverIsland = null;
+  }
+
+  get hoverIslandLabel(): string | null {
+    return this.hoverIsland ? this.islandLabel[this.hoverIsland] : null;
+  }
+ 
+
+  private readonly rainfallHighlightsByIsland: Record<IslandKey, string> = {
+    kauai: 'Kauaʻi highlight...',
+    oahu: 'Oʻahu highlight...',
+    molokai: 'Molokaʻi highlight...',
+    lanai: 'Lānaʻi highlight...',
+    maui: 'Maui highlight...',
+    kahoolawe: 'Kahoʻolawe highlight...',
+    hawaii: 'Hawaiʻi Island highlight...',
+  };
+
+  get rainfallHighlightsText(): string {
+    if (!this.hoverIsland) return 'Hover an island to see rainfall highlights.';
+    return this.rainfallHighlightsByIsland[this.hoverIsland] ?? 'No highlight yet.';
   }
 
 }
