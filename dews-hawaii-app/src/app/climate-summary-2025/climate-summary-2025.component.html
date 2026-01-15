@@ -31,22 +31,21 @@
         class="tab"
         type="button"
         role="tab"
-        [class.active]="rainfallMode === 'total'"
-        [attr.aria-selected]="rainfallMode === 'total'"
-        (click)="setRainfallMode('total')"
-      >
-        Total rainfall
-      </button>
-
-      <button
-        class="tab"
-        type="button"
-        role="tab"
         [class.active]="rainfallMode === 'pdiff'"
         [attr.aria-selected]="rainfallMode === 'pdiff'"
         (click)="setRainfallMode('pdiff')"
       >
         Percent difference
+      </button>
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="rainfallMode === 'total'"
+        [attr.aria-selected]="rainfallMode === 'total'"
+        (click)="setRainfallMode('total')"
+      >
+        Total rainfall
       </button>
     </div>
 
@@ -93,6 +92,57 @@
           <div class="callout-kicker">Highlights</div>
           <p class="callout-text">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          </p>
+        </article>
+      </aside>
+
+    </div>
+    </div>
+    <div class="section">
+    <h1 class="title">Drought in 2025</h1>
+    <p class="subtitle">Explore annual rainfall totals, percent of normal, and departures from climatology.</p>
+
+    <div class="grid">
+      <section class="card map-card">
+        <div class="map-stage">
+          <img
+            class="map-img base"
+            [src]="droughtSrc"
+          />
+
+
+          <div class="legend" aria-label="Legend">
+            <h4>{{ droughtLegendTitle }}</h4>
+
+            <div
+              class="legend-bar"
+              aria-hidden="true"
+              [style.background]="droughtLegendGradient"
+            ></div>
+
+            <div class="legend-scale">
+              <span *ngFor="let t of droughtLegendTicks">
+                {{ t }}{{ droughtLegendUnit }}
+              </span>
+            </div>
+          </div>
+
+
+        </div>
+      </section>
+
+      <aside class="callouts" aria-label="Rainfall takeaways">
+        <article class="card callout callout--primary">
+          <div class="callout-kicker">SPI</div>
+          <div class="callout-value"></div>
+          <p class="callout-text">
+            
+          </p>
+        </article>
+
+        <article class="card callout callout--secondary">
+          <div class="callout-kicker"></div>
+          <p class="callout-text">
           </p>
         </article>
       </aside>
@@ -174,10 +224,41 @@
     </div>
     <div class="section">
     <h1 class="title">Monthly Breakdown</h1>
+    <div class="tabs" role="tablist" aria-label="Rainfall map mode">
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="monthMode === 'monthly'"
+        [attr.aria-selected]="monthMode === 'monthly'"
+        (click)="setMonthMode('monthly')"
+      >
+        {{ monthModeLabel['monthly'] }}
+      </button>
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="monthMode === 'anomaly'"
+        [attr.aria-selected]="monthMode === 'anomaly'"
+        (click)="setMonthMode('anomaly')"
+      >
+        {{ monthModeLabel['anomaly'] }}
+      </button>
+        
+    </div>
     <section class="card chart-card" aria-label="Monthly breakdown chart">
+      
       <highcharts-chart
+        *ngIf="monthMode === 'monthly'"
         [Highcharts]="Highcharts"
         [options]="monthlyChartOptions"
+        style="width: 100%; height: 420px; display: block;"
+      ></highcharts-chart>
+      <highcharts-chart
+        *ngIf="monthMode === 'anomaly'"
+        [Highcharts]="Highcharts"
+        [options]="anomalyChartOptions"
         style="width: 100%; height: 420px; display: block;"
       ></highcharts-chart>
     </section>
