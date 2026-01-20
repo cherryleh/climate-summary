@@ -18,6 +18,11 @@ type RainHighlight = {
   rankText: string;
 };
 
+type DroughtHighlight = {
+  percentDry: number;
+  percentModerateDrought: number;
+};
+
 @Component({
   selector: 'app-climate-summary-2025',
   standalone: true,
@@ -81,17 +86,15 @@ export class ClimateSummary2025Component implements OnInit {
   readonly temperatureLegendItems: Record<temperatureMode, LegendItem[] | null> = {
     total: null,
     anom: [
-      { color: '#730000', label: '> 2.25°F' },
-      { color: '#FF0000', label: '1.75 to 2.25°F' },
-      { color: '#FF4d00', label: '1.25 to 1.75°F' },
+      { color: '#730000', label: '> 1.75°F' },
+      { color: '#FF0000', label: '1.25 to 1.75°F' },
       { color: '#FF9900', label: '0.75 to 1.25°F' },
       { color: '#ffe1c2', label: '0.25 to 0.75°F' },
       { color: '#FFFFFF', label: '-0.25 to 0.25°F' },
       { color: '#cfe8ff', label: '-0.75 to -0.25°F' },
       { color: '#66a3ff', label: '-1.25 to -0.75°F' },
       { color: '#0066CC', label: '-1.75 to -1.25°F' },
-      { color: '#003d80', label: '-2.25 to -1.75°F' },
-      { color: '#001933', label: '< -2.25°F' },
+      { color: '#003d80', label: '< -1.75°F' },
     ],
   };
 
@@ -379,19 +382,31 @@ export class ClimateSummary2025Component implements OnInit {
   }
 
 
-  hoverIsland: IslandKey | null = null;
+  hoverRainIsland: IslandKey | null = null;
+  hoverDroughtIsland: IslandKey | null = null;
+  hoverTempIsland: IslandKey | null = null;
 
-  setHoverIsland(k: IslandKey) {
-    this.hoverIsland = k;
+  setHoverIsland(panel: 'rain' | 'drought' | 'temp', k: IslandKey) {
+    if (panel === 'rain') this.hoverRainIsland = k;
+    if (panel === 'drought') this.hoverDroughtIsland = k;
+    if (panel === 'temp') this.hoverTempIsland = k;
   }
 
-  clearHoverIsland() {
-    this.hoverIsland = null;
+  clearHoverIsland(panel: 'rain' | 'drought' | 'temp') {
+    if (panel === 'rain') this.hoverRainIsland = null;
+    if (panel === 'drought') this.hoverDroughtIsland = null;
+    if (panel === 'temp') this.hoverTempIsland = null;
   }
 
-  get hoverIslandLabel(): string | null {
-    return this.hoverIsland ? this.islandLabel[this.hoverIsland] : null;
+  hoverIslandLabel(panel: 'rain' | 'drought' | 'temp'): string | null {
+    const k =
+      panel === 'rain' ? this.hoverRainIsland :
+      panel === 'drought' ? this.hoverDroughtIsland :
+      this.hoverTempIsland;
+
+    return k ? this.islandLabel[k] : null;
   }
+
 
   private readonly rainfallHighlightsByIsland: Record<IslandKey, RainHighlight> = {
     kauai:      { totalIn: 67.02, pdiff: -14.2, rankText: '21st driest on record (106 years)' },
@@ -403,9 +418,24 @@ export class ClimateSummary2025Component implements OnInit {
     hawaii:     { totalIn: 40.65, pdiff: -47.0, rankText: '2nd driest on record (106 years)' },
   };
 
-  get rainfallHighlight(): RainHighlight | null {
-    return this.hoverIsland ? this.rainfallHighlightsByIsland[this.hoverIsland] : null;
+  private readonly droughtHighlightsByIsland: Record<IslandKey, DroughtHighlight> = {
+    kauai:      { percentDry: 56, percentModerateDrought: 50 },
+    oahu:       { percentDry: 45, percentModerateDrought: 60 },
+    molokai:    { percentDry: 100, percentModerateDrought: 80 },
+    lanai:      { percentDry: 82, percentModerateDrought: 85 },
+    maui:       { percentDry: 83, percentModerateDrought: 90 },
+    kahoolawe:  { percentDry: 0, percentModerateDrought: 95 },
+    hawaii:     { percentDry: 61, percentModerateDrought: 70 },
+  };
+
+  get droughtHighlight(): DroughtHighlight | null {
+    return this.hoverDroughtIsland ? this.droughtHighlightsByIsland[this.hoverDroughtIsland] : null;
   }
+
+  get rainfallHighlight(): RainHighlight | null {
+    return this.hoverRainIsland ? this.rainfallHighlightsByIsland[this.hoverRainIsland] : null;
+  }
+
 
   fmtIn(x: number) { return x.toFixed(2); }
   fmtPct(x: number) { return `${x > 0 ? '+' : ''}${x.toFixed(0)}%`; }

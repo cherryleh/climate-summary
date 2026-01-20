@@ -389,6 +389,7 @@ highcharts-chart{
   font-size: 15px;
   line-height: 1.2;
   color: #22324a;
+  margin-top: 5px;
 }
 
 /* If your grid collapses to 1 column, keep nice spacing */
@@ -413,7 +414,7 @@ highcharts-chart{
   position: relative;
   border-radius: calc(var(--radius) - 6px);
   overflow: hidden;
-  background: #eef3fb;
+  background: #ccecff;
   border: 1px solid rgba(230, 237, 247, 0.9);
 }
 

@@ -61,17 +61,18 @@
             <path
               *ngFor="let isl of islandPaths"
               class="island"
-              [class.active]="hoverIsland === isl.id"
+              [class.active]="hoverRainIsland === isl.id"
               [attr.d]="isl.d"
-              (mouseenter)="setHoverIsland(isl.id)"
-              (mouseleave)="clearHoverIsland()"
-              (focus)="setHoverIsland(isl.id)"
-              (blur)="clearHoverIsland()"
-              (click)="setHoverIsland(isl.id)"
+              (mouseenter)="setHoverIsland('rain', isl.id)"
+              (mouseleave)="clearHoverIsland('rain')"
+              (focus)="setHoverIsland('rain', isl.id)"
+              (blur)="clearHoverIsland('rain')"
+              (click)="setHoverIsland('rain', isl.id)"
               tabindex="0"
               role="button"
               [attr.aria-label]="isl.label"
             ></path>
+
           </svg>
 
 
@@ -119,13 +120,12 @@
         <article class="card callout callout--secondary">
           <div class="callout-kicker">
             Highlights
-            <span class="muted-inline" *ngIf="hoverIslandLabel as lbl">— {{ lbl }}</span>
+            <span class="muted-inline" *ngIf="hoverIslandLabel('rain') as lbl">— {{ lbl }}</span>
           </div>
 
           <ng-container *ngIf="rainfallHighlight as h; else noHover">
             <p class="hi-sentence">
-              {{ hoverIslandLabel }} recorded <strong>{{ fmtIn(h.totalIn) }} in</strong>
-
+              {{ hoverIslandLabel('rain') }} recorded <strong>{{ fmtIn(h.totalIn) }} in</strong>
               of rainfall,
               <span
                 class="pdiff"
@@ -134,11 +134,10 @@
               >
                 {{ h.pdiff > 0 ? '+' : '' }}{{ h.pdiff.toFixed(0) }}%
               </span>
-
-
               from normal, making it {{ h.rankText }}.
             </p>
           </ng-container>
+
 
           <ng-template #noHover>
             <p class="callout-text muted">Hover an island to see rainfall highlights.</p>
@@ -159,10 +158,36 @@
     <div class="grid">
       <section class="card map-card">
         <div class="map-stage">
-          <img
-            class="map-img base"
-            [src]="droughtSrc"
-          />
+          <svg
+            class="map-svg"
+            [attr.viewBox]="mapW && mapH ? ('0 0 ' + mapW + ' ' + mapH) : '0 0 1 1'"
+            preserveAspectRatio="xMidYMid meet"
+            aria-label="Rainfall map with island hover regions"
+          >
+          <image
+            [attr.href]="droughtSrc"
+            x="0"
+            y="0"
+            [attr.width]="mapW || 1"
+            [attr.height]="mapH || 1"
+            preserveAspectRatio="xMidYMid meet"
+          ></image>
+            <path
+              *ngFor="let isl of islandPaths"
+              class="island"
+              [class.active]="hoverDroughtIsland === isl.id"
+              [attr.d]="isl.d"
+              (mouseenter)="setHoverIsland('drought', isl.id)"
+              (mouseleave)="clearHoverIsland('drought')"
+              (focus)="setHoverIsland('drought', isl.id)"
+              (blur)="clearHoverIsland('drought')"
+              (click)="setHoverIsland('drought', isl.id)"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="isl.label"
+            ></path>
+
+          </svg>
 
 
           <div class="legend legend--v" aria-label="Legend">
@@ -189,17 +214,23 @@
 
       <aside class="callouts" aria-label="Rainfall takeaways">
         <article class="card callout callout--primary">
-          <div class="callout-kicker">SPI</div>
-          <div class="callout-value"></div>
+          <div class="callout-kicker">Dryness</div>
+          <div class="callout-value">65% abnormally dry</div>
           <p class="callout-text">
-            
+            <strong>65% of Hawaiʻi</strong> was classified as abnormally dry (SPI < −0.5) or worse, reflecting cumulative rainfall deficits over 2025. <strong> 49% of the state</strong> experienced at least moderate drought (SPI < −0.8).
           </p>
         </article>
 
         <article class="card callout callout--secondary">
-          <div class="callout-kicker"></div>
-          <p class="callout-text">
-          </p>
+          <div class="callout-kicker">
+            Highlights
+            <span class="muted-inline" *ngIf="hoverIslandLabel('drought') as lbl">— {{ lbl }}</span>
+          </div>
+          <ng-container *ngIf="droughtHighlight as h; else noHover">
+            <p class="hi-sentence">
+              <strong>{{ h.percentDry }}%</strong> of {{ hoverIslandLabel('drought') }} is classified as abnormally dry or worse.
+            </p>
+          </ng-container>
         </article>
       </aside>
 
