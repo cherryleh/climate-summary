@@ -122,9 +122,30 @@
             <span class="muted-inline" *ngIf="hoverIslandLabel as lbl">— {{ lbl }}</span>
           </div>
 
-          <p class="callout-text">
-            {{ rainfallHighlightsText }}
-          </p>
+          <ng-container *ngIf="rainfallHighlight as h; else noHover">
+            <p class="hi-sentence">
+              {{ hoverIslandLabel }} recorded <strong>{{ fmtIn(h.totalIn) }} in</strong>
+
+              of rainfall,
+              <span
+                class="pdiff"
+                [class.pdiff-pos]="h.pdiff > 0"
+                [class.pdiff-neg]="h.pdiff < 0"
+              >
+                {{ h.pdiff > 0 ? '+' : '' }}{{ h.pdiff.toFixed(0) }}%
+              </span>
+
+
+              from normal, making it {{ h.rankText }}.
+            </p>
+          </ng-container>
+
+          <ng-template #noHover>
+            <p class="callout-text muted">Hover an island to see rainfall highlights.</p>
+          </ng-template>
+
+
+
         </article>
 
       </aside>

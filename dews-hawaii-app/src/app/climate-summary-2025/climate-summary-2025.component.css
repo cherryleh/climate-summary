@@ -1,4 +1,3 @@
-/* in your component .css */
 :host{
   --bg: #f3f6fb;
   --card: #ffffff;
@@ -50,30 +49,6 @@
   color: var(--muted);
   font-size: 15px;
 }
-
-/* .tabs{
-  display: inline-flex;
-  gap: 10px;
-  padding: 6px;
-  margin-bottom: 16px;
-}
-
-.tab{
-  border: 1px solid var(--tab-border);
-  background: var(--tab-bg);
-  color: var(--tab-text);
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  user-select: none;
-}
-.tab.active{
-  background: var(--tab-active-bg);
-  border-color: var(--tab-active-border);
-  box-shadow: inset 0 0 0 1px rgba(43, 87, 217, 0.08);
-} */
 
 .tabs{
   display: inline-flex;
@@ -131,7 +106,6 @@
   transform: translateY(1px);
 }
 
-
 .grid{
   display: grid;
   grid-template-columns: 2.1fr 1fr;
@@ -153,16 +127,14 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;            /* key change: no crop */
-  object-position: center;        /* center it */
+  object-fit: contain;            
+  object-position: center;        
   display: block;
   background-color: #ccecff;
   border-radius: 10px;
   z-index: 1;
 }
 
-
-/* Optional: if you want the overlay image to be semi-transparent */
 .map-img.overlay{
   mix-blend-mode: multiply;
   opacity: 0.85;
@@ -173,7 +145,7 @@
   position: absolute;
   left: 16px;
   bottom: 16px;
-  z-index: 3;              /* add */
+  z-index: 3;            
 
   background: rgba(255,255,255,0.82);
   border: 1px solid rgba(230, 237, 247, 0.9);
@@ -225,18 +197,16 @@
   align-items: stretch;
 }
 
-/* The vertical bar */
 .legend--v .legend-bar{
   width: 14px;
-  height: 150px;          /* control bar height here */
+  height: 150px;         
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.10);
-  margin: 0;              /* override old horizontal spacing */
+  margin: 0;            
 }
 
-/* Tick labels aligned to the bar height */
 .legend--v .legend-ticks{
-  height: 150px;          /* MUST match .legend-bar height */
+  height: 150px;         
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -249,23 +219,6 @@
 
 .section{
   margin-top: 22px;
-}
-
-.section-head{
-  margin: 0 0 14px 0;
-}
-
-.section-title{
-  font-size: 30px;          /* matches your .title rhythm */
-  line-height: 1.15;
-  margin: 0 0 6px 0;
-  letter-spacing: -0.02em;
-}
-
-.section-subtitle{
-  margin: 0 0 6px 0;
-  color: var(--muted);
-  font-size: 15px;
 }
 
 .extremes-grid{
@@ -363,7 +316,6 @@
   color: #0f172a;
 }
 
-/* Responsive */
 @media (max-width: 1100px){
   .extremes-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -376,68 +328,6 @@ highcharts-chart{
   display: block;
   width: 100%;
   height: 360px;
-}
-
-/* Card */
-.news{
-  display: block;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  text-decoration: none;
-  color: inherit;
-  overflow: hidden;
-  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
-}
-
-.news:hover{
-  transform: translateY(-2px);
-  border-color: rgba(43, 87, 217, 0.25);
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.14);
-}
-
-.news:focus-visible{
-  outline: 3px solid rgba(43, 87, 217, 0.35);
-  outline-offset: 3px;
-}
-
-/* Thumbnail area */
-.card__thumb{
-  height: 150px;
-  border-radius: calc(var(--radius) - 2px);
-  margin: 12px 12px 0;
-  border: 1px solid rgba(15, 23, 42, 0.10);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Soft gradients to mimic placeholders */
-.card__thumb--peach{
-  background:
-    radial-gradient(140px 120px at 25% 25%, rgba(255, 220, 210, 0.95), rgba(255, 220, 210, 0) 70%),
-    radial-gradient(220px 160px at 70% 45%, rgba(210, 226, 255, 0.7), rgba(210, 226, 255, 0) 72%),
-    linear-gradient(180deg, rgba(255, 246, 230, 0.9), rgba(255, 246, 230, 0.75));
-}
-
-.card__thumb--smoke{
-  background:
-    radial-gradient(240px 160px at 30% 25%, rgba(60, 70, 90, 0.35), rgba(60, 70, 90, 0) 70%),
-    radial-gradient(240px 160px at 75% 50%, rgba(255, 200, 190, 0.35), rgba(255, 200, 190, 0) 72%),
-    linear-gradient(180deg, rgba(45, 55, 75, 0.55), rgba(45, 55, 75, 0.35));
-}
-
-.card__thumb--sky{
-  background:
-    radial-gradient(220px 160px at 55% 35%, rgba(220, 240, 255, 0.95), rgba(220, 240, 255, 0) 70%),
-    linear-gradient(180deg, rgba(235, 244, 255, 0.95), rgba(235, 244, 255, 0.75));
-}
-
-.card__thumb--mint{
-  background:
-    radial-gradient(220px 160px at 30% 35%, rgba(210, 245, 236, 0.95), rgba(210, 245, 236, 0) 70%),
-    radial-gradient(220px 160px at 70% 45%, rgba(220, 230, 255, 0.70), rgba(220, 230, 255, 0) 72%),
-    linear-gradient(180deg, rgba(236, 250, 245, 0.95), rgba(236, 250, 245, 0.75));
 }
 
 .thumb-icon{
@@ -458,58 +348,6 @@ highcharts-chart{
 .thumb-icon svg{
   width: 18px;
   height: 18px;
-}
-
-/* Card content */
-.card__body{
-  padding: 12px 14px 16px;
-}
-
-.card__meta{
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.card__time{
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.card__cta{
-  justify-self: end;
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-/* .pill{
-  justify-self: start;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  line-height: 1;
-  white-space: nowrap;
-} */
-
-.card__title{
-  margin: 0 0 8px;
-  font-size: 16px;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-}
-
-.card__desc{
-  margin: 0;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.45;
 }
 
 
@@ -579,18 +417,14 @@ highcharts-chart{
   border: 1px solid rgba(230, 237, 247, 0.9);
 }
 
-/* Right column: match map-card height and split into 2 equal boxes */
 .callouts{
   display: grid;
   gap: 16px;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1.2fr 0.8fr;
 
-  /* Match total visible height of the left map card:
-     map height + top/bottom padding (14*2) */
   height: calc(var(--mapH) + (var(--mapPad) * 2));
 }
 
-/* Boxes fill their half cleanly */
 .callout{
   display: flex;
   flex-direction: column;
@@ -694,43 +528,6 @@ color: var(--muted);
 
 
 
-/* Overlay sits on top of the map image */
-.island-overlay{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2; /* map image is z=1, legend is z=3 */
-  pointer-events: none; /* enable events only on paths */
-}
-
-/* Make island shapes interactive */
-.island-overlay .island{
-  pointer-events: all;
-
-  fill: rgba(43, 87, 217, 0.00);  /* invisible by default */
-  stroke: rgba(43, 87, 217, 0.00);
-  stroke-width: 2;
-
-  cursor: pointer;
-  transition: fill 120ms ease, stroke 120ms ease, stroke-width 120ms ease;
-}
-
-/* Hover/focus state */
-.island-overlay .island:hover,
-.island-overlay .island:focus{
-  fill: rgba(43, 87, 217, 0.12);
-  stroke: rgba(43, 87, 217, 0.55);
-  stroke-width: 2.5;
-  outline: none;
-}
-
-/* “Pinned” active class while hovered */
-.island-overlay .island.active{
-  fill: rgba(43, 87, 217, 0.10);
-  stroke: rgba(43, 87, 217, 0.50);
-}
-
 .muted-inline{
   color: var(--muted);
   font-weight: 700;
@@ -739,44 +536,7 @@ color: var(--muted);
   margin-left: 6px;
 }
 
-/* Overlay sits on top of the map image */
-.island-overlay{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  pointer-events: none;
-}
 
-/* ALWAYS visible outlines (no hover needed) */
-.island-overlay .island{
-  pointer-events: all;
-
-  /* outline always on */
-  fill: rgba(255, 255, 255, 0.06);          
-  stroke: rgba(0, 0, 0, 0.55);              
-  stroke-width: 2.5;
-  vector-effect: non-scaling-stroke;        
-  stroke-linejoin: round;
-  stroke-linecap: round;
-
-  cursor: pointer;
-}
-
-/* Optional: make hover just a little stronger (but not required) */
-.island-overlay .island:hover,
-.island-overlay .island:focus{
-  fill: rgba(43, 87, 217, 0.12);
-  stroke: rgba(0, 0, 0, 0.75);
-  stroke-width: 3;
-  outline: none;
-}
-
-/* Optional: while active */
-.island-overlay .island.active{
-  fill: rgba(43, 87, 217, 0.10);
-}
 
 .map-svg{
   position: absolute;
@@ -785,6 +545,7 @@ color: var(--muted);
   height: 100%;
   display: block;
   z-index: 1;
+  pointer-events: none;
 }
 
 .map-svg .island{
@@ -794,4 +555,25 @@ color: var(--muted);
   stroke-width: 2.5;
   vector-effect: non-scaling-stroke;
   cursor: pointer;
+}
+
+.hi-sentence{
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text, #0f172a);
+}
+
+
+.pdiff{
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pdiff-pos{
+  color: #1f7a1f;   /* green */
+}
+
+.pdiff-neg{
+  color: #b30000;   /* red */
 }

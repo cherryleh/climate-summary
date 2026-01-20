@@ -12,6 +12,11 @@ type LegendItem = { color: string; label: string };
 
 type IslandKey = 'kauai'|'oahu'|'molokai'|'lanai'|'maui'|'kahoolawe'|'hawaii';
 
+type RainHighlight = {
+  totalIn: number;
+  pdiff: number;     
+  rankText: string;
+};
 
 @Component({
   selector: 'app-climate-summary-2025',
@@ -387,21 +392,23 @@ export class ClimateSummary2025Component implements OnInit {
   get hoverIslandLabel(): string | null {
     return this.hoverIsland ? this.islandLabel[this.hoverIsland] : null;
   }
- 
 
-  private readonly rainfallHighlightsByIsland: Record<IslandKey, string> = {
-    kauai: 'Kauaʻi highlight...',
-    oahu: 'Oʻahu highlight...',
-    molokai: 'Molokaʻi highlight...',
-    lanai: 'Lānaʻi highlight...',
-    maui: 'Maui highlight...',
-    kahoolawe: 'Kahoʻolawe highlight...',
-    hawaii: 'Hawaiʻi Island highlight...',
+  private readonly rainfallHighlightsByIsland: Record<IslandKey, RainHighlight> = {
+    kauai:      { totalIn: 67.02, pdiff: -14.2, rankText: '21st driest on record (106 years)' },
+    oahu:       { totalIn: 46.04, pdiff: -24.7, rankText: '16th driest on record (106 years)' },
+    molokai:    { totalIn: 25.55, pdiff: -59.9, rankText: '5th driest on record (106 years)' },
+    lanai:      { totalIn: 12.76, pdiff: -68.7, rankText: '15th driest on record (106 years)' },
+    maui:       { totalIn: 40.67, pdiff: -50.0, rankText: 'driest on record (106 years)' },
+    kahoolawe:  { totalIn: 9.92,  pdiff: -59.2, rankText: '23rd driest on record (106 years)' },
+    hawaii:     { totalIn: 40.65, pdiff: -47.0, rankText: '2nd driest on record (106 years)' },
   };
 
-  get rainfallHighlightsText(): string {
-    if (!this.hoverIsland) return 'Hover an island to see rainfall highlights.';
-    return this.rainfallHighlightsByIsland[this.hoverIsland] ?? 'No highlight yet.';
+  get rainfallHighlight(): RainHighlight | null {
+    return this.hoverIsland ? this.rainfallHighlightsByIsland[this.hoverIsland] : null;
   }
+
+  fmtIn(x: number) { return x.toFixed(2); }
+  fmtPct(x: number) { return `${x > 0 ? '+' : ''}${x.toFixed(0)}%`; }
+
 
 }
