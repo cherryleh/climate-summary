@@ -93,17 +93,15 @@ export class ClimateSummary2025Component implements OnInit {
   readonly rainfallLegendItems: Record<rainfallMode, LegendItem[] | null> = {
     total: null,
     pdiff: [
-      { color: '#001933', label: '> 90%' },
-      { color: '#0066cc', label: '70 to 90%' },
-      { color: '#4d94ff', label: '50 to 70%' },
-      { color: '#99ccff', label: '30 to 50%' },
-      { color: '#d6f0ff', label: '15 to 30%' },
-      { color: '#ffffff', label: '-15 to 15%' },
-      { color: '#ff9900', label: '-30 to -15%' },
-      { color: '#ff4d00', label: '-50 to -30%' },
-      { color: '#b30000', label: '-70 to -50%' },
-      { color: '#7a0000', label: '-90 to -70%' },
-      { color: '#4a0000', label: '< -90%' },
+      { color: '#001a4d', label: '> 70%' },
+      { color: '#2f7dff', label: '70 to 50%' },
+      { color: '#7fc3ff', label: '50 to 30%' },
+      { color: '#cfefff', label: '30 to 10%' },
+      { color: '#ffffff', label: '10 to -10%' },
+      { color: '#ff5a1f', label: '-10 to -30%' },
+      { color: '#c00000', label: '-30 to -50%' },
+      { color: '#7f0000', label: '-50 to -70%' },
+      { color: '#4b0000', label: '< -70%' },
     ],
   };
 
@@ -243,6 +241,31 @@ export class ClimateSummary2025Component implements OnInit {
       });
 
     // Monthly Anomaly
+    this.http
+    .get('climate-summary/monthly_anomaly_summary.csv', { responseType: 'text' })
+    .subscribe({
+      next: (csv) => {
+        const parsed = this.parseMonthlyAnomalyCsv(csv);
+
+        const categories = parsed.map((r) => r.monthName);
+        const rfAnom = parsed.map((r) => r.rf_anomaly);
+        const tAnom = parsed.map((r) => r.t_anomaly);
+
+        this.anomalyChartOptions = {
+          ...this.anomalyChartOptions,
+          xAxis: {
+            ...(this.anomalyChartOptions.xAxis as Highcharts.XAxisOptions),
+            categories,
+          },
+          series: [
+            { type: 'column', name: 'Rainfall anomaly', data: rfAnom, yAxis: 0 },
+            { type: 'spline', name: 'Temperature anomaly', data: tAnom, yAxis: 1 },
+          ],
+        };
+        },
+    error: (err) => console.error('Failed to load monthly_anomaly_summary.csv', err),
+    });
+
     this.http.get('hawaii_islands_overlay.svg', { responseType: 'text' }).subscribe({
       next: (svgText) => {
         const parsed = this.parseIslandSvg(svgText);

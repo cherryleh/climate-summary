@@ -43,8 +43,6 @@
     <div class="grid">
       <section class="card map-card">
           <div class="map-stage">
-
-          <!-- SVG map + hover overlay -->
           <svg
             class="map-svg"
             [attr.viewBox]="mapW && mapH ? ('0 0 ' + mapW + ' ' + mapH) : '0 0 1 1'"
@@ -80,7 +78,6 @@
           <div class="legend" aria-label="Legend">
             <h4>{{ rainfallLegendTitle[rainfallMode] }}</h4>
 
-            <!-- DISCRETE (pdiff categories) -->
             <div *ngIf="rainfallLegendItems[rainfallMode] as items; else continuousLegend"
                  class="legend-discrete">
               <div class="legend-row" *ngFor="let it of items">
