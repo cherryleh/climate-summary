@@ -347,7 +347,16 @@
       >
         {{ monthModeLabel['anomaly'] }}
       </button>
-        
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="monthMode === 'drought'"
+        [attr.aria-selected]="monthMode === 'drought'"
+        (click)="setMonthMode('drought')"
+      >
+        {{ monthModeLabel['drought'] }}
+      </button>        
     </div>
     <section class="card chart-card" aria-label="Monthly breakdown chart">
       
@@ -361,6 +370,12 @@
         *ngIf="monthMode === 'anomaly'"
         [Highcharts]="Highcharts"
         [options]="anomalyChartOptions"
+        style="width: 100%; height: 420px; display: block;"
+      ></highcharts-chart>
+      <highcharts-chart
+        *ngIf="monthMode === 'drought'"
+        [Highcharts]="Highcharts"
+        [options]="droughtStackAreaOptions"
         style="width: 100%; height: 420px; display: block;"
       ></highcharts-chart>
     </section>

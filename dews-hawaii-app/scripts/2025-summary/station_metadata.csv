@@ -1,0 +1,104 @@
+station_id,location,name,full_name,lat,lng,elevation,vegh,skn,nws_id,status
+0115,hawaii,Piiholo,Piʻiholo,20.8415,-156.2948,637,0.1,434.11,017HI,active
+0116,hawaii,Keokea,Kēōkea,20.7067,-156.3554,871,0.1,267.11,016HI,active
+0118,hawaii,Pulehu,Pūlehu,20.79532,-156.35991,427,0,322.2,042HI,active
+0119,hawaii,Kula Ag,Kula Agricultural Experiment Station,20.757889,-156.320028,964,0.1,324.6,001HI,active
+0121,hawaii,Lipoa,Līpoa,20.7458333,-156.4305556,88,0.02,260.3,039HI,active
+0122,hawaii,Kaehu,Kaʻehu,20.909167,-156.489444,6,0,484.2,071HI,active
+0131,hawaii,Lahaina WTP,Lahaina Water Treatment Plant,20.89072,-156.65493,244,0.1,361.3,036HI,active
+0132,hawaii,Olowalu,Olowalu,20.82078,-156.6152,54,1,297.1,055HI,active
+0133,hawaii,Honolua,Honolua,21.0012,-156.62267,170,1,494.1,059HI,active
+0134,hawaii,Hanaula,Hanaʻula,20.84100,-156.55450,1215,1,247.21,058HI,active
+0141,hawaii,Auwahi,Auwahi,20.644222,-156.342056,1177,2,253,028HI,active
+0143,hawaii,Nakula,Nākula,20.674736,-156.233487,1632,0.7,257.11,,active
+0144,hawaii,Kahikinui,Kahikinui,20.633945,-156.273889,713,0.3,254.11,019HI,active
+0145,hawaii,Upper Kahikinui,Upper Kahikinui,20.644215,-156.284703,1034,0.1,254.12,032HI,active
+0151,hawaii,Park HQ,Haleakalā Park Headquarters,20.759806,-156.248167,2114,1,339.4,002HI,active
+0152,hawaii,Nene Nest,Nēnē Nest,20.738194,-156.245833,2593,0.1,339.5,013HI,active
+0153,hawaii,Summit,Haleakalā Summit,20.710361,-156.25675,2984,0,339.6,003HI,active
+0154,hawaii,Waikamoi,Waikamoi,20.773636,-156.222311,1935,1,341.7,020HI,active
+0155,hawaii,EMI Base Yard,East Maui Irrigation Company Base Yard,20.890997,-156.212316,210,0.05,446.2,048HI,active
+0156,hawaii,West Kuiaha,West Kuiaha Road,20.90433,-156.306715,242,0.05,486.8,066HI,active
+0160,hawaii,Kuiki,Kuiki,20.712186,-156.134742,2299,1.5,279.1,070HI,active
+0161,hawaii,Pohaku Palaha,Pōhaku Pālaha,20.730574,-156.141316,2460,0.5,279,043HI,active
+0162,hawaii,Treeline,Treeline,20.734315,-156.123354,2235,,,,planned
+0164,hawaii,Big Bog,Big Bog,20.726514,-156.092308,1652,,,,planned
+0165,hawaii,Hamoa,Hāmoa,20.719497,-156.002356,106,0.05,283,023HI,active
+0166,hawaii,Kipahulu VC,Kīpahulu Visitors Center,20.661092,-156.044767,29,0.33,258.7,052HI,active
+0201,hawaii,Nahuku,Nāhuku,19.415215,-155.238394,1202,19.2,54.8,004HI,active
+0202,hawaii,Keaau,Keaʻau,19.6061748,-155.0515231,182,0,92.11,033HI,active
+0203,hawaii,Olaa,ʻŌlaʻa,19.478399,-155.214969,1043,,,,planned
+0204,hawaii,Pahoa,Pāhoa,19.501169,-154.943731,175,0,64.1,047HI,active
+0211,hawaii,Kanakaleonui,Kanakaleonui,19.845036,-155.362586,2352,0.5,126.2,022HI,active
+0212,hawaii,Kulaimano,Kulaʻimano,19.834341,-155.122435,260,0.02,141.1,021HI,active
+0213,hawaii,Piihonua,Piʻihonua,19.7064059,-155.1873737,606,0.01,84.1,040HI,active
+0214,hawaii,Waipunalei,Waipunalei,19.9090639,-155.332875,1654,0.33,124.3,057HI,active
+0215,hawaii,Hakalau,Hakalau,19.786173,-155.314264,,,,,planned
+0216,hawaii,Punahoa,Punahoa,19.68865,-155.23145,,,,,planned
+0221,hawaii,Kaluamakani,Kaluamakani,19.9153271,-155.5002897,1880,0.5,105.1,053HI,active
+0222,hawaii,Aipalaoa,Aipalaoa,19.8541197,-155.5915919,2039,0.5,102.9,054HI,active
+0223,hawaii,Naohuleelua,Nāʻōhuleʻelua,19.664467,-155.705311,,,,,planned
+0224,hawaii,Puuheewai,Puʻuheʻewai,19.629045,-155.566923,,,,,planned
+0225,hawaii,Alaekila,Alaekila,20.042368,-155.408793,,,,,planned
+0231,hawaii,Kaiholena,Kaiholena,19.16877,-155.57035,631,0.5,12.16,018HI,active
+0232,hawaii,Kahilipalinui,Kahilipalinui,19.044023,-155.57921,,,,,planned
+0233,hawaii,Ka Lae,Ka Lae,18.953,-155.689,,,,,planned
+0234,hawaii,Kahuku,Kahuku,19.052519,-155.69205,,,,,planned
+0235,hawaii,Manuka,Manukā,19.05934,-155.852,108,2,23.3,067HI,active
+0241,hawaii,Keahuolu,Keahuolū,19.668669,-155.957474,537,0,68.61,029HI,active
+0242,hawaii,Kaiaulu Puuwaawaa,Kaiāulu Puʻuwaʻawaʻa,19.77241,-155.83118,1161,0.2,94.6,034HI,active
+0243,hawaii,Kona Hema,Kona Hema,19.2068247,-155.8109802,1283,0,23.1,035HI,active
+0244,hawaii,Kealakekua,Kealakekua,19.505859,-155.762429,1840,0,77.11,050HI,active
+0245,hawaii,Kipuka Nui,Kīpuka Nui,19.5087559,-155.8445347,1176,0.2,77.12,051HI,inactive
+0246,hawaii,Kona Ag,Kona Research Station,19.5335322,-155.9263885,446,0.1,73.35,067HI,active
+0247,hawaii,Kipahoehoe,Kipahoehoe,19.2312376,-155.8681021,,,,,planned
+0248,hawaii,Kauhuku Mauka,Kauhuku Mauka,19.382805,-155.74623,,,,,planned
+0251,hawaii,Kehena,Kehena Ditch Cabin,20.122834,-155.749329,1158,0.6,181.3,025HI,active
+0252,hawaii,Lalamilo,Lālāmilo,20.019528,-155.677085,802,0,191.41,027HI,active
+0253,hawaii,Puuloa,Puʻuloa,20.0621502,-155.7511354,1026,0.15,148.61,062HI,active
+0254,hawaii,Kawaihae,Kawaihae,20.0240444,-155.807983,113,0,98.3,063HI,active
+0255,hawaii,Waipoo,Waipoʻo,20.099334,-155.696415,1381,3,185.8,064HI,active
+0256,hawaii,Mealani,Mealani Research Station,20.0394972,-155.6083761,879,0.05,201.31,069HI,active
+0257,hawaii,Io,ʻIo,20.19367,-155.80635,538,1,177.2,074HI,active
+0258,hawaii,Iole,ʻIole,20.241549,-155.779528,52,0.1,177.1,075HI,active
+0259,hawaii,Puuoli,Puʻuoli,19.830955,-155.699863,,,,,planned
+0260,hawaii,Puanui,Puanui,20.145059,-155.889468,,,,,planned
+0281,hawaii,IPIF,Institute of Pacific Islands Forestry,19.69748,-155.0954,112,0.1,87.9,005HI,active
+0282,hawaii,Spencer,Spencer,19.96358,-155.25014,469,1,132.2,006HI,active
+0283,hawaii,Laupahoehoe,Laupāhoehoe,19.93217,-155.29129,1152,27,127.5,007HI,active
+0286,hawaii,Palamanui,Pālamanui,19.73756,-155.99582,264,1.3,69.25,008HI,active
+0287,hawaii,Mamalahoa,Māmalahoa,19.80258,-155.850629,603,1.3,93.13,009HI,active
+0288,hawaii,Puuwaawaa,Puʻuwaʻawaʻa,19.725393,-155.873917,1654,21,70.7,010HI,active
+0411,hawaii,Keopukaloa,Keōpukaloa,21.145283,-156.729459,187,0.2,598.1,030HI,active
+0412,hawaii,Honoulimaloo,Honoulimaloʻo,21.131411,-156.758626,402,2,598.2,031HI,active
+0413,hawaii,Ualapue,ʻUalapuʻe,21.066782,-156.830634,,,,,planned
+0414,hawaii,Pepeopae,Pēpēʻōpae ,21.1191,-156.90066,,,,,planned
+0421,hawaii,Kualapuu,Kualapuʻu,21.151872,-157.053235,259,0.05,531.2,072HI,active
+0422,hawaii,Naiwa,Nāʻiwa,21.128209,-157.082404,68,0.5,525.2,073HI,active
+0431,hawaii,Anapuka,Anapuka,21.215984,-157.241786,68,0.2,550.4,045HI,active
+0501,hawaii,Lyon,Lyon Arboretum,21.333,-157.8025,151,0.1,785.12,011HI,active
+0502,hawaii,Nuuanu Res 1,Nuʻuanu Reservoir Number 1,21.339124,-157.836859,117,0.1,775.11,012HI,active
+0503,hawaii,Upper Waolani,Upper Waolani,21.34666,-157.83641,202,0.5,775.12,037HI,active
+0504,hawaii,Waolani,Waolani,21.33756,-157.84092,98,0.1,775.13,038HI,active
+0505,hawaii,Napuumaia,Nāpuʻumaiʻa,21.35489,-157.83063,508,1.3,775.14,041HI,active
+0506,hawaii,Kalawahine,Kalāwahine,21.34522,-157.80556,506,1.3,784.11,046HI,active
+0520,hawaii,Kaala Repeater,Kaʻala Repeater,,,,,,,inactive
+0521,hawaii,Kaala,Kaʻala,21.50675,-158.144861,1205,3,844.5,026HI,active
+0522,hawaii,Palikea,Palikea,21.41584,-158.09930,897,,,,planned
+0531,hawaii,Kaluanui Ridge,Kaluanui Ridge,21.30491,-157.70302,239,0.05,724.23,061HI,active
+0532,hawaii,Palolo Mauka,Pālolo Mauka,21.33536,-157.77658,714,1,718.11,,active
+0541,hawaii,Kaaawa Makai,Kaʻaʻawa Makai,21.540352,-157.845041,3,0.1,886.12,049HI,active
+0542,hawaii,Poamoho LZ,Poamoho Connex Landing Zone,21.53106,-157.96613,542,,,,planned
+0543,hawaii,Poamoho Summit,Poamoho Summit,21.52732,-157.92056,788,,,,planned
+0544,hawaii,Waiawa,Waiawa,21.46897,-157.88992,645,,,,planned
+0551,hawaii,Kalahee Ridge,Kalaheʻe Ridge,21.63252,-158.04065,197,0,892.3,056HI,active
+0601,hawaii,Waipa,Waipā,22.202647,-159.518833,5,0.1,1117.11,014HI,active
+0602,hawaii,Common Ground,Common Ground,22.197439,-159.42123,112,0.1,1132.11,015HI,active
+0603,hawaii,Lower Limahuli,Lower Limahuli,22.219805,-159.575195,31,0.3,1116.2,024HI,active
+0604,hawaii,Upper Limahuli,Upper Limahuli,22.18454,-159.582659,994,,,,planned
+0611,hawaii,Kealia,Keālia,22.128016,-159.336382,148,0.5,1102.3,065HI,active
+0621,hawaii,Lawai NTBG,Lāwaʻi National Tropical Botanical Garden,21.905295,-159.510395,106,0.1,934.2,044HI,active
+0631,hawaii,Polihale,Polihale,22.07487,-159.76204,7,,,,planned
+0632,hawaii,Kitano Reservoir,Kitano Reservoir,22.01968,-159.67723,546,,,,planned
+0641,hawaii,Hanamaulu,Hanamāʻulu,22.018201,-159.437989,225,0.3,1054.11,060HI,active
+0642,hawaii,Powerline Trail,Powerline Trail,22.113562,-159.438786,651,,,,planned

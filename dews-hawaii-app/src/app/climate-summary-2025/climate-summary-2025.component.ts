@@ -7,7 +7,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 
 type rainfallMode = 'total' | 'pdiff' ;
 type temperatureMode = 'total' | 'anom';
-type monthMode = 'monthly' | 'anomaly';
+type monthMode = 'monthly' | 'anomaly' | 'drought';
 type LegendItem = { color: string; label: string };
 
 type IslandKey = 'kauai'|'oahu'|'molokai'|'lanai'|'maui'|'kahoolawe'|'hawaii';
@@ -22,6 +22,77 @@ type DroughtHighlight = {
   percentDry: number;
   percentModerateDrought: number;
 };
+
+const DROUGHT_ORDER = [
+  'D4 Exceptional Drought',
+  'D3 Extreme Drought',
+  'D2 Severe Drought',
+  'D1 Moderate Drought',
+  'D0 Abnormally Dry',
+  'Near Normal',
+  'W0 Abnormally Wet',
+  'W1 Moderately Wet',
+  'W2 Severely Wet',
+  'W3 Extremely Wet',
+  'W4 Exceptionally Wet',
+] as const;
+
+type DroughtBin = (typeof DROUGHT_ORDER)[number];
+
+type DryBin =
+  | 'D0 Abnormally Dry'
+  | 'D1 Moderate Drought'
+  | 'D2 Severe Drought'
+  | 'D3 Extreme Drought'
+  | 'D4 Exceptional Drought';
+
+type WetBin =
+  | 'W0 Abnormally Wet'
+  | 'W1 Moderately Wet'
+  | 'W2 Severely Wet'
+  | 'W3 Extremely Wet'
+  | 'W4 Exceptionally Wet';
+
+
+const DRY_STACK_OUTER_TO_INNER: DryBin[] = [
+  'D0 Abnormally Dry',
+  'D1 Moderate Drought',
+  'D2 Severe Drought',
+  'D3 Extreme Drought',
+  'D4 Exceptional Drought', // darkest -> should end up closest to 0
+];
+
+const WET_STACK_OUTER_TO_INNER: WetBin[] = [
+  'W0 Abnormally Wet',
+  'W1 Moderately Wet',
+  'W2 Severely Wet',
+  'W3 Extremely Wet',
+  'W4 Exceptionally Wet', // darkest -> should end up closest to 0
+];
+
+
+
+
+// type DryBin = (typeof DRY_BINS)[number];
+// type WetBin = (typeof WET_BINS)[number];
+
+const BIN_COLORS: Record<DryBin | WetBin, string> = {
+  'D0 Abnormally Dry': '#FFFF00',
+  'D1 Moderate Drought': '#FFD37F',
+  'D2 Severe Drought': '#FF9900',
+  'D3 Extreme Drought': '#FF0000',
+  'D4 Exceptional Drought': '#730000',
+
+  'W0 Abnormally Wet': '#99CCFF',
+  'W1 Moderately Wet': '#0066CC',
+  'W2 Severely Wet': '#0052A3',
+  'W3 Extremely Wet': '#003d80',
+  'W4 Exceptionally Wet': '#001a4d',
+};
+
+type DroughtAreaKey = DryBin | WetBin | 'Near Normal';
+
+
 
 @Component({
   selector: 'app-climate-summary-2025',
@@ -56,6 +127,7 @@ export class ClimateSummary2025Component implements OnInit {
   readonly monthModeLabel: Record<monthMode, string> = {
     monthly: 'Monthly Values',
     anomaly: 'Monthly Anomaly',
+    drought: 'Drought',
   };
 
   readonly rainfallSrc: Record<rainfallMode, string> = {
@@ -112,7 +184,6 @@ export class ClimateSummary2025Component implements OnInit {
       { color: '#4b0000', label: '< -70%' },
     ],
   };
-
 
 
    readonly temperatureLegendTitle: Record<temperatureMode, string> = {
@@ -216,6 +287,70 @@ export class ClimateSummary2025Component implements OnInit {
     ],
   };
 
+  droughtStackAreaOptions: Highcharts.Options = {
+    chart: { type: 'area', marginTop: 40, spacingRight: 10 },
+    
+    title: { text: '' },
+    credits: { enabled: false },
+
+    xAxis: {
+      type: 'category',
+      categories: [],
+      tickmarkPlacement: 'on',
+      startOnTick: false,
+      endOnTick: false,
+      minPadding: 0,
+      maxPadding: 0,
+      // keeps categories from being treated like a "gapped" axis
+      ordinal: false,
+    },
+
+    yAxis: {
+      title: { text: 'Area (%)' },
+      min: -65,
+      max: 65,
+      tickInterval: 20,
+      labels: {
+        formatter: function () {
+          return `${Math.abs(Number(this.value))}%`;
+        },
+      },
+      plotLines: [{ value: 0, width: 1 }],
+    },
+
+    legend: { enabled: true, reversed: true },
+
+    tooltip: {
+      shared: true,
+      formatter: function () {
+        const pts = (this.points ?? []).slice().sort((a, b) => Math.abs(Number(b.y ?? 0)) - Math.abs(Number(a.y ?? 0)));
+        const lines = pts.map((p) => {
+          const v = Math.abs(Number(p.y ?? 0));
+          return `<span style="color:${p.color}">●</span> ${p.series.name}: <b>${v.toFixed(1)}%</b>`;
+        });
+        return `<b>${this.x}</b><br/>${lines.join('<br/>')}`;
+      },
+    },
+
+
+    plotOptions: {
+      area: {
+        stacking: 'normal',
+        lineWidth: 0,
+        marker: { enabled: false },
+        threshold: 0,
+        fillOpacity: 1,
+        // THIS is the important part for tightening to the category ticks
+        pointPlacement: 'on',
+      },
+    },
+
+
+    series: [],
+  };
+
+
+  readonly droughtOrder = DROUGHT_ORDER;
 
 
   ngOnInit(): void {
@@ -274,6 +409,49 @@ export class ClimateSummary2025Component implements OnInit {
     error: (err) => console.error('Failed to load monthly_anomaly_summary.csv', err),
     });
 
+    this.http
+    .get('climate-summary/spi3_distribution_2025.csv', { responseType: 'text' })
+    .subscribe({
+      next: (csv) => {
+        const parsed = this.parseDroughtDistributionCsv(csv);
+
+        const categories = parsed.map((r) => r.monthName);
+
+        const drySeries: Highcharts.SeriesAreaOptions[] = DRY_STACK_OUTER_TO_INNER.map((k) => ({
+          type: 'area',
+          name: k,
+          stack: 'dry',
+          data: parsed.map((r) => r.values[k] ?? 0),
+          color: BIN_COLORS[k],
+        }));
+
+        const wetSeries: Highcharts.SeriesAreaOptions[] = WET_STACK_OUTER_TO_INNER.map((k) => ({
+          type: 'area',
+          name: k,
+          stack: 'wet',
+          data: parsed.map((r) => -(r.values[k] ?? 0)),
+          color: BIN_COLORS[k],
+        }));
+
+
+
+        this.droughtStackAreaOptions = {
+          ...this.droughtStackAreaOptions,
+          xAxis: {
+            ...(this.droughtStackAreaOptions.xAxis as Highcharts.XAxisOptions),
+            categories,
+          },
+          series: [
+            // order matters: put wet first so it fills downward cleanly, then dry
+            ...wetSeries,
+            ...drySeries,
+          ],
+        };
+      },
+      error: (err) => console.error('Failed to load spi3_distribution_2025.csv', err),
+    });
+
+
     this.http.get('hawaii_islands_overlay.svg', { responseType: 'text' }).subscribe({
       next: (svgText) => {
         const parsed = this.parseIslandSvg(svgText);
@@ -287,6 +465,56 @@ export class ClimateSummary2025Component implements OnInit {
 
 
   }
+
+  private parseDroughtDistributionCsv(csv: string): Array<{
+    monthName: string;
+    values: Record<DroughtAreaKey, number>;
+  }> {
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    const lines = csv
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+
+    if (lines.length < 2) return [];
+
+    const header = lines[0].split(',').map((s) => s.trim());
+    const idxMonth = header.findIndex((h) => h.toLowerCase() === 'month');
+
+    const allKeys: DroughtAreaKey[] = [
+      ...DRY_STACK_OUTER_TO_INNER,
+      'Near Normal',
+      ...WET_STACK_OUTER_TO_INNER,
+    ];
+
+
+    const colIndex: Partial<Record<DroughtAreaKey, number>> = {};
+    for (const key of allKeys) {
+      const i = header.findIndex((h) => h === key);
+      if (i >= 0) colIndex[key] = i;
+    }
+
+    return lines
+      .slice(1)
+      .map((line) => line.split(',').map((s) => s.trim()))
+      .filter((parts) => parts.length >= header.length)
+      .map((parts) => {
+        const mRaw = idxMonth >= 0 ? parts[idxMonth] : parts[0];
+        const m = Number(mRaw);
+        const monthName = monthNames[Math.max(1, Math.min(12, m)) - 1] ?? String(mRaw);
+
+        const values = {} as Record<DroughtAreaKey, number>;
+        for (const key of allKeys) {
+          const i = colIndex[key];
+          const v = i == null ? 0 : Number(parts[i]);
+          values[key] = Number.isFinite(v) ? v : 0;
+        }
+
+        return { monthName, values };
+      });
+  }
+
 
 
   private parseMonthlyCsv(csv: string): Array<{ monthName: string; rf_mean: number; tmean: number }> {
