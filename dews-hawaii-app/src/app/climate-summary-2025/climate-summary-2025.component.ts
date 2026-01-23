@@ -582,7 +582,7 @@ export class ClimateSummary2025Component implements OnInit {
         return {
           monthName: monthNames[Math.max(1, Math.min(12, m)) - 1] ?? String(m),
           rf_anomaly: Number(parts[1]),
-          t_anomaly: Number(parts[2]),
+          t_anomaly: Number(parts[3]),
         };
       })
       .filter((r) => Number.isFinite(r.rf_anomaly) && Number.isFinite(r.t_anomaly));
