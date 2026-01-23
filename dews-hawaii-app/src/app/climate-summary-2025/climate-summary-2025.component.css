@@ -678,3 +678,101 @@ color: var(--muted);
   box-shadow: var(--shadow, 0 10px 30px rgba(15, 23, 42, 0.08));
   overflow: hidden;
 }
+
+
+.hi-index{
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.hi-anom{
+  font-size: clamp(34px, 3.2vw, 46px);
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.hi-anom-sign{
+  margin-right: 2px;
+  opacity: 0.9;
+}
+
+.hi-anom-pos{ color: #1f7a1f; }
+.hi-anom-neg{ color: #b30000; }
+
+.hi-rank{
+  font-size: 20px;
+  line-height: 1.35;
+  font-weight: 850;
+  color: #22324a;
+}
+
+.hi-label{
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.hi-meta{
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.hi-meta-label{
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 11px;
+  opacity: 0.95;
+}
+
+.hi-meta-val{
+  color: #22324a;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Make the secondary callout more compact so it fits inside the fixed row height */
+.callout--secondary{
+  padding: 14px 14px 12px;   /* was 18/16 */
+}
+
+/* tighten the highlight index block */
+.callout--secondary .hi-index{
+  gap: 6px;                  /* was 10 */
+  margin-top: 6px;           /* was 10 */
+}
+
+/* shrink the big number */
+.callout--secondary .hi-anom{
+  font-size: clamp(28px, 2.4vw, 36px); /* was 34–46 */
+  line-height: 1;
+}
+
+/* make rank smaller + clamp so it can't push past the box */
+.callout--secondary .hi-rank{
+  font-size: 18px;           /* was 14 */
+  line-height: 1.25;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+/* optional: if you kept hi-meta, make it compact too */
+.callout--secondary .hi-meta{
+  padding-top: 6px;          /* was 8 */
+  gap: 8px;
+  font-size: 12px;
+}
+.callout--secondary .hi-meta-label{
+  font-size: 10px;
+}

@@ -13,7 +13,6 @@ type LegendItem = { color: string; label: string };
 type IslandKey = 'kauai'|'oahu'|'molokai'|'lanai'|'maui'|'kahoolawe'|'hawaii';
 
 type RainHighlight = {
-  totalIn: number;
   pdiff: number;     
   rankText: string;
 };
@@ -21,6 +20,11 @@ type RainHighlight = {
 type DroughtHighlight = {
   percentDry: number;
   percentModerateDrought: number;
+};
+
+type TemperatureHighlight = {
+  anom: number;
+  rankText: string;
 };
 
 const DROUGHT_ORDER = [
@@ -324,8 +328,8 @@ export class ClimateSummary2025Component implements OnInit {
       layout: 'horizontal',
       align: 'center',
 
-      itemWidth: 185,   // try 180–210
-      width: 925,        // 5 * itemWidth (keep these in sync)
+      itemWidth: 185,  
+      width: 925,        
       itemDistance: 12,
 
       symbolRadius: 0,
@@ -654,13 +658,13 @@ export class ClimateSummary2025Component implements OnInit {
 
 
   private readonly rainfallHighlightsByIsland: Record<IslandKey, RainHighlight> = {
-    kauai:      { totalIn: 67.02, pdiff: -14.2, rankText: '21st driest on record (106 years)' },
-    oahu:       { totalIn: 46.04, pdiff: -24.7, rankText: '16th driest on record (106 years)' },
-    molokai:    { totalIn: 25.55, pdiff: -59.9, rankText: '5th driest on record (106 years)' },
-    lanai:      { totalIn: 12.76, pdiff: -68.7, rankText: '15th driest on record (106 years)' },
-    maui:       { totalIn: 40.67, pdiff: -50.0, rankText: 'driest on record (106 years)' },
-    kahoolawe:  { totalIn: 9.92,  pdiff: -59.2, rankText: '23rd driest on record (106 years)' },
-    hawaii:     { totalIn: 40.65, pdiff: -47.0, rankText: '2nd driest on record (106 years)' },
+    kauai:      { pdiff: -14.2, rankText: '21st' },
+    oahu:       { pdiff: -24.7, rankText: '16th' },
+    molokai:    { pdiff: -59.9, rankText: '5th' },
+    lanai:      { pdiff: -68.7, rankText: '15th' },
+    maui:       { pdiff: -50.0, rankText: 'driest ' },
+    kahoolawe:  { pdiff: -59.2, rankText: '23rd' },
+    hawaii:     { pdiff: -47.0, rankText: '2nd' },
   };
 
   private readonly droughtHighlightsByIsland: Record<IslandKey, DroughtHighlight> = {
@@ -673,12 +677,26 @@ export class ClimateSummary2025Component implements OnInit {
     hawaii:     { percentDry: 61, percentModerateDrought: 70 },
   };
 
+  private readonly temperatureHighlightsByIsland: Record<IslandKey, TemperatureHighlight> = {
+    kauai:      { anom: 0.9, rankText: '3rd' },
+    oahu:       { anom: 1.0, rankText: '4th' },
+    molokai:    { anom: 0.9, rankText: '4th' },
+    lanai:      { anom: 0.9, rankText: '4th' },
+    maui:       { anom: 0.8, rankText: '3rd' },
+    kahoolawe:  { anom: 0.9, rankText: '4th' },
+    hawaii:     { anom: 0.7, rankText: '8th' },
+  };
+
   get droughtHighlight(): DroughtHighlight | null {
     return this.hoverDroughtIsland ? this.droughtHighlightsByIsland[this.hoverDroughtIsland] : null;
   }
 
   get rainfallHighlight(): RainHighlight | null {
     return this.hoverRainIsland ? this.rainfallHighlightsByIsland[this.hoverRainIsland] : null;
+  }
+
+  get temperatureHighlight(): TemperatureHighlight | null {
+    return this.hoverTempIsland ? this.temperatureHighlightsByIsland[this.hoverTempIsland] : null;
   }
 
 
