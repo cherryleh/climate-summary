@@ -318,7 +318,24 @@ export class ClimateSummary2025Component implements OnInit {
       plotLines: [{ value: 0, width: 1 }],
     },
 
-    legend: { enabled: true, reversed: true },
+    legend: {
+      enabled: true,
+
+      layout: 'horizontal',
+      align: 'center',
+
+      itemWidth: 185,   // try 180–210
+      width: 925,        // 5 * itemWidth (keep these in sync)
+      itemDistance: 12,
+
+      symbolRadius: 0,
+      symbolWidth: 12,
+      symbolHeight: 12,
+      padding: 0,
+      margin: 6,
+      itemMarginTop: 2,
+      itemMarginBottom: 2,
+    },
 
     tooltip: {
       shared: true,
