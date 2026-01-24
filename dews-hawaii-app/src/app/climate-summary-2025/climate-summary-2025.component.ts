@@ -158,7 +158,7 @@ export class ClimateSummary2025Component implements OnInit {
     pdiff: ['-100', '0', '100']
   };
 
-  
+
 
   readonly temperatureLegendItems: Record<temperatureMode, LegendItem[] | null> = {
     total: null,
@@ -189,6 +189,20 @@ export class ClimateSummary2025Component implements OnInit {
       { color: '#4b0000', label: '< -70%' },
     ],
   };
+
+  readonly droughtLegendItems: LegendItem[] = [
+    { color: '#730000', label: 'D4 Exceptional Drought' },
+    { color: '#FF0000', label: 'D3 Extreme Drought' },
+    { color: '#FF9900', label: 'D2 Severe Drought' },
+    { color: '#FFD37F', label: 'D1 Moderate Drought' },
+    { color: '#FFFF00', label: 'D0 Abnormally Dry' },
+    { color: '#FFFFFF', label: 'Near Normal' },
+    { color: '#99CCFF', label: 'W0 Abnormally Wet' },
+    { color: '#0066CC', label: 'W1 Moderately Wet' },
+    { color: '#0052A3', label: 'W2 Severely Wet' },
+    { color: '#003d80', label: 'W3 Extremely Wet' },
+    { color: '#001a4d', label: 'W4 Exceptionally Wet' },
+  ];
 
 
    readonly temperatureLegendTitle: Record<temperatureMode, string> = {

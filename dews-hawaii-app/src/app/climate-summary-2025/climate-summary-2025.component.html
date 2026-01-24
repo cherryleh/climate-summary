@@ -188,23 +188,15 @@
           <div class="legend legend--v" aria-label="Legend">
             <h4>{{ droughtLegendTitle }}</h4>
 
-            <div class="legend-v">
-              <div
-                class="legend-bar"
-                aria-hidden="true"
-                [style.background]="droughtLegendGradient"
-              ></div>
-
-              <div class="legend-ticks">
-                <span *ngFor="let t of droughtLegendTicks">
-                  {{ t }}{{ droughtLegendUnit }}
-                </span>
+              <div class="legend-discrete">
+                <div class="legend-row" *ngFor="let it of droughtLegendItems">
+                  <span class="swatch" [style.background]="it.color" aria-hidden="true"></span>
+                  <span class="lbl">{{ it.label }}</span>
+                </div>
               </div>
             </div>
           </div>
 
-
-        </div>
       </section>
 
       <aside class="callouts" aria-label="Rainfall takeaways">
@@ -704,7 +696,7 @@
           </p>
           <div class="feature-actions">
             <a class="feature-link" href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/" target="_blank" rel="noopener">
-              Visit Mesonet Live Data Access
+              Visit Mesonet Live Data
             </a>
           </div>
         </div>
@@ -749,7 +741,7 @@
             Make a custom climate portfolio for any location in the State and have it emailed to you in minutes. 
           </p>
           <div class="feature-actions">
-            <a class="feature-link" href="https://ccvd.manoa.hawaii.edu/" target="_blank" rel="noopener">
+            <a class="feature-link" href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener">
               View tool
             </a>
           </div>
