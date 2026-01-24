@@ -4,6 +4,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { FormsModule } from '@angular/forms';
 
 type rainfallMode = 'total' | 'pdiff' ;
 type temperatureMode = 'total' | 'anom';
@@ -101,7 +102,7 @@ type DroughtAreaKey = DryBin | WetBin | 'Near Normal';
 @Component({
   selector: 'app-climate-summary-2025',
   standalone: true,
-  imports: [NgFor, NgIf, HttpClientModule, HighchartsChartModule],
+  imports: [NgFor, NgIf, HttpClientModule, HighchartsChartModule, FormsModule],
   templateUrl: './climate-summary-2025.component.html',
   styleUrls: ['./climate-summary-2025.component.css'],
 })
@@ -702,6 +703,39 @@ export class ClimateSummary2025Component implements OnInit {
 
   fmtIn(x: number) { return x.toFixed(2); }
   fmtPct(x: number) { return `${x > 0 ? '+' : ''}${x.toFixed(0)}%`; }
+  subscribeEmail = '';
+  submitting = false;
+  subscribeStatus: 'idle' | 'ok' | 'dup' | 'err' = 'idle';
+
+  // paste your Apps Script Web App URL here
+  readonly subscribeEndpoint = 'https://script.google.com/macros/s/AKfycbyUdIHyAKzgxeSvvzw-Z6KLQAvSocbnEc14DCrIjT5bF_lxMO3rcn-Cz64JcXMFVsLB/exec';
+
+  async submitSubscribe() {
+    const email = this.subscribeEmail.trim();
+    if (!email) return;
+
+    this.submitting = true;
+    this.subscribeStatus = 'idle';
+
+    try {
+      await fetch(this.subscribeEndpoint, {
+        method: 'POST',
+        mode: 'no-cors',                 // KEY
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'climate-summary-2025' }),
+      });
+
+      // With no-cors you can't inspect the response; assume success if no exception.
+      this.subscribeStatus = 'ok';
+      this.subscribeEmail = '';
+    } catch (err) {
+      console.error(err);
+      this.subscribeStatus = 'err';
+    } finally {
+      this.submitting = false;
+    }
+  }
+
 
 
 }

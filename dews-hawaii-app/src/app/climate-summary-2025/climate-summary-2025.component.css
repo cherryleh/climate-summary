@@ -938,3 +938,274 @@ color: var(--muted);
     grid-template-columns: 1fr;
   }
 }
+
+.feature-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+  align-items: stretch; /* equal height per row */
+}
+/* remove the old stacking spacing */
+.feature-card{
+  margin-top: 0; /* was 16px */
+}
+
+/* keep cards from stretching to match the tallest neighbor */
+.feature-card{
+  align-self: start;
+}
+
+/* tablet/phone: stack */
+@media (max-width: 980px){
+  .feature-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-card{
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr; /* image left, text right */
+  height: 100%;                       /* fill the grid cell */
+  margin-top: 0;                      /* spacing handled by feature-grid gap */
+  overflow: hidden;
+}
+
+/* Make the left side NOT define the card height */
+.feature-media{
+  background: #f3f6fb;
+  border-right: 1px solid var(--border);
+  padding: 10px;
+  display: grid;
+  place-items: center;
+}
+
+/* Key: lock the image box height so all cards match */
+.feature-media img{
+  width: 100%;
+  height: 220px;        /* pick a single height for all cards */
+  object-fit: contain;  /* show whole screenshot */
+  display: block;
+}
+
+/* Make the right side fill the card and keep links aligned */
+.feature-body{
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+/* Prevent one long paragraph from making the card taller */
+.feature-text{
+  margin: 0;
+  color: #22324a;
+  font-size: 14px;
+  line-height: 1.5;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+
+.comingsoon-header,
+.comingsoon-body {
+  max-width: none !important;
+  width: 100%;
+}
+
+/* Monthly Climate Summary – Coming Soon block (self-contained styles) */
+.comingsoon {
+  margin-top: 22px;
+  padding: 18px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  
+}
+
+.comingsoon-header {
+  max-width: 980px;
+}
+
+.comingsoon-title {
+  margin: 0;
+  font-size: 1.85rem;
+  line-height: 1.15;
+  letter-spacing: 0.2px;
+}
+
+.comingsoon-meta {
+  margin-top: 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.comingsoon-soon {
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.comingsoon-date {
+  font-weight: 700;
+  font-size: 1.05rem;
+  opacity: 0.85;
+}
+
+.comingsoon-body {
+  margin: 12px 0 0;
+  line-height: 1.6;
+  opacity: 0.92;
+}
+
+/* Two-panel layout */
+.comingsoon-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1.35fr 0.85fr;
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .comingsoon-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Panels */
+.comingsoon-panel {
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.comingsoon-panelhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.comingsoon-panelkicker {
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.comingsoon-paneltitle {
+  font-weight: 800;
+  font-size: 1.15rem;
+  line-height: 1.15;
+}
+
+.comingsoon-imagewrap {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.comingsoon-imagewrap img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.comingsoon-caption {
+  margin-top: 10px;
+  font-size: 0.92rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Form */
+.comingsoon-form {
+  margin-top: 8px;
+}
+
+.comingsoon-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.comingsoon-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: rgba(255, 255, 255, 0.92);
+  color: inherit;
+  font: inherit;
+}
+
+.comingsoon-input:focus {
+  outline: 2px solid rgba(33, 102, 172, 0.35);
+  outline-offset: 2px;
+}
+
+.comingsoon-btn {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 0;
+  background: #2166ac;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.comingsoon-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.comingsoon-status {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.comingsoon-status--error {
+  opacity: 0.95;
+}
+
+.comingsoon-fine {
+  margin: 10px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  opacity: 0.75;
+}
+
+/* SR-only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.comingsoon {
+box-shadow:
+    0 12px 28px rgba(33, 102, 172, 0.18),  /* main blue lift */
+    0 0 0 1px rgba(33, 102, 172, 0.22),   /* blue edge */
+    0 0 36px rgba(33, 102, 172, 0.20);    /* outer glow */
+}

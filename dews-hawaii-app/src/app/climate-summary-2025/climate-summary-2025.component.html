@@ -664,6 +664,7 @@
     <div class="section">
       <h1 class="title">HCDP in 2025</h1>
       <p class="subtitle">Highlights from product development, tools, and network growth.</p>
+      <div class="feature-grid">
       <article class="card feature-card">
         <div class="feature-media">
           <img
@@ -676,8 +677,7 @@
         <div class="feature-body">
           <h2 class="feature-title">Hawai‘i Mesonet</h2>
 
-          <p class="feature-text">
-            The Hawaii Mesonet Project is an ongoing effort to improve our capacity to monitor climate in Hawaii. This year we saw the installation of several new Hawaii Mesonet stations bringing the total number of stations up to 76 with more installations planned in the coming year. 
+          <p class="feature-text">This year we saw the installation of several new Hawaii Mesonet stations bringing the total number of stations up to 76 with more installations planned in the coming year. 
           </p>
           <div class="feature-actions">
             <a class="feature-link" href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet/" target="_blank" rel="noopener">
@@ -755,44 +755,95 @@
           </div>
         </div>
       </article>
+      </div>
     </div>
+
 
     <div class="section">
-    <!-- <h1 class="title">Coming Soon to HCDP</h1>
-      <div class="hcdp-comingsoon-grid">
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">New Map Products</h3>
-          </div>
-          <div class="mini-value">Gridded Datasets</div>
-          <p class="mini-desc">We are expanding our gridded datasets to include new climate variables such as solar radiation, wind, and KBDI.</p>
-        </article>
+      <div class="comingsoon" aria-labelledby="comingsoon-title">
+        <div class="comingsoon-header">
+          <h1 id="comingsoon-title" class="comingsoon-title">Monthly Climate Summary</h1>
 
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">New Website</h3>
+          <div class="comingsoon-meta">
+            <div class="comingsoon-soon">Coming Soon!</div>
+            <div class="comingsoon-date">Spring 2026</div>
           </div>
 
-          <div class="mini-value">State of the Climate</div>
-          <p class="mini-desc">We are developing a new "State of the Climate" website, where...</p>
-        </article>
+          <p class="comingsoon-body">
+            Do you like what you have seen in this report? If so, we have developed a system to provide you with monthly
+            climate data and information at a range of relevant scales. Sign up for this monthly report and you will receive
+            the most recent month’s rainfall, temperature and drought information delivered right to your inbox. We will
+            provide State and County information to everyone, but there will also be an option to customize information at
+            the Moku, watershed, or Ahupua‘a scale so the information can be tailored to your needs.
+          </p>
+        </div>
 
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">Downscaled Products</h3>
+        <div class="comingsoon-grid">
+          <!-- Screenshot -->
+          <div class="comingsoon-panel comingsoon-panel--media" aria-label="Monthly Climate Summary preview">
+            <div class="comingsoon-panelhead">
+              <div class="comingsoon-panelkicker">Preview</div>
+            </div>
+
+            <div class="comingsoon-imagewrap">
+              <img
+                src="climate-summary/monthly_preview.png"
+                alt="Preview screenshot of the Monthly Climate Summary app"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="comingsoon-caption">
+              Preview mockup. Final design may change.
+            </div>
           </div>
 
-          <div class="mini-value">X</div>
-          <p class="mini-desc">X</p>
+          <!-- Subscribe -->
+          <div class="comingsoon-panel comingsoon-panel--subscribe" aria-label="Subscribe for updates">
+            <div class="comingsoon-panelhead">
+              <div class="comingsoon-panelkicker">Subscribe</div>
+              <div class="comingsoon-paneltitle">Get launch updates</div>
+            </div>
 
-        </article>
-        
-      </div> -->
-      <div> <h1>Monthly Climate Summary
-            Coming Soon! 
-</h1></div>
-            To subscribe, please email...
+            <form class="comingsoon-form" (ngSubmit)="submitSubscribe()" #subForm="ngForm">
+              <label class="sr-only" for="subscribeEmail">Email</label>
+
+              <div class="comingsoon-row">
+                <input
+                  id="subscribeEmail"
+                  class="comingsoon-input"
+                  type="email"
+                  name="email"
+                  [(ngModel)]="subscribeEmail"
+                  required
+                  autocomplete="email"
+                  placeholder="you@domain.com"
+                />
+
+                <button class="comingsoon-btn" type="submit" [disabled]="submitting || !subForm.valid">
+                  {{ submitting ? 'Submitting…' : 'Notify me' }}
+                </button>
+              </div>
+
+              <div class="comingsoon-status" *ngIf="subscribeStatus === 'ok'">
+                Thanks — you’re subscribed.
+              </div>
+              <div class="comingsoon-status comingsoon-status--error" *ngIf="subscribeStatus === 'err'">
+                Sorry — something went wrong. Try again.
+              </div>
+
+              <p class="comingsoon-fine">
+                You’ll receive state and county summaries by default, with options to customize by Moku, watershed,
+                or Ahupua‘a when the tool launches.
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+
   </div>
 
 
