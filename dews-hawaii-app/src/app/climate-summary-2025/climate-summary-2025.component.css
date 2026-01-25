@@ -801,6 +801,32 @@ color: var(--muted);
   font-size: 10px;
 }
 
+/* percent + two-line label beside it */
+.hi-anom--split{
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 10px;
+  align-items: center;      /* keeps label vertically centered next to % */
+  line-height: 1.05;        /* only affects the big number */
+  padding-bottom: 2px;      /* avoids any clipping */
+}
+
+.hi-anom--split .hi-val{
+  font: inherit;
+  line-height: 1;
+}
+
+.hi-anom--split .hi-label{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;    /* force at most 2 lines */
+  overflow: hidden;
+
+  line-height: 1.15;        /* spacing within the two lines */
+  margin-top: 2px;          /* tiny optical tweak */
+}
+
+
 @media (max-width: 980px){
   .grid{
     grid-template-columns: 1fr; /* map above callouts */

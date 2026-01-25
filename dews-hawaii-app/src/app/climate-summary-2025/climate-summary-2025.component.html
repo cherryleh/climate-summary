@@ -80,15 +80,15 @@
           <div class="legend" aria-label="Legend">
             <h4>{{ rainfallLegendTitle[rainfallMode] }}</h4>
 
-            <div *ngIf="rainfallLegendItems[rainfallMode] as items; else continuousLegend"
-                 class="legend-discrete">
-              <div class="legend-row" *ngFor="let it of items">
-                <span class="swatch" [style.background]="it.color" aria-hidden="true"></span>
-                <span class="lbl">{{ it.label }}</span>
-              </div>
+              <div *ngIf="rainfallLegendItems[rainfallMode] as items; else rainContinuousLegend"
+                   class="legend-discrete">
+                <div class="legend-row" *ngFor="let it of items">
+                  <span class="swatch" [style.background]="it.color" aria-hidden="true"></span>
+                  <span class="lbl">{{ it.label }}</span>
+                </div>
             </div>
 
-            <ng-template #continuousLegend>
+            <ng-template #rainContinuousLegend>
               <div class="legend--v">
                 <div class="legend-v">
                   <div
@@ -216,13 +216,12 @@
 
           <ng-container *ngIf="droughtHighlight as h; else noHover">
             <div class="hi-index">
-              <div
-                class="hi-anom"
-                [class.hi-anom-pos]="h.percentDry < 0"
-                [class.hi-anom-neg]="h.percentDry > 0"
-              >
-               {{ h.percentDry.toFixed(0) }}% <span class="hi-label"> in abnormally dry or worse conditions</span>
+              <div class="hi-anom hi-anom--split" [class.hi-anom-pos]="h.percentDry < 0"
+                [class.hi-anom-neg]="h.percentDry > 0">
+                <span class="hi-val">{{ h.percentDry.toFixed(0) }}%</span>
+                <span class="hi-label">in abnormally dry or worse conditions</span>
               </div>
+
 
               <div class="hi-rank">{{ h.percentModerateDrought }}% in moderate drought or worse conditions</div>
             </div>
@@ -295,18 +294,20 @@
             ></path>
 
           </svg>
-          <div class="legend" aria-label="Legend">
+            <div class="legend" aria-label="Legend">
             <h4>{{ temperatureLegendTitle[temperatureMode] }}</h4>
 
-            <div *ngIf="temperatureLegendItems[temperatureMode] as items; else continuousLegend"
-                 class="legend-discrete">
+            <div
+              *ngIf="temperatureLegendItems[temperatureMode] as items; else tempContinuousLegend"
+              class="legend-discrete"
+            >
               <div class="legend-row" *ngFor="let it of items">
                 <span class="swatch" [style.background]="it.color" aria-hidden="true"></span>
                 <span class="lbl">{{ it.label }}</span>
               </div>
             </div>
 
-            <ng-template #continuousLegend>
+            <ng-template #tempContinuousLegend>
               <div class="legend--v">
                 <div class="legend-v">
                   <div
@@ -431,6 +432,17 @@
       </article>
       <article class="card mini-card">
         <div class="mini-top">
+          <h3 class="mini-kicker"></h3>
+        </div>
+
+        <div class="mini-value">11 out of 12 months drier than average</div>
+        <p class="mini-desc">
+          Other than January, all months in 2025 received below average rainfall. All 12 months saw higher than average temperature.
+        </p>
+
+      </article>
+      <article class="card mini-card">
+        <div class="mini-top">
           <h3 class="mini-kicker">Dryest Areas</h3>
         </div>
 
@@ -440,17 +452,7 @@
 
       </article>
 
-      <article class="card mini-card">
-        <div class="mini-top">
-          <h3 class="mini-kicker">?</h3>
-        </div>
-
-        <div class="mini-value"></div>
-        <p class="mini-desc">
-          ?
-        </p>
-
-      </article>
+      
     </div>
     <div class="section">
     <h1 class="title">Extremes and Records</h1>

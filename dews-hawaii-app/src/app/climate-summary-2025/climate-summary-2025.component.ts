@@ -211,7 +211,7 @@ export class ClimateSummary2025Component implements OnInit {
   };
 
   readonly temperatureLegendTicks: Record<temperatureMode, string[]> = {
-    total: ['90', '40'],
+    total: ['90', '65','40'],
     anom: ['-2.25', '0', '2.25'],
   };
 
@@ -227,7 +227,7 @@ export class ClimateSummary2025Component implements OnInit {
 
   readonly rainfallLegendGradient: Record<rainfallMode, string> = {
     total:
-      'linear-gradient(180deg, #fde725 0%, #5ec962 25%, #21918c 50%, #3b528b 75%, #440154 100%)',
+      'linear-gradient(180deg, #440154 0%, #3b528b 25%, #21918c 50%, #5ec962 75%, #fde725 100%)',
     pdiff:
       'linear-gradient(180deg, #b2182b 0%, #f7f7f7 50%, #2166ac 100%)',
   };
