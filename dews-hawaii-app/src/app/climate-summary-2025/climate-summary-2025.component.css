@@ -739,7 +739,7 @@ color: var(--muted);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
   color: var(--muted);
   line-height: 1.2;
 }
@@ -773,14 +773,14 @@ color: var(--muted);
 
 /* tighten the highlight index block */
 .callout--secondary .hi-index{
-  gap: 6px;                  /* was 10 */
-  margin-top: 6px;           /* was 10 */
+  gap: 5px;   
+  margin-top: 10px;
 }
 
 /* shrink the big number */
 .callout--secondary .hi-anom{
   font-size: clamp(28px, 2.4vw, 36px); /* was 34–46 */
-  line-height: 1;
+  line-height: 0.5;
 }
 
 /* make rank smaller + clamp so it can't push past the box */
