@@ -370,22 +370,23 @@
         class="tab"
         type="button"
         role="tab"
-        [class.active]="monthMode === 'monthly'"
-        [attr.aria-selected]="monthMode === 'monthly'"
-        (click)="setMonthMode('monthly')"
-      >
-        {{ monthModeLabel['monthly'] }}
-      </button>
-      <button
-        class="tab"
-        type="button"
-        role="tab"
         [class.active]="monthMode === 'anomaly'"
         [attr.aria-selected]="monthMode === 'anomaly'"
         (click)="setMonthMode('anomaly')"
       >
         {{ monthModeLabel['anomaly'] }}
       </button>
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        [class.active]="monthMode === 'monthly'"
+        [attr.aria-selected]="monthMode === 'monthly'"
+        (click)="setMonthMode('monthly')"
+      >
+        {{ monthModeLabel['monthly'] }}
+      </button>
+      
       <button
         class="tab"
         type="button"
@@ -398,19 +399,19 @@
       </button>        
     </div>
     <section class="card chart-card" aria-label="Monthly breakdown chart">
-      
-      <highcharts-chart
-        *ngIf="monthMode === 'monthly'"
-        [Highcharts]="Highcharts"
-        [options]="monthlyChartOptions"
-        style="width: 100%; height: 420px; display: block;"
-      ></highcharts-chart>
       <highcharts-chart
         *ngIf="monthMode === 'anomaly'"
         [Highcharts]="Highcharts"
         [options]="anomalyChartOptions"
         style="width: 100%; height: 420px; display: block;"
       ></highcharts-chart>
+      <highcharts-chart
+        *ngIf="monthMode === 'monthly'"
+        [Highcharts]="Highcharts"
+        [options]="monthlyChartOptions"
+        style="width: 100%; height: 420px; display: block;"
+      ></highcharts-chart>
+      
       <highcharts-chart
         *ngIf="monthMode === 'drought'"
         [Highcharts]="Highcharts"

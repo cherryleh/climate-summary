@@ -117,7 +117,7 @@ export class ClimateSummary2025Component implements OnInit {
   //Defaults
   rainfallMode: rainfallMode = 'pdiff';
   temperatureMode: temperatureMode = 'anom';
-  monthMode: monthMode = 'monthly';
+  monthMode: monthMode = 'anomaly';
 
   readonly rainfallModeLabel: Record<rainfallMode, string> = {
     total: 'Total',
