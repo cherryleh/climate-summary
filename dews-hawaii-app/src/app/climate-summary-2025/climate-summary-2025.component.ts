@@ -270,7 +270,29 @@ export class ClimateSummary2025Component implements OnInit {
       { title: { text: 'Rainfall (in)' } },
       { title: { text: 'Temperature (°F)' }, opposite: true },
     ],
-    tooltip: { shared: true,valueDecimals: 2,  },
+    tooltip: {
+      shared: true,
+      formatter: function () {
+        const month =
+          String((this.points?.[0] as any)?.key ?? '') ||
+          String((this as any).key ?? '') ||
+          String(this.x);
+
+        const header = `<b>${month}</b>`;
+
+        const lines = (this.points ?? []).map((p) => {
+          const y = Number(p.y ?? 0);
+          const name = (p.series.name || '').toLowerCase();
+          const unit = name.includes('temp') ? '°F' : 'in';
+
+          return `<span style="color:${p.color}">●</span> ${p.series.name}: <b>${y.toFixed(
+            2
+          )} ${unit}</b>`;
+        });
+
+        return `${header}<br/>${lines.join('<br/>')}`;
+      },
+    },
     legend: { enabled: true },
     series: [
       { type: 'column', name: 'Rainfall', data: [], yAxis: 0 },
@@ -298,11 +320,47 @@ export class ClimateSummary2025Component implements OnInit {
         plotLines: [{ value: 0, width: 1 }],
       },
     ],
-    tooltip: { shared: true, valueDecimals: 2 },
+    tooltip: {
+      shared: true,
+      formatter: function () {
+        const month =
+          String((this.points?.[0] as any)?.key ?? '') ||
+          String((this as any).key ?? '') ||
+          String(this.x);
+
+        const header = `<b>${month}</b>`;
+
+        const lines = (this.points ?? []).map((p) => {
+          const y = Number(p.y ?? 0);
+          const name = (p.series.name || '').toLowerCase();
+          const unit = name.includes('temp') ? '°F' : 'in';
+
+          return `<span style="color:${p.color}">●</span> ${p.series.name}: <b>${y.toFixed(
+            2
+          )} ${unit}</b>`;
+        });
+
+        return `${header}<br/>${lines.join('<br/>')}`;
+      },
+    },
     legend: { enabled: true },
-    series: [
-      { type: 'column', name: 'Rainfall anomaly', data: [], yAxis: 0 },
-      { type: 'spline', name: 'Temperature anomaly', data: [], yAxis: 1 },
+      series: [
+      {
+        type: 'column',
+        name: 'Rainfall anomaly',
+        data: [],
+        yAxis: 0,
+        threshold: 0,                 // split at zero
+        color: '#2166ac',             // positive bars (pick whatever)
+        negativeColor: '#c00000',     // negative bars -> red
+      },
+      { type: 'spline', 
+        name: 'Temperature anomaly', 
+        data: [], 
+        yAxis: 1,
+      threshold: 0,
+    color: '#c00000',
+    negativeColor: '#2166ac',},
     ],
   };
 
