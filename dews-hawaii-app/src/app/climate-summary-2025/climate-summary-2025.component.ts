@@ -731,13 +731,13 @@ export class ClimateSummary2025Component implements OnInit {
 
 
   private readonly rainfallHighlightsByIsland: Record<IslandKey, RainHighlight> = {
-    kauai:      { pdiff: -14.2, rankText: '21st' },
-    oahu:       { pdiff: -24.7, rankText: '16th' },
-    molokai:    { pdiff: -59.9, rankText: '5th' },
-    lanai:      { pdiff: -68.7, rankText: '15th' },
-    maui:       { pdiff: -50.0, rankText: 'driest ' },
-    kahoolawe:  { pdiff: -59.2, rankText: '23rd' },
-    hawaii:     { pdiff: -47.0, rankText: '2nd' },
+    kauai:      { pdiff: -14.2, rankText: '21st driest ' },
+    oahu:       { pdiff: -24.7, rankText: '16th driest ' },
+    molokai:    { pdiff: -59.9, rankText: '5th driest ' },
+    lanai:      { pdiff: -68.7, rankText: '15th driest ' },
+    maui:       { pdiff: -50.0, rankText: 'Driest' },
+    kahoolawe:  { pdiff: -59.2, rankText: '23rd driest ' },
+    hawaii:     { pdiff: -47.0, rankText: '2nd driest ' },
   };
 
   private readonly droughtHighlightsByIsland: Record<IslandKey, DroughtHighlight> = {
