@@ -253,7 +253,7 @@ export class ClimateSummary2025Component implements OnInit {
     this.monthMode = mode;
   }
 
-   mapW = 0;
+  mapW = 0;
   mapH = 0;
 
 
@@ -414,17 +414,36 @@ export class ClimateSummary2025Component implements OnInit {
       itemMarginBottom: 2,
     },
 
+    // tooltip: {
+    //   shared: true,
+    //   formatter: function () {
+    //     const pts = (this.points ?? []).slice().sort((a, b) => Math.abs(Number(b.y ?? 0)) - Math.abs(Number(a.y ?? 0)));
+    //     const lines = pts.map((p) => {
+    //       const v = Math.abs(Number(p.y ?? 0));
+    //       return `<span style="color:${p.color}">●</span> ${p.series.name}: <b>${v.toFixed(1)}%</b>`;
+    //     });
+    //     return `<b>${this.x}</b><br/>${lines.join('<br/>')}`;
+    //   },
+    // },
+
     tooltip: {
       shared: true,
       formatter: function () {
-        const pts = (this.points ?? []).slice().sort((a, b) => Math.abs(Number(b.y ?? 0)) - Math.abs(Number(a.y ?? 0)));
+        const header = `<b>${String((this as any).key ?? this.x)}</b>`;
+
+        const pts = (this.points ?? [])
+          .slice()
+          .sort((a, b) => Math.abs(Number(b.y ?? 0)) - Math.abs(Number(a.y ?? 0)));
+
         const lines = pts.map((p) => {
           const v = Math.abs(Number(p.y ?? 0));
           return `<span style="color:${p.color}">●</span> ${p.series.name}: <b>${v.toFixed(1)}%</b>`;
         });
-        return `<b>${this.x}</b><br/>${lines.join('<br/>')}`;
+
+        return `${header}<br/>${lines.join('<br/>')}`;
       },
     },
+
 
 
     plotOptions: {
@@ -488,6 +507,31 @@ export class ClimateSummary2025Component implements OnInit {
         const rfAnom = parsed.map((r) => r.rf_anomaly);
         const tAnom = parsed.map((r) => r.t_anomaly);
 
+        // keep the original styled series as a base
+        const baseSeries = (this.anomalyChartOptions.series ?? []) as Highcharts.SeriesOptionsType[];
+
+        const rainfallBase =
+          (baseSeries.find((s: any) => s.name === 'Rainfall anomaly') as Highcharts.SeriesColumnOptions) ??
+          ({
+            type: 'column',
+            name: 'Rainfall anomaly',
+            yAxis: 0,
+            threshold: 0,
+            color: '#2166ac',
+            negativeColor: '#c00000',
+          } as Highcharts.SeriesColumnOptions);
+
+        const tempBase =
+          (baseSeries.find((s: any) => s.name === 'Temperature anomaly') as Highcharts.SeriesSplineOptions) ??
+          ({
+            type: 'spline',
+            name: 'Temperature anomaly',
+            yAxis: 1,
+            threshold: 0,
+            color: '#c00000',
+            negativeColor: '#2166ac',
+          } as Highcharts.SeriesSplineOptions);
+
         this.anomalyChartOptions = {
           ...this.anomalyChartOptions,
           xAxis: {
@@ -495,12 +539,12 @@ export class ClimateSummary2025Component implements OnInit {
             categories,
           },
           series: [
-            { type: 'column', name: 'Rainfall anomaly', data: rfAnom, yAxis: 0 },
-            { type: 'spline', name: 'Temperature anomaly', data: tAnom, yAxis: 1 },
+            { ...rainfallBase, data: rfAnom },
+            { ...tempBase, data: tAnom },
           ],
         };
-        },
-    error: (err) => console.error('Failed to load monthly_anomaly_summary.csv', err),
+      },
+      error: (err) => console.error('Failed to load monthly_anomaly_summary.csv', err),
     });
 
     this.http
