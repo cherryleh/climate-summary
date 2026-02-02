@@ -1236,3 +1236,24 @@ box-shadow:
     0 0 36px rgba(33, 102, 172, 0.20);    /* outer glow */
 }
 
+
+.hi-anom-line{
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;          
+}
+
+.hi-anom-sub{
+  font-size: 14px;          
+  font-weight: 600;
+  color: #22324a;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.95;
+  white-space: normal;
+}
+
+.callout--secondary .hi-anom-sub{
+  font-size: 18px;
+}

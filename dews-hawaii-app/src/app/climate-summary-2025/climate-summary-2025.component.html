@@ -126,13 +126,22 @@
 
           <ng-container *ngIf="rainfallHighlight as h; else noHover">
             <div class="hi-index">
-              <div
-                class="hi-anom"
-                [class.hi-anom-pos]="h.pdiff > 0"
-                [class.hi-anom-neg]="h.pdiff < 0"
-              >
-                <span class="hi-anom-sign">{{ h.pdiff > 0 ? '+' : '' }}</span>{{ h.pdiff.toFixed(0) }}%
+              <div class="hi-anom-line">
+                <div
+                  class="hi-anom"
+                  [class.hi-anom-pos]="h.pdiff > 0"
+                  [class.hi-anom-neg]="h.pdiff < 0"
+                >
+                  <span class="hi-anom-sign">{{ h.pdiff > 0 ? '+' : '' }}</span>{{ h.pdiff.toFixed(0) }}%
+                </div>
+
+                <div class="hi-anom-sub">
+                  {{ h.value.toFixed(0) }}in,
+                  {{ abs(h.absdiff).toFixed(0) }}in
+                  {{ h.absdiff < 0 ? 'below' : 'above' }} normal
+                </div>
               </div>
+
 
               <div class="hi-rank">{{ h.rankText }} on record (106 years)</div>
             </div>

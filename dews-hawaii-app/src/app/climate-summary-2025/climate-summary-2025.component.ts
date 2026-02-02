@@ -110,6 +110,9 @@ type DroughtAreaKey = DryBin | WetBin | 'Near Normal';
 })
 export class ClimateSummary2025Component implements OnInit {
   constructor(private http: HttpClient) {}
+  abs(x: number): number {
+    return Math.abs(x);
+  }
 
   readonly tabs: { key: rainfallMode; label: string }[] = [
     { key: 'total', label: 'Total rainfall' },
@@ -142,6 +145,7 @@ export class ClimateSummary2025Component implements OnInit {
     pdiff: 'climate-summary/annual_rainfall_2025_pdiff.png'
   };
 
+  
   readonly droughtSrc = 'climate-summary/spi12.png';
 
   readonly droughtLegendTitle = 'Drought (SPI-12)';
