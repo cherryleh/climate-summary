@@ -27,6 +27,7 @@ type DroughtHighlight = {
 
 type TemperatureHighlight = {
   anom: number;
+  value: number;
   rankText: string;
 };
 
@@ -98,8 +99,6 @@ const BIN_COLORS: Record<DryBin | WetBin, string> = {
 };
 
 type DroughtAreaKey = DryBin | WetBin | 'Near Normal';
-
-
 
 @Component({
   selector: 'app-climate-summary-2025',
@@ -447,7 +446,6 @@ export class ClimateSummary2025Component implements OnInit {
         marker: { enabled: false },
         threshold: 0,
         fillOpacity: 1,
-        // THIS is the important part for tightening to the category ticks
         pointPlacement: 'on',
       },
     },
@@ -574,7 +572,6 @@ export class ClimateSummary2025Component implements OnInit {
             categories,
           },
           series: [
-            // order matters: put wet first so it fills downward cleanly, then dry
             ...wetSeries,
             ...drySeries,
           ],
@@ -790,13 +787,13 @@ export class ClimateSummary2025Component implements OnInit {
   };
 
   private readonly temperatureHighlightsByIsland: Record<IslandKey, TemperatureHighlight> = {
-    kauai:      { anom: 0.9, rankText: '3rd' },
-    oahu:       { anom: 1.0, rankText: '4th' },
-    molokai:    { anom: 0.9, rankText: '4th' },
-    lanai:      { anom: 0.9, rankText: '4th' },
-    maui:       { anom: 0.8, rankText: '3rd' },
-    kahoolawe:  { anom: 0.9, rankText: '4th' },
-    hawaii:     { anom: 0.7, rankText: '8th' },
+    kauai:      { anom: 0.9, value: 72, rankText: '3rd' },
+    oahu:       { anom: 1.0, value: 74, rankText: '4th' },
+    molokai:    { anom: 0.9, value: 73, rankText: '4th' },
+    lanai:      { anom: 0.9, value: 73, rankText: '4th' },
+    maui:       { anom: 0.8, value: 70, rankText: '3rd' },
+    kahoolawe:  { anom: 0.9, value: 75, rankText: '4th' },
+    hawaii:     { anom: 0.7, value: 64, rankText: '8th' },
   };
 
   get droughtHighlight(): DroughtHighlight | null {
@@ -818,7 +815,6 @@ export class ClimateSummary2025Component implements OnInit {
   submitting = false;
   subscribeStatus: 'idle' | 'ok' | 'dup' | 'err' = 'idle';
 
-  // paste your Apps Script Web App URL here
   readonly subscribeEndpoint = 'https://script.google.com/macros/s/AKfycbyUdIHyAKzgxeSvvzw-Z6KLQAvSocbnEc14DCrIjT5bF_lxMO3rcn-Cz64JcXMFVsLB/exec';
 
   async submitSubscribe() {
@@ -836,7 +832,6 @@ export class ClimateSummary2025Component implements OnInit {
         body: JSON.stringify({ email, source: 'climate-summary-2025' }),
       });
 
-      // With no-cors you can't inspect the response; assume success if no exception.
       this.subscribeStatus = 'ok';
       this.subscribeEmail = '';
     } catch (err) {

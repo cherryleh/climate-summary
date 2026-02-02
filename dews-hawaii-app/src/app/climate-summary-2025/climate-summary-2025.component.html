@@ -16,7 +16,7 @@
     <div class = "content">
     <div class="section">
     <h1 class="title">Rainfall in 2025</h1>
-    <p class="subtitle">Explore percent difference and annual rainfall totals in 2025</p>
+    <p class="subtitle">Explore percent difference and annual rainfall totals</p>
 
     <div class="tabs" role="tablist" aria-label="Rainfall map mode">
       <button
@@ -124,7 +124,7 @@
             <span class="muted-inline" *ngIf="hoverIslandLabel('rain') as lbl">— {{ lbl }}</span>
           </div>
 
-          <ng-container *ngIf="rainfallHighlight as h; else noHover">
+          <ng-container *ngIf="rainfallHighlight as h; else noHoverRain">
             <div class="hi-index">
               <div class="hi-anom-line">
                 <div
@@ -146,8 +146,8 @@
               <div class="hi-rank">{{ h.rankText }} on record (106 years)</div>
             </div>
           </ng-container>
-          <ng-template #noHover>
-            <p class="callout-text muted">Hover an island to see rainfall highlights.</p>
+          <ng-template #noHoverRain>
+            <p class="callout-text muted">Hover over an island to view detailed rainfall statistics.</p>
           </ng-template>
         </article>
 
@@ -157,7 +157,7 @@
     </div>
     <div class="section">
     <h1 class="title">Drought in 2025</h1>
-    <p class="subtitle">Explore the extent and intensity of drought and wet conditions</p>
+    <p class="subtitle">Explore the extent and intensity of drought and wet conditions in the year</p>
 
     <div class="grid">
       <section class="card map-card">
@@ -223,7 +223,7 @@
             <span class="muted-inline" *ngIf="hoverIslandLabel('drought') as lbl">— {{ lbl }}</span>
           </div>
 
-          <ng-container *ngIf="droughtHighlight as h; else noHover">
+          <ng-container *ngIf="droughtHighlight as h; else noHoverDrought">
             <div class="hi-index">
               <div class="hi-anom hi-anom--split" [class.hi-anom-pos]="h.percentDry < 0"
                 [class.hi-anom-neg]="h.percentDry > 0">
@@ -235,6 +235,9 @@
               <div class="hi-rank">{{ h.percentModerateDrought }}% in moderate drought or worse conditions</div>
             </div>
           </ng-container>
+          <ng-template #noHoverDrought>
+            <p class="callout-text muted">Hover over an island to view detailed drought statistics.</p>
+          </ng-template>
         </article>
       </aside>
 
@@ -352,8 +355,9 @@
             <span class="muted-inline" *ngIf="hoverIslandLabel('temp') as lbl">—  {{ lbl }}</span>
           </div>
 
-          <ng-container *ngIf="temperatureHighlight as h; else noHover">
+          <ng-container *ngIf="temperatureHighlight as h; else noHoverTemp">
             <div class="hi-index">
+              <div class="hi-anom-line">
               <div
                 class="hi-anom"
                 [class.hi-anom-pos]="h.anom < 0"
@@ -361,12 +365,17 @@
               >
                 <span class="hi-anom-sign">{{ h.anom > 0 ? '+' : '' }}</span>{{ h.anom.toFixed(1) }}°F
               </div>
-
-              <div class="hi-rank">{{ h.rankText }} warmest on record (36 years)</div>
+              <div class="hi-anom-sub">
+                {{ h.anom < 0 ? 'below' : 'above' }} normal, averaged
+                {{ h.value.toFixed(0) }}°F
+              </div>
+              </div>  
+              
             </div>
+            <div class="hi-rank">{{ h.rankText }} warmest on record (36 years)</div>
           </ng-container>
-          <ng-template #noHover>
-            <p class="callout-text muted">Hover an island to see rainfall highlights.</p>
+          <ng-template #noHoverTemp>
+            <p class="callout-text muted">Hover over an island to view detailed temperature statistics.</p>
           </ng-template>
         </article>
       </aside>
@@ -489,9 +498,9 @@
           <h3 class="mini-kicker">By island</h3>
         </div>
 
-        <div class="mini-value">Maui had the highest county-average day</div>
+        <div class="mini-value">Maui had the highest island-average day</div>
         <p class="mini-desc">
-          Wettest day for each county based on that county’s gridded-area rainfall statistic.
+          Wettest day for each island based on that island’s gridded-area rainfall statistic.
         </p>
 
         <details class="mini-detail">
@@ -521,46 +530,9 @@
       </article>
     </div>
     <section class="section extremes" aria-labelledby="extremes-title">
-      <!-- <div class="extremes-grid">
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">New Records</h3>
-          </div>
-
-          <div class="mini-value">August</div>
-          <p class="mini-desc">August 2025 marked the driest August Hawaii has seen in the last 35 years</p>
-        </article>
-
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">Wettest Day</h3>
-          </div>
-
-          <div class="mini-value">Jan 31</div>
-          <p class="mini-desc">Hawaiʻi recorded its highest single-day rainfall total of the year on January 31, 2025, during a winter storm system that impacted the entire state from January 30–31. The event alone was enough to fill over 471,000 Olympic-sized pools. <a href="/climate-summary/01_31.png" target="_blank">View Map</a></p>
-        </article>
-
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">Highest temperature (or hot nights?)</h3>
-          </div>
-
-          <div class="mini-value">XX°F</div>
-          <p class="mini-desc">Statewide maximum (mock); include station + date in detail.</p>
-        </article>
-
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">Longest dry spell</h3>
-          </div>
-
-          <div class="mini-value">158 days</div>
-          <p class="mini-desc">South Molokaʻi experienced 158 consecutive days with rainfall below 0.04 inches (1 mm), spanning from May 1 to October 5, 2025.</p>
-        </article>
-      </div> -->
       <h2 class="subsection-title">Hot and Cool Day</h2>
       <p class="subtitle">
-        Hottest and coolest temperatures in 2025 summarized statewide, by county, and location.
+        Hottest and coolest temperatures in 2025 summarized statewide, by island, and location.
       </p>
 
       <div class="wettest-grid">
@@ -654,49 +626,6 @@
       </div>
     </section>
     </div>
-
-    <!-- <div class="section">
-    <h1 class="title">HCDP in 2025</h1> 
-      <div class="hcdp-2025-grid">
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">Mesonet Stations</h3>
-          </div>
-          <div class="mini-value">76 Active Stations</div>
-          <p class="mini-desc">We are expanding our gridded datasets to include new climate variables such as solar radiation, wind, and KBDI.</p>
-        </article>
-
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">New Website</h3>
-          </div>
-
-          <div class="mini-value">Mesonet Live Viewer</div>
-          <p class="mini-desc">We are developing a new "State of the Climate" website, where...</p>
-        </article>
-
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">New Tool</h3>
-          </div>
-
-          <div class="mini-value">Climate Portfolios</div>
-          <p class="mini-desc">X</p>
-
-        </article>
-
-        <article class="card mini-card">
-          <div class="mini-top">
-            <h3 class="mini-kicker">Gridded Products</h3>
-          </div>
-
-          <div class="mini-value">X</div>
-          <p class="mini-desc">X</p>
-
-        </article>
-        
-      </div>
-    </div> -->
 
     <div class="section">
       <h1 class="title">HCDP in 2025</h1>
@@ -877,13 +806,8 @@
           </div>
         </div>
       </div>
-
     </div>
-
-
   </div>
-
-
 </div>
 
 <footer class="site-footer" aria-label="Acknowledgements and data disclaimer">
@@ -910,7 +834,7 @@
       </p>
     </section>
 
-    <!-- Logos (bottom) -->
+    <!-- Logos  -->
     <div class="footer-logos" aria-label="Partner logos">
       <a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener"><img src="logos/hcdp.png" alt="Hawaiʻi Climate Data Portal logo" /></a>
       <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet/" target="_blank" rel="noopener"><img src="logos/mesonet.png" alt="Hawaiʻi Mesonet" /></a>
