@@ -350,7 +350,7 @@
                 [class.hi-anom-pos]="h.anom < 0"
                 [class.hi-anom-neg]="h.anom > 0"
               >
-                <span class="hi-anom-sign">{{ h.anom > 0 ? '+' : '' }}</span>{{ h.anom.toFixed(2) }}°F
+                <span class="hi-anom-sign">{{ h.anom > 0 ? '+' : '' }}</span>{{ h.anom.toFixed(1) }}°F
               </div>
 
               <div class="hi-rank">{{ h.rankText }} warmest on record (36 years)</div>

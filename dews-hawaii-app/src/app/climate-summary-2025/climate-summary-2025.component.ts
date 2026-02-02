@@ -15,6 +15,8 @@ type IslandKey = 'kauai'|'oahu'|'molokai'|'lanai'|'maui'|'kahoolawe'|'hawaii';
 
 type RainHighlight = {
   pdiff: number;     
+  value: number;
+  absdiff: number;
   rankText: string;
 };
 
@@ -414,18 +416,6 @@ export class ClimateSummary2025Component implements OnInit {
       itemMarginBottom: 2,
     },
 
-    // tooltip: {
-    //   shared: true,
-    //   formatter: function () {
-    //     const pts = (this.points ?? []).slice().sort((a, b) => Math.abs(Number(b.y ?? 0)) - Math.abs(Number(a.y ?? 0)));
-    //     const lines = pts.map((p) => {
-    //       const v = Math.abs(Number(p.y ?? 0));
-    //       return `<span style="color:${p.color}">●</span> ${p.series.name}: <b>${v.toFixed(1)}%</b>`;
-    //     });
-    //     return `<b>${this.x}</b><br/>${lines.join('<br/>')}`;
-    //   },
-    // },
-
     tooltip: {
       shared: true,
       formatter: function () {
@@ -775,15 +765,16 @@ export class ClimateSummary2025Component implements OnInit {
 
 
   private readonly rainfallHighlightsByIsland: Record<IslandKey, RainHighlight> = {
-    kauai:      { pdiff: -14.2, rankText: '21st driest ' },
-    oahu:       { pdiff: -24.7, rankText: '16th driest ' },
-    molokai:    { pdiff: -59.9, rankText: '5th driest ' },
-    lanai:      { pdiff: -68.7, rankText: '15th driest ' },
-    maui:       { pdiff: -50.0, rankText: 'Driest' },
-    kahoolawe:  { pdiff: -59.2, rankText: '23rd driest ' },
-    hawaii:     { pdiff: -47.0, rankText: '2nd driest ' },
+    kauai:      { pdiff: -11, value: 67, absdiff: -8,rankText: '21st driest ' },
+    oahu:       { pdiff: -15, value: 46, absdiff: -8,rankText: '16th driest ' },
+    molokai:    { pdiff: -38, value: 26, absdiff: -16,rankText: '5th driest ' },
+    lanai:      { pdiff: -28, value: 13, absdiff: -5,rankText: '15th driest ' },
+    maui:       { pdiff: -41, value: 41, absdiff: -28, rankText: 'Driest' },
+    kahoolawe:  { pdiff: -14, value: 10, absdiff: -2, rankText: '23rd driest ' },
+    hawaii:     { pdiff: -36, value: 41, absdiff: -23, rankText: '2nd driest ' },
   };
 
+  
   private readonly droughtHighlightsByIsland: Record<IslandKey, DroughtHighlight> = {
     kauai:      { percentDry: 56, percentModerateDrought: 50 },
     oahu:       { percentDry: 45, percentModerateDrought: 60 },
