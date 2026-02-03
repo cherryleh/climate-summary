@@ -15,6 +15,11 @@ import { Pool } from 'geotiff';
 import { NgZone } from '@angular/core';
 import { MapPanelComponent } from '../map-panel/map-panel.component';
 
+import { EmailSubscriptionService } from '../services/email-subscription.service';
+
+import { of, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+
 export type Scope = 'divisions' | 'moku' | 'ahupuaa' | 'watershed';
 
 type Dataset = 'Rainfall' | 'Temperature' | 'Drought';
@@ -94,7 +99,7 @@ function canonIsland(name: string): string {
   styleUrls: ['./climate-dashboard.component.css']
 })
 export class ClimateDashboardComponent implements OnDestroy {
-  constructor(private http: HttpClient, private ngZone: NgZone) { }
+  constructor(private http: HttpClient, private ngZone: NgZone,private emailSvc: EmailSubscriptionService) { }
 
   // ===== Map data/state =====
   islands = signal<Island[]>([]);
@@ -327,10 +332,62 @@ export class ClimateDashboardComponent implements OnDestroy {
   private emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   isEmailValid = computed(() => this.emailRegex.test(this.email().trim()));
   subscribe() {
+    const email = this.email().trim();
     if (!this.isEmailValid()) return;
-    const label = this.selectedDivision() || this.selectedCounty() || 'Statewide';
-    alert(`Subscribed ${this.email()} to monthly ${this.selectedDataset()} updates for ${label}.`);
+
+    // your existing "new_body" construction
+    const newBody: any = { email };
+
+    const countySel = this.selectedCounty();
+    const scope = this.selectedScope();
+    const divisionKey = this.selectedDivision();
+
+    if (countySel) newBody.county = [this.countyToApi(countySel)];
+    else newBody.county = ['hawaii', 'honolulu', 'kauai', 'maui'];
+
+    if (scope && divisionKey) {
+      const name = this.extractScopedName(divisionKey);
+      if (scope === 'moku') newBody.moku = [name];
+      else if (scope === 'ahupuaa') newBody.ahupuaa = [name];
+      else if (scope === 'watershed') newBody.watershed = [name];
+      // (divisions) only if API supports it
+    }
+
+    this.emailSvc.emailLookup(email).pipe(
+      switchMap(({ userID }) => {
+        // New user -> create
+        if (!userID) {
+          return this.emailSvc.createSubscription(newBody).pipe(
+            map(() => ({ mode: 'created' as const }))
+          );
+        }
+
+        // Existing user -> fetch existing subscription, merge, update
+        return this.emailSvc.getSubscription(userID).pipe(
+          switchMap(existing => {
+            const updatedBody = this.buildUpdatedBody(existing, newBody);
+            return this.emailSvc.updateSubscription(userID, updatedBody).pipe(
+              map(() => ({ mode: 'updated' as const }))
+            );
+          })
+        );
+      }),
+      catchError(err => {
+        console.error('Subscription error:', err);
+        // show the API error details if present
+        const msg =
+          typeof err?.error === 'string'
+            ? err.error
+            : JSON.stringify(err?.error ?? err, null, 2);
+        alert(msg);
+        return throwError(() => err);
+      })
+    ).subscribe(({ mode }) => {
+      const label = this.selectedDivisionName() || this.countyLabel() || 'Statewide';
+      alert(`${mode === 'created' ? 'Subscribed' : 'Updated subscription'} for ${this.selectedDataset()} — ${label}.`);
+    });
   }
+
 
   chartVisible = signal(true);
   chartFullscreen = signal(false);
@@ -1145,6 +1202,57 @@ export class ClimateDashboardComponent implements OnDestroy {
     return `${sign}${value.toFixed(1)}${unit}`.trim();
   }
 
+  private slugifySelection(s: string): string {
+    return (s || '')
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/['’ʻ`]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '_'); // wahiawa, north_kauai, etc.
+  }
+
+  private countyToApi(county: string): string {
+    // Your county labels might be "Honolulu", "Hawaiʻi", etc.
+    // API examples use lowercase: hawaii, honolulu
+    return this.slugifySelection(county).replace('_county', '');
+  }
+
+  private extractScopedName(key: string): string {
+    // key looks like "molokai::Kona" (in your code)
+    // We want the right-hand name
+    const parts = key.split('::');
+    const name = (parts.length === 2 ? parts[1] : key).trim();
+    return this.slugifySelection(name);
+  }
+
+  private readonly LIST_FIELDS: Array<'county'|'moku'|'ahupuaa'|'watershed'> =
+    ['county', 'moku', 'ahupuaa', 'watershed'];
+
+  private mergeDedup(oldVals: string[] = [], newVals: string[] = []): string[] {
+    const out: string[] = [];
+    const seen = new Set<string>();
+
+    for (const v of [...oldVals, ...newVals]) {
+      const s = (v ?? '').trim();
+      if (!s) continue;
+      if (!seen.has(s)) {
+        seen.add(s);
+        out.push(s);
+      }
+    }
+    return out;
+  }
+
+  private buildUpdatedBody(existing: any, incoming: any) {
+    const updated: any = { email: existing.email };
+
+    for (const f of this.LIST_FIELDS) {
+      updated[f] = this.mergeDedup(existing?.[f] ?? [], incoming?.[f] ?? []);
+    }
+
+    return updated;
+  }
 
 
 }
