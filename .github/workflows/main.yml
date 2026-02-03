@@ -15,6 +15,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Inject API token into environment.prod.ts
+        run: |
+          mkdir -p src/environments
+          echo "export const environment = { production: true, apiToken: '$(echo '${{ secrets.API_CONFIG_JSON }}' | base64 -d)' > src/environments/environment.prod.ts
+      - name: Generate environment.ts
+        run: |
+          echo "export const environment = { production: false, apiToken: '' };" > src/environments/environment.ts
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
