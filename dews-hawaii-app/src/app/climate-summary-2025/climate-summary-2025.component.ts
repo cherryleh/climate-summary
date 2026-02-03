@@ -782,7 +782,7 @@ export class ClimateSummary2025Component implements OnInit {
     molokai:    { percentDry: 100, percentModerateDrought: 80 },
     lanai:      { percentDry: 82, percentModerateDrought: 85 },
     maui:       { percentDry: 83, percentModerateDrought: 90 },
-    kahoolawe:  { percentDry: 0, percentModerateDrought: 95 },
+    kahoolawe:  { percentDry: 0, percentModerateDrought: 0 },
     hawaii:     { percentDry: 61, percentModerateDrought: 70 },
   };
 
