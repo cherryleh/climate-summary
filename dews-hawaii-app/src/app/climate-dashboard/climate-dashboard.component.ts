@@ -47,7 +47,7 @@ const COUNTY_BY_ISLAND: Record<string, string> = {
 
 // interface County {
 //   id: string;
-//   name: string;  
+//   name: string;
 //   short: string;
 //   feature: any;
 //   key: string;
@@ -557,15 +557,15 @@ export class ClimateDashboardComponent implements OnDestroy {
       ];
 
       const rainfallColors = [
-        "#730000", 
-        "#FF0000", 
-        "#FF6600", 
-        "#FFCC66", 
-        "#FFFFFF", 
-        "#CCE5FF", 
-        "#99CCFF", 
-        "#0066CC", 
-        "#001933"  
+        "#730000",
+        "#FF0000",
+        "#FF6600",
+        "#FFCC66",
+        "#FFFFFF",
+        "#CCE5FF",
+        "#99CCFF",
+        "#0066CC",
+        "#001933"
       ];
 
 
@@ -628,7 +628,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
     this.drawColorbar(dataset);
-    
+
   }
 
   private getNoDataValue(image: any): number | undefined {
@@ -837,7 +837,7 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   private loadRainfallData() {
     const county = this.selectedCounty();
-    const file = county ? 'county_rainfall.csv' : 'statewide_rf.csv';
+    const file = county ? 'rainfall/county_rainfall.csv' : 'rainfall/statewide_rainfall.csv';
 
     this.http.get(file, { responseType: 'text' }).subscribe(csv => {
       const data = this.parseCsv(csv, county ? 'county' : 'state');
@@ -858,7 +858,7 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   private loadTemperatureData() {
     const county = this.selectedCounty();
-    const file = county ? 'county_temperature.csv' : 'statewide_temp.csv';
+    const file = county ? 'temperature/county_temperature.csv' : 'temperature/statewide_temperature.csv';
 
     this.http.get(file, { responseType: 'text' }).subscribe(csv => {
       const data = this.parseCsv(csv, county ? 'county' : 'state');
@@ -881,7 +881,7 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   private loadSPIData(scale: number) {
     // Island-level (always)
-    this.http.get(`island_spi${scale}.csv`, { responseType: 'text' })
+    this.http.get(`spi/island_spi${scale}.csv`, { responseType: 'text' })
       .subscribe(csv => {
         this.islandSPI = this.parseCsv(csv, 'island');
         if (this.selectedCounty()) this.pickCounty(this.selectedCounty()!);
@@ -893,9 +893,9 @@ export class ClimateDashboardComponent implements OnDestroy {
     if (scope) {
       let file = '';
       let labelKey: 'division' | 'moku' | 'ahupuaa';
-      if (scope === 'divisions') { file = `climate_spi${scale}.csv`; labelKey = 'division'; }
-      else if (scope === 'moku') { file = `moku_spi${scale}.csv`; labelKey = 'moku'; }
-      else { file = `ahupuaa_spi${scale}.csv`; labelKey = 'ahupuaa'; }
+      if (scope === 'divisions') { file = `spi/climate_spi${scale}.csv`; labelKey = 'division'; }
+      else if (scope === 'moku') { file = `spi/moku_spi${scale}.csv`; labelKey = 'moku'; }
+      else { file = `spi/ahupuaa_spi${scale}.csv`; labelKey = 'ahupuaa'; }
 
       this.http.get(file, { responseType: 'text' })
         .subscribe(csv => {
@@ -907,8 +907,8 @@ export class ClimateDashboardComponent implements OnDestroy {
       this.selectedDivision.set(null);
     }
 
-    // Statewide (always)
-    this.http.get(`statewide_spi${scale}.csv`, { responseType: 'text' })
+    // Statewide
+    this.http.get(`spi/statewide_spi${scale}.csv`, { responseType: 'text' })
       .subscribe(csv => {
         this.statewideSPI = this.parseCsv(csv, 'state');
         if (!this.selectedCounty() && !this.selectedDivision()) {
@@ -974,17 +974,17 @@ export class ClimateDashboardComponent implements OnDestroy {
       let labelKey: 'state' | 'division' | 'moku' | 'ahupuaa' | 'watershed' | 'county' = 'state';
 
       if (scope === 'divisions') {
-        file = `climate_spi${scale}.csv`; labelKey = 'division';
+        file = `spi/climate_spi${scale}.csv`; labelKey = 'division';
       } else if (scope === 'moku') {
-        file = `moku_spi${scale}.csv`; labelKey = 'moku';
+        file = `spi/moku_spi${scale}.csv`; labelKey = 'moku';
       } else if (scope === 'ahupuaa') {
-        file = `ahupuaa_spi${scale}.csv`; labelKey = 'ahupuaa';
+        file = `spi/ahupuaa_spi${scale}.csv`; labelKey = 'ahupuaa';
       } else if (scope === 'watershed') {
-        file = `watershed_spi${scale}.csv`; labelKey = 'watershed';
+        file = `spi/watershed_spi${scale}.csv`; labelKey = 'watershed';
       } else if (county) {
-        file = `county_spi${scale}.csv`; labelKey = 'county';
+        file = `spi/county_spi${scale}.csv`; labelKey = 'county';
       } else {
-        file = `statewide_spi${scale}.csv`; labelKey = 'state';
+        file = `spi/statewide_spi${scale}.csv`; labelKey = 'state';
       }
 
 
@@ -1056,7 +1056,7 @@ export class ClimateDashboardComponent implements OnDestroy {
       // Drought — load all SPI scales
       const scales = [1, 6, 12];
       const promises = scales.map(scale =>
-        firstValueFrom(this.http.get(`${scope}_spi${scale}.csv`, { responseType: 'text' }))
+        firstValueFrom(this.http.get(`spi/${scope}_spi${scale}.csv`, { responseType: 'text' }))
           .then(csv => {
             const parsed = this.parseCsv(csv, labelKey);
             this.divisionSPIByScale[scale] = parsed;
@@ -1198,7 +1198,7 @@ export class ClimateDashboardComponent implements OnDestroy {
         ? ' in'
         : dataset === 'Temperature'
         ? '°F'
-        : ''; 
+        : '';
     return `${sign}${value.toFixed(1)}${unit}`.trim();
   }
 
