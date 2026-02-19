@@ -19,7 +19,7 @@
   --pill-indigo-bg: #eef0ff;
   --pill-indigo-text: #2a2f8a;
 
-  --mapH: 300px;      
+  --mapH: 300px;
   --mapPad: 14px;
 }
 .card{
@@ -127,8 +127,8 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;            
-  object-position: center;        
+  object-fit: contain;
+  object-position: center;
   display: block;
   background-color: #ccecff;
   border-radius: 10px;
@@ -215,14 +215,14 @@
 
 .legend--v .legend-bar{
   width: 14px;
-  height: 150px;         
+  height: 150px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.10);
-  margin: 0;            
+  margin: 0;
 }
 
 .legend--v .legend-ticks{
-  height: 150px;         
+  height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -457,7 +457,7 @@ radial-gradient(1200px 420px at 18% -12%, #eef3ff 0%, transparent 60%),
 radial-gradient(900px 360px at 88% 0%, #f1fbff 0%, transparent 55%),
 linear-gradient(180deg, #fbfcff 0%, #eef2fb 100%);
 border-bottom: 1px solid var(--border);
-position: relative; 
+position: relative;
 
 }
 
@@ -682,7 +682,7 @@ color: var(--muted);
 .footer-logos img{
   display: block;
   width: 100%;
-  height: 128px; 
+  height: 128px;
   object-fit: contain;
   filter: saturate(0.95);
   opacity: 0.92;
@@ -773,7 +773,7 @@ color: var(--muted);
 
 /* tighten the highlight index block */
 .callout--secondary .hi-index{
-  gap: 5px;   
+  gap: 5px;
   margin-top: 10px;
 }
 
@@ -847,7 +847,7 @@ color: var(--muted);
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: 0;
-  margin-top: 16px;  
+  margin-top: 16px;
   overflow: hidden;
 }
 .feature-media{
@@ -1050,7 +1050,7 @@ color: var(--muted);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  
+
 }
 
 .comingsoon-header {
@@ -1241,11 +1241,11 @@ box-shadow:
   display: flex;
   align-items: baseline;
   gap: 10px;
-  flex-wrap: wrap;          
+  flex-wrap: wrap;
 }
 
 .hi-anom-sub{
-  font-size: 14px;          
+  font-size: 14px;
   font-weight: 600;
   color: #22324a;
   line-height: 1.2;
@@ -1256,4 +1256,66 @@ box-shadow:
 
 .callout--secondary .hi-anom-sub{
   font-size: 16px;
+}
+
+.hero-actions{
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.hero-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(43, 87, 217, 0.24);
+  background: rgba(43, 87, 217, 0.12);
+  color: #1f3b8a;
+
+  font-weight: 900;
+  font-size: 13px;
+  text-decoration: none;
+  line-height: 1;
+
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 90ms ease,
+    color 140ms ease;
+}
+
+.hero-btn:hover{
+  background: rgba(43, 87, 217, 0.16);
+  border-color: rgba(43, 87, 217, 0.34);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.10);
+  transform: translateY(-1px);
+}
+
+.hero-btn:active{
+  transform: translateY(1px);
+}
+
+.hero-btn:focus-visible{
+  outline: 3px solid rgba(43, 87, 217, 0.30);
+  outline-offset: 3px;
+}
+
+/* Optional “secondary” style */
+.hero-btn--ghost{
+  background: rgba(255, 255, 255, 0.70);
+  border-color: rgba(15, 23, 42, 0.14);
+  color: #0f172a;
+}
+
+.hero-btn--ghost:hover{
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(15, 23, 42, 0.18);
 }

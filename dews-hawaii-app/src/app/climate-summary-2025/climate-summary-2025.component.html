@@ -8,6 +8,17 @@
       <img class="hero-logo-img hcdp-logo" src="logos/hcdp.png" alt="HCDP logo" />
       <img class="hero-logo-img mesonet-logo" src="logos/mesonet.png" alt="Hawaiʻi Mesonet logo" />
     </div>
+    <div class="hero-actions" aria-label="Report actions">
+      <a
+        class="hero-btn"
+        href="https://online.fliphtml5.com/rblc/2025-Climate-Report-Final/#p=1"
+        target="_blank"
+        rel="noopener"
+      >
+        Open PDF Version
+      </a>
+
+    </div>
 
   </div>
 
@@ -269,7 +280,7 @@
         Average temperature
       </button>
 
-      
+
     </div>
 
     <div class="grid">
@@ -369,8 +380,8 @@
                 {{ h.anom < 0 ? 'below' : 'above' }} normal, averaged
                 {{ h.value.toFixed(0) }}°F
               </div>
-              </div>  
-              
+              </div>
+
             </div>
             <div class="hi-rank">{{ h.rankText }} warmest on record (36 years)</div>
           </ng-container>
@@ -404,7 +415,7 @@
       >
         {{ monthModeLabel['monthly'] }}
       </button>
-      
+
       <button
         class="tab"
         type="button"
@@ -414,7 +425,7 @@
         (click)="setMonthMode('drought')"
       >
         {{ monthModeLabel['drought'] }}
-      </button>        
+      </button>
     </div>
     <section class="card chart-card" aria-label="Monthly breakdown chart">
       <highcharts-chart
@@ -429,7 +440,7 @@
         [options]="monthlyChartOptions"
         style="width: 100%; height: 420px; display: block;"
       ></highcharts-chart>
-      
+
       <highcharts-chart
         *ngIf="monthMode === 'drought'"
         [Highcharts]="Highcharts"
@@ -437,7 +448,7 @@
         style="width: 100%; height: 420px; display: block;"
       ></highcharts-chart>
     </section>
-    
+
     </div>
     <div class="wettest-grid">
       <article class="card mini-card">
@@ -471,7 +482,7 @@
 
       </article>
 
-      
+
     </div>
     <div class="section">
     <h1 class="title">Extremes and Records</h1>
@@ -554,7 +565,7 @@
 
           <div class="mini-value">Kaho‘olawe had the highest single-day average temperature</div>
           <p class="mini-desc">
-            
+
           </p>
 
           <details class="mini-detail">
@@ -643,7 +654,7 @@
         <div class="feature-body">
           <h2 class="feature-title">Hawai‘i Mesonet</h2>
 
-          <p class="feature-text">This year we saw the installation of several new Hawaii Mesonet stations bringing the total number of stations up to 76 with more installations planned in the coming year. 
+          <p class="feature-text">This year we saw the installation of several new Hawaii Mesonet stations bringing the total number of stations up to 76 with more installations planned in the coming year.
           </p>
           <div class="feature-actions">
             <a class="feature-link" href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet/" target="_blank" rel="noopener">
@@ -666,7 +677,7 @@
           <h2 class="feature-title">Mesonet Live Viewer</h2>
 
           <p class="feature-text">
-            View real-time climate variables from any of the Hawaii Mesonet Stations using this interactive tool 
+            View real-time climate variables from any of the Hawaii Mesonet Stations using this interactive tool
           </p>
           <div class="feature-actions">
             <a class="feature-link" href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/" target="_blank" rel="noopener">
@@ -689,7 +700,7 @@
           <h2 class="feature-title">Climate Portfolio Tool</h2>
 
           <p class="feature-text">
-            Make a custom climate portfolio for any location in the State and have it emailed to you in minutes. 
+            Make a custom climate portfolio for any location in the State and have it emailed to you in minutes.
           </p>
           <div class="feature-actions">
             <a class="feature-link" href="https://ccvd.manoa.hawaii.edu/" target="_blank" rel="noopener">
