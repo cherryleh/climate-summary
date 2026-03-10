@@ -441,7 +441,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     else if (this.selectedCounty()) prefix = 'county';    // county level
 
     const suffix = dataset.toLowerCase(); // rainfall | temperature
-    const file = `${prefix}_${suffix}_stats.csv`;
+    const file = `${suffix}/${prefix}_${suffix}_stats.csv`;
 
     console.log(`Fetching stats CSV: ${file}`);
 
