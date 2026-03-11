@@ -1,7 +1,7 @@
 .map {
   position: relative;
   width: 100%;
-  height: 340px;           
+  height: 340px;
   background: #f9fafb;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -10,7 +10,7 @@
 }
 
 .map-content {
-  transform: translateX(110px); /* tune this based on overlay width */
+  transform: none;
   transition: transform 0.3s ease;
 }
 
@@ -109,9 +109,9 @@ select.input option {
 
 .colorbar.legend {
   position: absolute;
-  top: 12px;         
-  right: 12px;       
-  transform: none;   
+  top: 12px;
+  right: 12px;
+  transform: none;
   background: rgba(255,255,255,0.9);
   padding: 8px;
   border-radius: 6px;
@@ -119,7 +119,7 @@ select.input option {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   display: flex;
   align-items: center;
-  gap: 8px;       
+  gap: 8px;
 }
 
 .colorbar-wrap {
@@ -145,10 +145,10 @@ select.input option {
   font-size: 12px;
   font-weight: 600;
   fill: #111;
-  stroke: #fff;         
-  stroke-width: 3px;    
-  paint-order: stroke;  
-  pointer-events: none; 
+  stroke: #fff;
+  stroke-width: 3px;
+  paint-order: stroke;
+  pointer-events: none;
   user-select: none;
 }
 

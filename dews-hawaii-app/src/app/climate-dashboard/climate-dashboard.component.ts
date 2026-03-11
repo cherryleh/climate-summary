@@ -1255,4 +1255,25 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
 
+  countyMenuOpen = signal(false);
+
+  toggleCountyMenu() {
+    this.countyMenuOpen.set(!this.countyMenuOpen());
+  }
+
+  closeCountyMenu() {
+    this.countyMenuOpen.set(false);
+  }
+
+  chooseCounty(county: string | null) {
+    this.closeCountyMenu();
+
+    if (!county) {
+      this.reset();
+      return;
+    }
+
+    this.pickCounty(county);
+  }
+  selectedCountyDisplay = computed(() => this.selectedCounty() || 'Statewide');
 }

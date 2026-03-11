@@ -7,15 +7,48 @@
 .topbar { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
 .brand { display:flex; align-items:center; gap:12px; }
 
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 24px;
+  align-items: start;
+}
 
-.grid { display:grid; grid-template-columns: 1fr; gap:24px; padding:24px; }
-@media (min-width:1024px) { .grid { grid-template-columns: 6fr 6fr; } }
-@media (min-width:1280px) { .grid { grid-template-columns: 7fr 5fr; } }
+@media (min-width: 1400px) {
+  .grid {
+    grid-template-columns: minmax(0, 7fr) minmax(360px, 5fr);
+    align-items: stretch;
+  }
 
-.left-col { display:flex; flex-direction:column; gap:24px; }
-.aside { display:flex; flex-direction:column; gap:24px; }
+  .left-col,
+  .aside {
+    height: 100%;
+  }
+}
+.left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
 
-.panel { background: var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+  min-width: 0;
+}
+
 .panel-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
 .eyebrow { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--sub); }
 .title { font-weight:600; }
@@ -48,30 +81,31 @@
 /* Stats grid */
 .stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-top: 12px;
 }
 
-@media (min-width: 640px) {
-  /* Rainfall & Temperature: 4-up */
+@media (min-width: 900px) {
   .stats {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  /* Drought: 3-up */
-  .stats-drought {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 .stats-drought {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 equal-width boxes */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  width: 100%;              /* span full width of container */
-  align-items: stretch;     /* make all boxes equal height */
-  justify-items: stretch;   /* ensure each fills its grid cell */
+  margin-top: 12px;
+  width: 100%;
+  align-items: stretch;
+  justify-items: stretch;
+}
+
+@media (min-width: 900px) {
+  .stats-drought {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
 
@@ -119,12 +153,12 @@
 
 .crumbs {
   display: flex;
-  flex-wrap: wrap;     
-  gap: 6px;           
+  flex-wrap: wrap;
+  gap: 6px;
   align-items: center;
   margin-top: 6px;
   font-size: 14px;
-  word-break: break-word; 
+  word-break: break-word;
 }
 
 .hover-label {
@@ -134,20 +168,9 @@
   paint-order: stroke;
   stroke: white;
   stroke-width: 2px;
-  pointer-events: none; 
+  pointer-events: none;
 }
 
-@media (min-width:640px) {
-  .stats-rainfall {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px; 
-  }
-
-  .stats:not(.stats-rainfall) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 
 /* Snapshot hero emphasis */
 .snapshot-hero {
@@ -166,9 +189,9 @@
 .snapshot-controls .control .tiny { font-weight:600; letter-spacing:.02em; }
 /* Make dataset selection buttons bigger */
 .chips-toggle .chip {
-  padding: 5px 8px;     /* larger click area */
-  font-size: 15px;     /* bolder text */
-  border-radius: 10px;    /* slightly rounder */
+  padding: 5px 8px;
+  font-size: 14px;
+  border-radius: 10px;
 }
 
 .chips-toggle .chip.chip-selected {
@@ -301,3 +324,156 @@
   user-select: none;
 }
 
+.map-panel {
+  overflow: hidden;
+  min-height: 450px;
+}
+.selection-bar {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid #eef2f7;
+  background: #f8fafc;
+}
+
+.selection-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.toolbar-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.county-anchor {
+  position: relative;
+}
+
+.county-current,
+.county-change {
+  white-space: nowrap;
+}
+
+.county-change-active {
+  background: #eef6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid #dbe4ee;
+  border-radius: 14px;
+  background: #fff;
+  gap: 2px;
+}
+
+.seg-btn {
+  padding: 5px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.seg-btn.active {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.btn-reset-inline {
+  margin-left: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 1.1;
+}
+
+.county-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 52px;
+  z-index: 20;
+  width: 180px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid #dbe4ee;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+  display: grid;
+  gap: 6px;
+}
+
+.menu-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  padding: 2px 4px 6px;
+}
+
+.menu-item {
+  text-align: left;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.menu-item-active {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #075985;
+}
+
+.map-wrap-panel {
+  position: relative;
+  padding: 14px 16px 16px;
+  min-height: 520px;
+  flex: 1 1 auto;
+}
+
+.map-panel-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 900px) {
+  .selection-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .toolbar-left,
+  .toolbar-right {
+    flex-wrap: wrap;
+  }
+
+  .map-wrap-panel {
+    padding: 10px 12px 12px;
+    min-height: 420px;
+  }
+}
