@@ -202,8 +202,7 @@
 
 .chips-toggle .chip.chip-selected { background:#e0f2fe; border-color:#7dd3fc; color:#075985; }
 
-/* Keep the statement wide; you already have .info-box – just ensure spacing feels tight */
-.snapshot-hero .info-box { margin-top:8px; }
+.snapshot-hero .info-box { margin-top:0px; }
 
 /* Snapshots tiles: rows of 2 (also for Temperature) */
 @media (min-width:640px) {
@@ -241,7 +240,7 @@
 .snapshot-hero {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .snapshot-hero.snapshot-hero-drought {

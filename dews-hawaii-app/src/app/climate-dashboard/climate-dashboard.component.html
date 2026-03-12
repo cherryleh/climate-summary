@@ -49,15 +49,15 @@
 
         <!-- Statement -->
         <div class="info-box" *ngIf="selectedDataset() === 'Rainfall'">
-          Hawai‘i received 2.0 inches of rainfall statewide — 3.2 inches (62%) below the August average, marking the driest August in the last 30 years.
+          {{ selectedDivisionName() || countyLabel() || 'Statewide' }} received 2.0 inches of rainfall statewide — 3.2 inches (62%) below the August average, marking the driest August in the last 30 years.
         </div>
 
         <div class="info-box" *ngIf="selectedDataset() === 'Temperature'">
-          Hawai‘i averaged 70°F statewide — 0.5°F above the August average, ranking as the 11th warmest August in the last 30 years.
+          {{ selectedDivisionName() || countyLabel() || 'Statewide' }} averaged 70°F statewide — 0.5°F above the August average, ranking as the 11th warmest August in the last 30 years.
         </div>
 
         <div class="info-box" *ngIf="selectedDataset() === 'Drought'">
-          Hawai‘i saw dry conditions with 67% of land area seeing at least abnormally dry conditions, and 21% seeing severe drought or worse conditions.
+          {{ selectedDivisionName() || countyLabel() || 'Statewide' }} saw dry conditions with 67% of land area seeing at least abnormally dry conditions, and 21% seeing severe drought or worse conditions.
         </div>
 
 
@@ -347,8 +347,7 @@
         <div class="mt">
           <div class="summary">
             <div class="muted">Selection</div>
-            <div class="strong">{{ selectedDivision() || selectedCounty() || 'Statewide' }}
- </div>
+            <div class="strong">{{ fullSelectionLabel }}</div>
           </div>
         </div>
 

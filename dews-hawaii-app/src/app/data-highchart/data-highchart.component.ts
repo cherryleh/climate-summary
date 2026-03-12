@@ -13,7 +13,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
     [options]="chartOptions"
     [(update)]="updateFlag"
     [oneToOne]="true"
-    style="width:100%; height:400px; display:block;"
+    style="width:100%; height:350px; display:block;"
   ></highcharts-chart>
   `
 })

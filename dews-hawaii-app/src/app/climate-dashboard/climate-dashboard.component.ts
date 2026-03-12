@@ -1036,7 +1036,7 @@ export class ClimateDashboardComponent implements OnDestroy {
   //   Promise.all(requests).then(results => this.spiSeries.set(results));
   // }
 
-    pickDivision(d: string | null) {
+  pickDivision(d: string | null) {
     this.selectedDivision.set(d);
     this.loadStats(d);
 
@@ -1089,18 +1089,32 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
     // Rainfall / Temperature
-    const file = `${scope === 'divisions' ? 'climate' : scope}_${dataset.toLowerCase()}.csv`;
+    const datasetFolder = dataset.toLowerCase(); // rainfall | temperature
+    const prefix = scope === 'divisions' ? 'climate' : scope;
+    const file = `${datasetFolder}/${prefix}_${datasetFolder}.csv`;
+
+    // for matching, use scoped name only unless your CSV stores island::name
+    const divisionName = this.extractScopedName(d);
 
     this.http.get(file, { responseType: 'text' }).subscribe(csv => {
       const parsed = this.parseCsv(csv, labelKey);
 
       const filtered = parsed
-        .filter(r => this.normalizeKey(r[labelKey] || '') === this.normalizeKey(d))
+        .filter(r => {
+          const csvLabel = this.normalizeKey(r[labelKey] || '');
+          return (
+            csvLabel === this.normalizeKey(d) ||               // matches island::name if CSV uses that
+            csvLabel === this.normalizeKey(divisionName)       // matches just name if CSV uses that
+          );
+        })
         .map(r => ({ month: r.month, value: r.value }));
 
+      console.log('Division chart file:', file);
+      console.log('Selected division:', d);
+      console.log('Division name:', divisionName);
+      console.log('Filtered rows:', filtered.length);
+
       this.tsData.set(filtered);
-
-
     });
   }
 
@@ -1293,4 +1307,33 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.pickCounty(county);
   }
   selectedCountyDisplay = computed(() => this.selectedCounty() || 'Statewide');
+
+  get fullSelectionLabel(): string {
+    const county = this.selectedCounty();
+    const rawDivision = this.selectedDivision();
+    // Provide a fallback string '' if selectedScope() is null
+    const scope = this.selectedScope() ?? '';
+
+    if (!county && !rawDivision) return 'Statewide';
+
+    if (rawDivision) {
+      const cleanName = rawDivision.includes('::')
+        ? rawDivision.split('::')[1]
+        : rawDivision;
+
+      const labels: Record<string, string> = {
+        'divisions': 'Climate Division',
+        'moku': 'Moku',
+        'ahupuaa': 'Ahupuaʻa',
+        'watershed': 'Watershed'
+      };
+
+      const suffix = labels[scope] || '';
+
+      // Return "County - Name Suffix"
+      return `${county} - ${cleanName} ${suffix}`.trim();
+    }
+
+    return county || 'Statewide';
+  }
 }
