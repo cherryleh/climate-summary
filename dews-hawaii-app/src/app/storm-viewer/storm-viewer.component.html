@@ -1,0 +1,66 @@
+<div class="page">
+
+<h1>March 10 to March 15, 2026 Storm Viewer</h1>
+
+<div class="container">
+
+  <div class="map">
+    <img [src]="imagePath">
+  </div>
+
+  <div class="sidebar">
+
+    <div class="stat">
+      <h3>Total Rainfall</h3>
+      <p>{{stats.total}}</p>
+    </div>
+
+    <div class="stat">
+      <h3>Max Rainfall</h3>
+      <p>{{stats.max}}</p>
+    </div>
+
+    <div class="stat">
+      <h3>Average Rainfall</h3>
+      <p>{{stats.avg}}</p>
+    </div>
+
+    <div class="stat">
+      <h3>Wettest Island</h3>
+      <p>{{stats.wettest}}</p>
+    </div>
+
+    <div class="day-label">
+      {{selectedDay.label}} · {{mode}}
+    </div>
+
+  </div>
+
+</div>
+
+<div class="controls-bar">
+
+  <div class="toggle-wrap">
+    <span>Daily</span>
+
+    <label class="switch">
+      <input type="checkbox" (change)="toggleMode()">
+      <span class="slider"></span>
+    </label>
+
+    <span>Cumulative</span>
+  </div>
+
+  <div class="buttons">
+    <button
+      *ngFor="let d of days; let i=index"
+      (click)="selectDay(i)"
+      [class.active]="selectedDayIndex === i"
+    >
+      {{d.label}}
+    </button>
+  </div>
+
+</div>
+
+</div>
