@@ -9,15 +9,8 @@
   </div>
 
   <div class="sidebar">
-
-    <div class="stat">
-      <h3>Total Rainfall</h3>
-      <p>{{stats.total}}</p>
-    </div>
-
-    <div class="stat">
-      <h3>Max Rainfall</h3>
-      <p>{{stats.max}}</p>
+    <div class="date">
+      {{stats.date}}
     </div>
 
     <div class="stat">
@@ -25,10 +18,6 @@
       <p>{{stats.avg}}</p>
     </div>
 
-    <div class="stat">
-      <h3>Wettest Island</h3>
-      <p>{{stats.wettest}}</p>
-    </div>
 
     <div class="day-label">
       {{selectedDay.label}} · {{mode}}
@@ -38,7 +27,8 @@
 
 </div>
 
-<div class="controls-bar">
+<!-- WITHOUT PLAY BUTTON -->
+<!-- <div class="controls-bar">
 
   <div class="toggle-wrap">
     <span>Daily</span>
@@ -61,6 +51,41 @@
     </button>
   </div>
 
-</div>
+</div> -->
+
+  <div class="controls-bar">
+
+    <div class="toggle-wrap">
+      <span>Daily</span>
+
+      <label class="switch">
+        <input type="checkbox" (change)="toggleMode()">
+        <span class="slider"></span>
+      </label>
+
+      <span>Cumulative</span>
+    </div>
+
+    <div class="buttons">
+      <button
+        type="button"
+        class="play-button"
+        (click)="togglePlay()"
+        [class.playing]="isPlaying"
+      >
+        {{ isPlaying ? 'Pause' : 'Play' }}
+      </button>
+
+      <button
+        type="button"
+        *ngFor="let d of days; let i = index"
+        (click)="selectDay(i)"
+        [class.active]="selectedDayIndex === i"
+      >
+        {{ d.label }}
+      </button>
+    </div>
+
+  </div>
 
 </div>

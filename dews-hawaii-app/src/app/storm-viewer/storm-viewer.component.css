@@ -20,7 +20,7 @@ h1 {
 }
 
 .container {
-  width: min(1180px, 100%);
+  width: 70%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(280px, 340px);
@@ -200,4 +200,43 @@ h1 {
   .page {
     padding: 16px;
   }
+}
+
+/* Play button */
+.buttons .play-button {
+  border: 1px solid #0f172a;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.buttons .play-button:hover {
+  background: #1e293b;
+  border-color: #1e293b;
+  color: white;
+}
+
+.buttons .play-button.playing {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+.date {
+  margin: 0 auto 16px auto;
+  padding: 14px 18px;
+
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1e293b;
 }
