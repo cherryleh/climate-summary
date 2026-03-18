@@ -297,20 +297,32 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         '#17becf', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22'
       ];
 
-        const series: Highcharts.SeriesOptionsType[] = stationIds.map((id, idx) => ({
+      const series: Highcharts.SeriesOptionsType[] = stationIds.map((id, idx) => ({
         name: id,
         type: 'line',
         data: seriesMap[id],
         color: colors[idx % colors.length],
         lineWidth: 1,
-        marker: { enabled: false }
+        marker: { enabled: false },
+        stickyTracking: false
       }));
 
-      this.chartOptions = {
-        ...this.chartOptions,
-        series: series // Replace existing series entirely
-      };
+      this.chartOptions.series = [];
       this.updateFlag = true;
+
+      setTimeout(() => {
+        this.chartOptions = {
+          ...this.chartOptions,
+          title: {
+            text: this.selectedCounty === 'all'
+                  ? 'Storm Station Rainfall Time Series'
+                  : `Storm Station Rainfall Time Series – ${this.selectedCounty}`
+          },
+          series: series
+        };
+        this.updateFlag = true;
+        this.isChartLoading = false;
+      }, 10);
 
       setTimeout(() => {
         this.updateFlag = true;
