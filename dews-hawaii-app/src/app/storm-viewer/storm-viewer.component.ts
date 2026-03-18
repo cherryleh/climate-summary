@@ -55,7 +55,8 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     },
     tooltip: {
       shared: false,
-      xDateFormat: '%b %e, %Y %I:%M %p'
+      xDateFormat: '%b %e, %Y %I:%M',
+      pointFormat: 'Station ID#{series.name}: <b>{point.y:.2f} in</b>'
     },
     legend: {
       enabled: false

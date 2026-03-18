@@ -11,12 +11,16 @@
   font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-h1 {
+h1, h2 {
   margin: 0 0 18px;
   text-align: center;
   font-size: 1.9rem;
   font-weight: 700;
   color: #0f172a;
+}
+
+h2{
+  margin-top: 18px;
 }
 
 .container {
@@ -217,6 +221,7 @@ h1 {
 }
 
 .chart-loading {
+  display: inline;
   margin-bottom: 10px;
   font-size: 0.95rem;
   color: #555;
@@ -270,6 +275,7 @@ h1 {
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 
@@ -283,15 +289,16 @@ h1 {
 }
 
 .summary-card {
-  flex: 1; /* This pushes the card to take up all remaining vertical space */
+  flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* Critical for flex-scroll behavior */
+  min-height: 0;
   overflow: hidden;
 }
 
 .summary-text {
   flex: 1;
-  overflow-y: auto; /* Adds scrollbar only if text is too long */
-  padding-right: 8px; /* Space for the scrollbar */
+  overflow-y: auto;
+  padding-right: 8px;
+  text-align: justify;
 }

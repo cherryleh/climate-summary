@@ -1,50 +1,54 @@
 <div class="page">
 
-<h1>March 10 to March 15, 2026 Storm Viewer</h1>
-<p> An intense Kona low developed northwest of the islands between March 10 and 16, drawing heavy tropical moisture northward to produce days of severe rain and thunderstorms. This historic storm caused widespread destruction across the Hawaiian Islands, resulting in significant damage and major disruptions to power and utility networks. The Hawaii Climate Data Portal (HCDP) has now finalized updated daily rainfall maps to help the community, researchers, and recovery teams understand the full scale and intensity of the event.</p>
-<div class="container">
+  <h1>March 10 to March 15, 2026 Storm Viewer</h1>
+  <p> An intense Kona low developed northwest of the islands between March 10 and 16, drawing heavy tropical moisture
+    northward to produce days of severe rain and thunderstorms. This historic storm caused widespread destruction across
+    the Hawaiian Islands, resulting in significant damage and major disruptions to power and utility networks. The
+    Hawaii Climate Data Portal (HCDP) has now finalized updated daily rainfall maps to help the community, researchers,
+    and recovery teams understand the full scale and intensity of the event.</p>
+  <div class="container">
 
-  <div class="map">
-    <img [src]="imagePath">
+    <div class="map">
+      <img [src]="imagePath">
+    </div>
+
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="date">
+          {{ stats.date }}
+        </div>
+        <div class="day-label">
+          {{ selectedDay.label }} · {{ mode | titlecase }}
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-item">
+          <h3>Minimum</h3>
+          <p>{{stats.min}}</p>
+        </div>
+        <div class="stat-item">
+          <h3>Average</h3>
+          <p>{{stats.avg}}</p>
+        </div>
+        <div class="stat-item">
+          <h3>Maximum</h3>
+          <p>{{stats.max}}</p>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-title">Storm Summary</div>
+        <div class="summary-text">
+          {{ selectedDay.stats.text }}
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="date">
-        {{ stats.date }}
-      </div>
-      <div class="day-label">
-        {{ selectedDay.label }} · {{ mode }}
-      </div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-item">
-        <h3>Minimum</h3>
-        <p>{{stats.min}}</p>
-      </div>
-      <div class="stat-item">
-        <h3>Average</h3>
-        <p>{{stats.avg}}</p>
-      </div>
-      <div class="stat-item">
-        <h3>Maximum</h3>
-        <p>{{stats.max}}</p>
-      </div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-title">Storm Summary</div>
-      <div class="summary-text">
-        {{ selectedDay.stats.text }}
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- WITHOUT PLAY BUTTON -->
-<!-- <div class="controls-bar">
+  <!-- WITHOUT PLAY BUTTON -->
+  <!-- <div class="controls-bar">
 
   <div class="toggle-wrap">
     <span>Daily</span>
@@ -83,53 +87,71 @@
     </div>
 
     <div class="buttons">
-      <button
-        type="button"
-        class="play-button"
-        (click)="togglePlay()"
-        [class.playing]="isPlaying"
-      >
+      <button type="button" class="play-button" (click)="togglePlay()" [class.playing]="isPlaying">
         {{ isPlaying ? 'Pause' : 'Play' }}
       </button>
 
-      <button
-        type="button"
-        *ngFor="let d of days; let i = index"
-        (click)="selectDay(i)"
-        [class.active]="selectedDayIndex === i"
-      >
+      <button type="button" *ngFor="let d of days; let i = index" (click)="selectDay(i)"
+        [class.active]="selectedDayIndex === i">
         {{ d.label }}
       </button>
+
+    </div>
+    <div class="controls-bar">
+      <div class="county-filters">
+        <div class="filter-label">Filter by County</div>
+        <div class="buttons">
+          <button type="button" (click)="selectedCounty = 'all'; onCountyChange()"
+            [class.active]="selectedCounty === 'all'">
+            All Counties
+          </button>
+          <button type="button" (click)="selectedCounty = 'kauai'; onCountyChange()"
+            [class.active]="selectedCounty === 'kauai'">
+            Kauaʻi
+          </button>
+          <button type="button" (click)="selectedCounty = 'oahu'; onCountyChange()"
+            [class.active]="selectedCounty === 'oahu'">
+            Oʻahu
+          </button>
+          <button type="button" (click)="selectedCounty = 'molokai'; onCountyChange()"
+            [class.active]="selectedCounty === 'molokai'">
+            Molokaʻi
+          </button>
+          <button type="button" (click)="selectedCounty = 'maui'; onCountyChange()"
+            [class.active]="selectedCounty === 'maui'">
+            Maui
+          </button>
+          <button type="button" (click)="selectedCounty = 'hawaii'; onCountyChange()"
+            [class.active]="selectedCounty === 'hawaii'">
+            Hawaiʻi
+          </button>
+        </div>
+      </div>
     </div>
 
   </div>
-  <div class="controls-row">
-    <label for="countySelect">County:</label>
-    <select
-      id="countySelect"
-      [(ngModel)]="selectedCounty"
-      (change)="onCountyChange()"
-    >
-      <option value="all">All counties</option>
-      <option value="maui">Maui</option>
-      <option value="hawaii">Hawaiʻi</option>
-      <option value="molokai">Molokaʻi</option>
-      <option value="oahu">Oʻahu</option>
-      <option value="kauai">Kauaʻi</option>
-    </select>
-  </div>
+  <div class="station-data-section">
+    <h2>Mesonet Station Data</h2>
 
-  <div class="chart-wrap">
-    <div *ngIf="isChartLoading" class="chart-loading">
-      Loading station time series...
+    <div class="controls-row">
+      <label for="countySelect">County:</label>
+      <select id="countySelect" [(ngModel)]="selectedCounty" (change)="onCountyChange()">
+        <option value="all">All counties</option>
+        <option value="maui">Maui</option>
+        <option value="hawaii">Hawaiʻi</option>
+        <option value="molokai">Molokaʻi</option>
+        <option value="oahu">Oʻahu</option>
+        <option value="kauai">Kauaʻi</option>
+      </select>
+
+      <div *ngIf="isChartLoading" class="chart-loading">
+        Loading station time series...
+      </div>
     </div>
 
-    <highcharts-chart
-      [Highcharts]="Highcharts"
-      [options]="chartOptions"
-      [(update)]="updateFlag"
-      [oneToOne]="true"
-      style="width:40%; height:1000px; display:block;"
-    ></highcharts-chart>
+    <div class="chart-wrap">
+      <highcharts-chart [Highcharts]="Highcharts" [options]="chartOptions" [(update)]="updateFlag" [oneToOne]="true"
+        style="width:90%; height:1000px; display:block;"></highcharts-chart>
+    </div>
   </div>
 </div>
