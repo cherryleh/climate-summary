@@ -240,3 +240,14 @@ h1 {
   font-weight: 600;
   color: #1e293b;
 }
+
+.chart-wrap {
+  width: 100%;
+  min-height: 400px;
+}
+
+.chart-loading {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #555;
+}
