@@ -25,6 +25,7 @@ h1 {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(280px, 340px);
   gap: 20px;
+  height: 600px;
   align-items: stretch;
 }
 
@@ -40,6 +41,11 @@ h1 {
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
+.map {
+  aspect-ratio: 16 / 10;
+  min-height: 0;
+}
+
 .map img {
   width: 100%;
   height: auto;
@@ -47,42 +53,6 @@ h1 {
   object-fit: contain;
 }
 
-.sidebar {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
-  padding: 22px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-}
-
-.stat + .stat {
-  margin-top: 18px;
-}
-
-.stat h3 {
-  margin: 0 0 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #64748b;
-  letter-spacing: 0.02em;
-}
-
-.stat p {
-  margin: 0;
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.day-label {
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid #e2e8f0;
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #334155;
-}
 
 .controls-bar {
   width: min(1180px, 100%);
@@ -250,4 +220,78 @@ h1 {
   margin-bottom: 10px;
   font-size: 0.95rem;
   color: #555;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Fill the grid cell */
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.sidebar-header {
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+  border: 1px solid #dbeafe;
+}
+
+.date {
+  margin: 0 0 8px 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.day-label {
+  margin: 0;
+  padding: 0;
+  border-bottom: none;
+  text-align: center;
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.01em;
+}
+
+.stat {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+
+.summary-title {
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.summary-card {
+  flex: 1; /* This pushes the card to take up all remaining vertical space */
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Critical for flex-scroll behavior */
+  overflow: hidden;
+}
+
+.summary-text {
+  flex: 1;
+  overflow-y: auto; /* Adds scrollbar only if text is too long */
+  padding-right: 8px; /* Space for the scrollbar */
 }

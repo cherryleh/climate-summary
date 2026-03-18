@@ -9,20 +9,36 @@
   </div>
 
   <div class="sidebar">
-    <div class="date">
-      {{stats.date}}
+    <div class="sidebar-header">
+      <div class="date">
+        {{ stats.date }}
+      </div>
+      <div class="day-label">
+        {{ selectedDay.label }} · {{ mode }}
+      </div>
     </div>
 
     <div class="stat">
-      <h3>Average Rainfall</h3>
-      <p>{{stats.avg}}</p>
+      <div class="stat-item">
+        <h3>Minimum</h3>
+        <p>{{stats.min}}</p>
+      </div>
+      <div class="stat-item">
+        <h3>Average</h3>
+        <p>{{stats.avg}}</p>
+      </div>
+      <div class="stat-item">
+        <h3>Maximum</h3>
+        <p>{{stats.max}}</p>
+      </div>
     </div>
 
-
-    <div class="day-label">
-      {{selectedDay.label}} · {{mode}}
+    <div class="summary-card">
+      <div class="summary-title">Storm Summary</div>
+      <div class="summary-text">
+        {{ selectedDay.stats.text }}
+      </div>
     </div>
-
   </div>
 
 </div>
