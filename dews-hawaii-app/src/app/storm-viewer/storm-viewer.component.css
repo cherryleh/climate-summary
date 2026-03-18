@@ -275,13 +275,7 @@ h2{
   letter-spacing: 0.01em;
 }
 
-.stat {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 12px;
-  margin-bottom: 12px;
-}
+
 
 
 .summary-title {
@@ -323,4 +317,59 @@ h2{
   padding: 18px 22px;
   border-radius: 14px;
 
+}
+
+.stat-item h3, p{
+  padding:0;
+  margin:0;
+}
+
+.stat-title{
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #475569;
+  display: block;
+}
+/* Container for the whole stat section */
+.stat-group {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f1f5f9; /* Light slate background to contrast with white sidebar */
+  border-radius: 14px;
+}
+
+.stat-title {
+  margin-bottom: 12px;
+  font-size: 0.75rem; /* Slightly smaller for that 'metadata' look */
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b; /* Muted slate */
+  display: block;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-item h3 {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.stat-item p {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
 }

@@ -56,13 +56,15 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     tooltip: {
       shared: false,
       xDateFormat: '%b %e, %Y %I:%M',
-      pointFormat: 'Station ID#{series.name}: <b>{point.y:.2f} in</b>'
+      pointFormat: 'Station ID#{series.name}: <b>{point.y:.2f} in</b>',
+
     },
     legend: {
       enabled: false
     },
     plotOptions: {
       series: {
+        stickyTracking: false,
         marker: { enabled: false },
         turboThreshold: 0,
         lineWidth: 1,
@@ -295,7 +297,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         '#17becf', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22'
       ];
 
-      const series: Highcharts.SeriesOptionsType[] = stationIds.map((id, idx) => ({
+        const series: Highcharts.SeriesOptionsType[] = stationIds.map((id, idx) => ({
         name: id,
         type: 'line',
         data: seriesMap[id],
@@ -306,14 +308,9 @@ export class StormViewerComponent implements OnInit, OnDestroy {
 
       this.chartOptions = {
         ...this.chartOptions,
-        title: {
-          text:
-            this.selectedCounty === 'all'
-              ? 'Storm Station Rainfall Time Series'
-              : `Storm Station Rainfall Time Series – ${this.selectedCounty}`
-        },
-        series
+        series: series // Replace existing series entirely
       };
+      this.updateFlag = true;
 
       setTimeout(() => {
         this.updateFlag = true;

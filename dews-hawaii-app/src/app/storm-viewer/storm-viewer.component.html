@@ -1,6 +1,6 @@
 <div class="page">
 
-  <h1>March 10 to March 15, 2026 Storm Viewer</h1>
+  <h1>March 10 to March 16, 2026 Storm Viewer</h1>
   <p class="intro">
     An intense Kona low developed northwest of the islands between March 10 and 16, drawing heavy tropical moisture
     northward to produce days of severe rain and thunderstorms. This historic storm caused widespread destruction across
@@ -15,27 +15,29 @@
     </div>
 
     <div class="sidebar">
-      <div class="sidebar-header">
+      <!-- <div class="sidebar-header">
         <div class="date">
           {{ stats.date }}
         </div>
         <div class="day-label">
           {{ selectedDay.label }} · {{ mode | titlecase }}
         </div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-item">
-          <h3>Minimum</h3>
-          <p>{{stats.min}}</p>
-        </div>
-        <div class="stat-item">
-          <h3>Average</h3>
-          <p>{{stats.avg}}</p>
-        </div>
-        <div class="stat-item">
-          <h3>Maximum</h3>
-          <p>{{stats.max}}</p>
+      </div> -->
+      <div class="stat-group">
+        <div class="stat-title">Daily Rainfall</div>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <h3>Min</h3>
+            <p>{{stats.min}}</p>
+          </div>
+          <div class="stat-item">
+            <h3>Avg</h3>
+            <p>{{stats.avg}}</p>
+          </div>
+          <div class="stat-item">
+            <h3>Max</h3>
+            <p>{{stats.max}}</p>
+          </div>
         </div>
       </div>
 
