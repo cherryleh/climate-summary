@@ -23,15 +23,19 @@ h2{
   margin-top: 18px;
 }
 
+
 .container {
-  width: 70%;
+  width: 95%; /* Use more screen real estate on smaller monitors */
+  max-width: 1200px; /* Limit size on giant monitors */
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(280px, 340px);
+  grid-template-columns: 1fr 340px; /* Simplify columns */
   gap: 20px;
-  height: 600px;
-  align-items: stretch;
+  /* Remove fixed height: 600px; */
+  align-items: start; /* Prevents sidebar from stretching weirdly */
 }
+
+
 
 .map {
   background: #ffffff;
@@ -41,22 +45,23 @@ h2{
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Remove aspect-ratio if it's causing height issues */
+  /* aspect-ratio: 16 / 10; */
+
+  /* Ensure it expands to fill the grid but doesn't push past viewport */
+  height: 100%;
   min-height: 460px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
-.map {
-  aspect-ratio: 16 / 10;
-  min-height: 0;
-}
-
 .map img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
+  /* This is the most important line: */
   object-fit: contain;
+  padding: 10px; /* Optional: gives the map some breathing room */
 }
-
 
 .controls-bar {
   width: min(1180px, 100%);
@@ -301,4 +306,21 @@ h2{
   overflow-y: auto;
   padding-right: 8px;
   text-align: justify;
+}
+
+.intro {
+  width: 80%;
+  margin: 0 auto 28px auto;
+
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: #334155;
+
+  text-align: justify;
+
+  /* subtle emphasis */
+  background: linear-gradient(to bottom, rgba(37, 99, 235, 0.04), transparent);
+  padding: 18px 22px;
+  border-radius: 14px;
+
 }
