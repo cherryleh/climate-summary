@@ -21,16 +21,20 @@ interface RainStats {
   max: string;
 }
 
-interface CountyDayStats {
+interface CountyStats {
   daily: RainStats;
   cumulative: RainStats;
+}
+
+interface SelectedDayStats extends CountyStats {
   text: string;
 }
 
 interface StormDay {
   label: string;
   date: string;
-  statsByCounty: Partial<Record<CountyFilter, CountyDayStats>>;
+  text: string;
+  statsByCounty: Partial<Record<CountyFilter, CountyStats>>;
 }
 
 @Component({
@@ -183,93 +187,208 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     {
       label: 'Day 1',
       date: '2026_03_10',
+      text: 'The storm’s impact began at the western end of the state with Kauaʻi recording the highest islandwide rainfall totals for the day. A notable observation was recorded at the Lāwaʻi National Tropical Botanical Garden (NTBG) Hawaiʻi Mesonet station, which received 2.92 inches of rain. This remarkably high value for a lowland leeward location was the result of the storm’s strong southerly flow that produced significant rainfall in typically rain-shadowed areas. While parts of Kauaʻi were receiving heavy rainfall, the central and eastern islands, including Maui, Molokaʻi, and Hawaiʻi Island, remained relatively dry.',
       statsByCounty: {
         all: {
-          daily: { date: 'March 10, 2026', min: '0.5 in', avg: '1.2 in', max: '1.8 in' },
-          cumulative: { date: 'March 10, 2026', min: '0.5 in', avg: '1.2 in', max: '1.8 in' },
-          text: 'The storm’s impact began at the western end of the state with Kauaʻi recording the highest islandwide rainfall totals for the day. A notable observation was recorded at the Lāwaʻi National Tropical Botanical Garden (NTBG) Hawaiʻi Mesonet station, which received 2.92 inches of rain. This remarkably high value for a lowland leeward location was the result of the storm’s strong southerly flow that produced significant rainfall in typically rain-shadowed areas. While parts of Kauaʻi were receiving heavy rainfall, the central and eastern islands, including Maui, Molokaʻi, and Hawaiʻi Island, remained relatively.'
+          daily: {date: 'March 10, 2026', min: '0.0 in', avg: '0.2 in', max: '6.3 in'},
+          cumulative: {date: 'March 10, 2026', min: '0.0 in', avg: '0.2 in', max: '6.3 in'}
+        },
+        maui: {
+          daily: { date: 'March 10, 2026', min: '0.02 in', avg: '1.2 in', max: '0.24 in'},
+          cumulative: { date: 'March 10, 2026', min: '0.0 in', avg: '0.0 in', max: '0.0 in'}
+        },
+        hawaii: {
+          daily: { date: 'March 10, 2026', min: '0.0 in', avg: '0.0 in', max: '0.0 in'},
+          cumulative: { date: 'March 10, 2026', min: '0.0 in', avg: '0.0 in', max: '0.0 in'}
+        },
+        oahu: {
+          daily: { date: 'March 10, 2026', min: '0.0 in', avg: '0.2 in', max: '0.6 in'},
+          cumulative: { date: 'March 10, 2026', min: '0.0 in', avg: '0.2 in', max: '0.6 in'}
+        },
+        kauai: {
+          daily: { date: 'March 10, 2026', min: '0.2 in', avg: '2.0 in', max: '6.3 in'},
+          cumulative: { date: 'March 10, 2026', min: '0.2 in', avg: '2.0 in', max: '6.3 in'}
         }
       }
     },
     {
       label: 'Day 2',
       date: '2026_03_11',
+      text: 'On the second day of the storm, the rainfall was primarily concentrated over Oʻahu, although it began to spread onto Maui as the system slowly shifted eastward. Maui County  claimed the highest islandwide rainfall, but the individual peak was found at the Kaʻala Hawaiʻi Mesonet station on Oʻahu with 4.71 inches. The National Weather Service noted an increasingly unstable atmosphere as the "Kona Low" environment deepened. During this time, the Big Island and Kauaʻi saw significantly lower rainfall totals compared to the central islands as the core of the storm was focused over the middle of the state.',
       statsByCounty: {
         all: {
-          daily: { date: 'March 11, 2026', min: '0.5 in', avg: '1.2 in', max: '1.8 in' },
-          cumulative: { date: 'March 11, 2026', min: '0.5 in', avg: '2.1 in', max: '3.6 in' },
-          text: 'On the second day of the storm, the rainfall was primarily concentrated over Oʻahu, although it began to spread onto Maui as the system slowly shifted eastward. Maui County  claimed the highest islandwide rainfall, but the individual peak was found at the Kaʻala Hawaiʻi Mesonet station on Oʻahu with 4.71 inches. The National Weather Service noted an increasingly unstable atmosphere as the "Kona Low" environment deepened. During this time, the Big Island and Kauaʻi saw significantly lower rainfall totals compared to the central islands as the core of the storm was focused over the middle of the state.'
+          daily: {date: 'March 11, 2026', min: '0.0 in', avg: '0.8 in', max: '4.8 in'},
+          cumulative: {date: 'March 11, 2026', min: '0.0 in', avg: '1.0 in', max: '8.4 in'}
+        },
+        maui: {
+          daily: { date: 'March 11, 2026', min: '0.2 in', avg: '1.4 in', max: '2.9 in'},
+          cumulative: { date: 'March 11, 2026', min: '0.2 in', avg: '1.4 in', max: '2.9 in'}
+        },
+        hawaii: {
+          daily: { date: 'March 11, 2026', min: '0.0 in', avg: '0.3 in', max: '1.4 in'},
+          cumulative: { date: 'March 11, 2026', min: '0.0 in', avg: '0.3 in', max: '1.4 in'}
+        },
+        oahu: {
+          daily: { date: 'March 11, 2026', min: '0.9 in', avg: '2.2 in', max: '4.8 in'},
+          cumulative: { date: 'March 11, 2026', min: '1.0 in', avg: '2.4 in', max: '5.4 in'}
+        },
+        kauai: {
+          daily: { date: 'March 11, 2026', min: '0.0 in', avg: '1.1 in', max: '2.7 in'},
+          cumulative: { date: 'March 11, 2026', min: '0.2 in', avg: '3.0 in', max: '8.4 in'}
         }
       }
     },
     {
       label: 'Day 3',
       date: '2026_03_12',
+      text: 'The storm stalled over the central islands, with rainfall remaining heavy on Oʻahu while spreading over Maui. Maui recorded the highest rainfall for the day, led by the Puʻu Kukui  with 4.01 inches. The slow movement of the system and high intensity rains began to saturate the terrain in some areas. Kauaʻi and the southern districts of Hawaiʻi Island remained on the fringes of the storm.',
       statsByCounty: {
         all: {
-          daily: { date: 'March 12, 2026', min: '0.5 in', avg: '1.6 in', max: '2.5 in' },
-          cumulative: { date: 'March 12, 2026', min: '0.5 in', avg: '3.2 in', max: '5.1 in' },
-          text: 'The storm stalled over the central islands, with rainfall remaining heavy on Oʻahu while spreading over Maui. Maui recorded the highest rainfall for the day, led by the Puʻu Kukui  with 4.01 inches. The slow movement of the system and high intensity rains began to saturate the terrain in some areas. Kauaʻi and the southern districts of Hawaiʻi Island remained on the fringes of the storm.'
+          daily: {date: 'March 12, 2026', min: '0.0 in', avg: '0.9 in', max: '5.6 in'},
+          cumulative: {date: 'March 12, 2026', min: '0.1 in', avg: '1.8 in', max: '14.0 in'}
+        },
+        maui: {
+          daily: { date: 'March 12, 2026', min: '0.2 in', avg: '1.3 in', max: '3.9 in'},
+          cumulative: { date: 'March 12, 2026', min: '0.6 in', avg: '2.7 in', max: '6.2 in'}
+        },
+        hawaii: {
+          daily: { date: 'March 12, 2026', min: '0.0 in', avg: '0.4 in', max: '1.0 in'},
+          cumulative: { date: 'March 12, 2026', min: '0.1 in', avg: '0.7 in', max: '1.9 in'}
+        },
+        oahu: {
+          daily: { date: 'March 12, 2026', min: '0.4 in', avg: '1.9 in', max: '4.3 in'},
+          cumulative: { date: 'March 12, 2026', min: '1.5 in', avg: '4.3 in', max: '8.4 in'}
+        },
+        kauai: {
+          daily: { date: 'March 12, 2026', min: '0.4 in', avg: '2.1 in', max: '5.6 in'},
+          cumulative: { date: 'March 12, 2026', min: '0.7 in', avg: '5.2 in', max: '14.0 in'}
         }
       }
     },
     {
       label: 'Day 4',
       date: '2026_03_13',
+      text: 'The weather situation turned critical on Maui as extreme rainfall was experienced over much or the island, especially at the highest elevations. The island recorded the highest rainfall totals in the state by a wide margin, dominated by an extraordinary 25.00 inches at the Haleakalā Summit station (see the Haleakalā Extreme Rainfall focus box below). This intensification was fueled by deep tropical moisture being lifted over Maui’s steep topography. Wind speeds also began to increase across the region as the pressure gradient tightened. While Maui was pummeled, the western end of the state, particularly Kauaʻi, had very little rainfall as it moved into a post-frontal regime.',
       statsByCounty: {
         all: {
-          daily: { date: 'March 13, 2026', min: '0.5 in', avg: '0.3 in', max: '1.0 in' },
-          cumulative: { date: 'March 13, 2026', min: '0.5 in', avg: '3.5 in', max: '6.0 in' },
-          text: 'The weather situation turned critical as the rainfall focused and intensified significantly on Maui. The island recorded the highest rainfall totals in the state by a wide margin, dominated by an extraordinary 25.00 inches at the Haleakalā Summit station. This intensification was fueled by deep tropical moisture being lifted over Maui’s steep topography. While Maui was inundated, the western end of the state, particularly Kauai, saw very little activity as it moved into a post-frontal regime. Wind speeds also began to peak across the region as the pressure gradient tightened.'
+          daily: {date: 'March 13, 2026', min: '0.0 in', avg: '2.9 in', max: '22.4 in'},
+          cumulative: {date: 'March 13, 2026', min: '0.3 in', avg: '4.7 in', max: '25.6 in'}
+        },
+        maui: {
+          daily: { date: 'March 13, 2026', min: '3.1 in', avg: '6.6 in', max: '22.4 in'},
+          cumulative: { date: 'March 13, 2026', min: '3.8 in', avg: '9.3 in', max: '25.6 in'}
+        },
+        hawaii: {
+          daily: { date: 'March 13, 2026', min: '0.0 in', avg: '1.1 in', max: '9.9 in'},
+          cumulative: { date: 'March 13, 2026', min: '0.3 in', avg: '1.8 in', max: '10.7 in'}
+        },
+        oahu: {
+          daily: { date: 'March 13, 2026', min: '2.3 in', avg: '6.8 in', max: '13.8 in'},
+          cumulative: { date: 'March 13, 2026', min: '3.8 in', avg: '11.1 in', max: '22.0 in'}
+        },
+        kauai: {
+          daily: { date: 'March 13, 2026', min: '0.8 in', avg: '4.1 in', max: '7.4 in'},
+          cumulative: { date: 'March 13, 2026', min: '1.5 in', avg: '9.3 in', max: '20.6 in'}
         }
       }
     },
     {
       label: 'Day 5',
       date: '2026_03_14',
+      text: 'March 14 was a day of extreme rainfall and high winds on Maui and Hawaiʻi Island. Rainfall on the east slope of Haleakalā was estimated to have been as high as 40 inches. Daily rainfall totals from high-elevation sites included Kuiki with 26.09 inches and Haleakalā Summit with 19.46 inches. By that evening, the cumulative total at Kuiki reached nearly 50 inches. This day also featured the highest recorded wind speed of the storm at the Kaiāulu Puʻuwaʻawaʻa Hawaiʻi Mesonet station on Hawaiʻi Island (see the Puʻuwaʻawaʻa Extreme Wind focus box below). Meanwhile, Kauaʻi was the only major island not experiencing heavy rainfall.',
       statsByCounty: {
         all: {
-          daily: { date: 'March 14, 2026', min: '0.5 in', avg: '2.0 in', max: '3.0 in' },
-          cumulative: { date: 'March 14, 2026', min: '0.5 in', avg: '5.4 in', max: '8.4 in' },
-          text: "March 14 was a day of extreme rainfall and high winds on Maui and Hawaiʻi Island. Rainfall on the east slope of Haleakalā was estimated to have been as high as 40 inches. Daily rainfall totals from high-elevation sites included Kuiki with 26.09 inches and Haleakalā Summit with 19.46 inches. By that evening, the cumulative total at Kuiki reached nearly 50 inches. This day also featured the highest recorded wind speed of the storm at the Kaiāulu Puʻuwaʻawaʻa Hawaiʻi Mesonet station on Hawaiʻi Island (see the Puʻuwaʻawaʻa Extreme Wind focus box below). Meanwhile, Kauaʻi was the only major island not experiencing heavy rainfall."
+          daily: {date: 'March 14, 2026', min: '0.0 in', avg: '6.6 in', max: '37.3 in'},
+          cumulative: {date: 'March 14, 2026', min: '1.5 in', avg: '11.4 in', max: '58.4 in'}
+        },
+        maui: {
+          daily: { date: 'March 14, 2026', min: '1.9 in', avg: '7.1 in', max: '37.2 in'},
+          cumulative: { date: 'March 14, 2026', min: '6.1 in', avg: '16.4 in', max: '58.4 in'}
+        },
+        hawaii: {
+          daily: { date: 'March 14, 2026', min: '1.5 in', avg: '8.2 in', max: '23.0 in'},
+          cumulative: { date: 'March 14, 2026', min: '1.9 in', avg: '10.0 in', max: '28.8 in'}
+        },
+        oahu: {
+          daily: { date: 'March 14, 2026', min: '0.8 in', avg: '1.7 in', max: '4.9 in'},
+          cumulative: { date: 'March 14, 2026', min: '4.5 in', avg: '12.7 in', max: '27.0 in'}
+        },
+        kauai: {
+          daily: { date: 'March 14, 2026', min: '0.0 in', avg: '0.1 in', max: '0.4 in'},
+          cumulative: { date: 'March 14, 2026', min: '1.5 in', avg: '9.4 in', max: '21.0 in'}
         }
       }
     },
     {
       label: 'Day 6',
       date: '2026_03_15',
+      text: 'Rainfall decreased on Maui, while Hawaiʻi Island recorded the highest islandwide rainfall for the day. The Puʻuwaʻawaʻa Hawaiʻi Mesonet station recorded a daily peak of 6.84 inches.  Maui’s high-elevation terrain continued to experience gusty winds. Oʻahu, Kauaʻi, and Molokaʻi saw clearing conditions.',
       statsByCounty: {
         all: {
-          daily: { date: 'March 15, 2026', min: '0.5 in', avg: '1.1 in', max: '1.8 in' },
-          cumulative: { date: 'March 15, 2026', min: '0.5 in', avg: '6.1 in', max: '7.9 in' },
-          text: "Rainfall decreased on Maui, while Hawaiʻi Island recorded the highest islandwide rainfall for the day. The Puʻuwaʻawaʻa Hawaiʻi Mesonet station recorded a daily peak of 6.84 inches.  Maui’s high-elevation terrain continued to experience gusty winds. Oʻahu, Kauaʻi, and Molokaʻi saw clearing conditions."
+          daily: {date: 'March 15, 2026', min: '0.0 in', avg: '1.1 in', max: '6.3 in'},
+          cumulative: {date: 'March 15, 2026', min: '1.8 in', avg: '12.5 in', max: '59.9 in'}
+        },
+        maui: {
+          daily: { date: 'March 15, 2026', min: '0.1 in', avg: '0.5 in', max: '1.6 in'},
+          cumulative: { date: 'March 15, 2026', min: '6.3 in', avg: '17.3 in', max: '61.4 in'}
+        },
+        hawaii: {
+          daily: { date: 'March 15, 2026', min: '0.1 in', avg: '1.5 in', max: '6.3 in'},
+          cumulative: { date: 'March 15, 2026', min: '3.3 in', avg: '11.5 in', max: '29.5 in'}
+        },
+        oahu: {
+          daily: { date: 'March 15, 2026', min: '0.0 in', avg: '0.1 in', max: '0.5 in'},
+          cumulative: { date: 'March 15, 2026', min: '4.6 in', avg: '12.8 in', max: '27.1 in'}
+        },
+        kauai: {
+          daily: { date: 'March 15, 2026', min: '0.0 in', avg: '0.5 in', max: '1.4 in'},
+          cumulative: { date: 'March 15, 2026', min: '1.8 in', avg: '9.9 in', max: '22.0 in'}
         }
       }
     },
     {
       label: 'Day 7',
       date: '2026_03_16',
+      text: 'On the final day of the event, Hawaiʻi Island continued to receive the most rainfall. The cumulative rainfall maps show a final storm total maximum of 62 inches at a point on the eastern flank of Haleakalā on Maui near the Kuiki Hawaiʻi Mesonet station, which recorded a storm total of 53.05 inches. ',
       statsByCounty: {
         all: {
-          daily: { date: 'March 16, 2026', min: '0.5 in', avg: '0.8 in', max: '1.2 in' },
-          cumulative: { date: 'March 16, 2026', min: '0.5 in', avg: '6.9 in', max: '8.7 in' },
-          text: "On the final day of the event, Hawaiʻi Island continued to receive the most rainfall. The cumulative rainfall maps show a final storm total maximum of 62 inches at a point on the eastern flank of Haleakalā on Maui near the Kuiki Hawaiʻi Mesonet station, which recorded a storm total of 53.05 inches. "
+          daily: {date: 'March 16, 2026', min: '0.0 in', avg: '0.6 in', max: '3.0 in'},
+          cumulative: {date: 'March 16, 2026', min: '1.8 in', avg: '61.4 in', max: '13.0 in'}
+        },
+        maui: {
+          daily: { date: 'March 16, 2026', min: '0.1 in', avg: '1.2 in', max: '1.8 in'},
+          cumulative: { date: 'March 16, 2026', min: '6.3 in', avg: '17.3 in', max: '61.4 in'}
+        },
+        hawaii: {
+          daily: { date: 'March 16, 2026', min: '0.1 in', avg: '1.5 in', max: '6.3 in'},
+          cumulative: { date: 'March 16, 2026', min: '3.6 in', avg: '12.3 in', max: '30.9 in'}
+        },
+        oahu: {
+          daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.1 in', max: '0.5 in'},
+          cumulative: { date: 'March 16, 2026', min: '4.6 in', avg: '12.8 in', max: '27.1 in'}
+        },
+        kauai: {
+          daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.5 in', max: '1.3 in'},
+          cumulative: { date: 'March 16, 2026', min: '1.8 in', avg: '10.0 in', max: '22.2 in'}
         }
       }
     }
   ];
 
-  get selectedStats(): CountyDayStats {
+  get selectedStats() {
     const day = this.selectedDay;
 
-    return (
+    const stats =
       day.statsByCounty[this.selectedCounty] ||
       day.statsByCounty['all'] || {
         daily: { date: '', min: '--', avg: '--', max: '--' },
-        cumulative: { date: '', min: '--', avg: '--', max: '--' },
-        text: 'No summary available.'
-      }
-    );
+        cumulative: { date: '', min: '--', avg: '--', max: '--' }
+      };
+
+    return {
+      ...stats,
+      text: day.text
+    };
   }
 
   ngOnInit(): void {

@@ -440,3 +440,94 @@ h2 {
   border-radius: 12px;
   padding: 12px;
 }
+
+.storm-highlights {
+  width: min(1240px, 100%);
+  margin: 28px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.highlight-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid #dbeafe;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.highlight-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.highlight-title {
+  margin: 0;
+  text-align: left;
+  font-size: 1.45rem;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.highlight-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #334155;
+  text-align: justify;
+}
+
+.highlight-media img,
+.highlight-chart img,
+.highlight-image-grid img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.highlight-image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.highlight-reference {
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #64748b;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .storm-highlights {
+    grid-template-columns: 1fr;
+  }
+
+  .highlight-image-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.wind-image-grid {
+  align-items: start;
+}
+
+.wind-image-grid img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.wind-station-photo {
+  max-height: 500px;
+  object-fit: contain;
+  align-self: start;
+}
