@@ -79,8 +79,19 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         stickyTracking: false,
         marker: { enabled: false },
         turboThreshold: 0,
+        boostThreshold: Number.MAX_VALUE,
         lineWidth: 1,
-        animation: false
+        animation: false,
+        states: {
+          hover: {
+            enabled: true,
+            lineWidthPlus: 2 // Makes the hovered line thicker
+          },
+          inactive: {
+            enabled: true,
+            opacity: 0.15 // Dims the other lines
+          }
+        }
       }
     },
     series: []
@@ -427,28 +438,43 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         stickyTracking: false
       }));
 
-      if (isRain) {
-        this.chartOptions.series = [];
-        this.updateFlag = true;
+        // Inside the isRain block of loadCsvChart
+        if (isRain) {
+          this.chartOptions.series = [];
+          this.updateFlag = true;
 
-        setTimeout(() => {
-          this.chartOptions = {
-            ...this.chartOptions,
-            title: {
-              text:
-                this.selectedCounty === 'all'
+          // 1. Determine if we are in county mode
+          const isCountyMode = this.selectedCounty !== 'all';
+
+          setTimeout(() => {
+            this.chartOptions = {
+              ...this.chartOptions,
+              title: {
+                text: this.selectedCounty === 'all'
                   ? 'Mesonet Station Cumulative Rainfall Time Series'
                   : `Mesonet Station Cumulative Rainfall Time Series – ${this.formatCountyName(this.selectedCounty)}`
-            },
-            yAxis: {
-              title: { text: this.mode === 'daily' ? 'Rainfall (in)' : 'Cumulative Rainfall (in)' }
-            },
-            series
-          };
-          this.updateFlag = true;
-          this.isChartLoading = false;
-        }, 10);
-      } else {
+              },
+              plotOptions: {
+                series: {
+                  // 2. CRITICAL: Disable boost for counties to allow the "inactive" state to work
+                  boostThreshold: isCountyMode ? 0 : 5000,
+                  states: {
+                    inactive: {
+                      opacity: isCountyMode ? 0.15 : 1, // Dim other lines
+                      enabled: isCountyMode
+                    },
+                    hover: {
+                      lineWidthPlus: 2 // Make hovered line thicker
+                    }
+                  }
+                }
+              },
+              series
+            };
+            this.updateFlag = true;
+            this.isChartLoading = false;
+          }, 10);
+        } else {
         this.windChartOptions.series = [];
         this.windUpdateFlag = true;
 
@@ -479,10 +505,40 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private formatCountyName(county: CountyFilter): string {
-    if (county === 'all') return 'Statewide';
+  private getStationColor(stationId: string): string {
+    let hash = 0;
+    for (let i = 0; i < stationId.length; i++) {
+      hash = stationId.charCodeAt(i) + ((hash << 5) - hash);
+    }
 
-    return county.charAt(0).toUpperCase() + county.slice(1);
+    const hue = Math.abs(hash % 360);
+
+    return `hsl(${hue}, 70%, 50%)`;
+  }
+
+  private formatCountyName(county: CountyFilter): string {
+    switch (county) {
+      case 'all':
+        return 'All Counties';
+
+      case 'maui':
+        return 'Maui County';
+
+      case 'hawaii':
+        return 'Hawaiʻi';
+
+      case 'oahu':
+        return 'Oʻahu';
+
+      case 'kauai':
+        return 'Kauaʻi';
+
+      case 'molokai':
+        return 'Molokaʻi';
+
+      default:
+        return county;
+    }
   }
 
   // async loadStormChart() {
