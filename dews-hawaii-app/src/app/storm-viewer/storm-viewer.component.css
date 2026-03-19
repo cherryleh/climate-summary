@@ -809,3 +809,29 @@ h2 {
     font-size: 0.9rem;
   }
 }
+
+.contact-section {
+  margin: 40px auto 20px;
+  padding: 0 16px;
+  max-width: 1200px;
+}
+
+.contact-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: center;
+  font-size: 18px;
+  color: #334155;
+}
+
+.contact-card a {
+  color: #1d4ed8;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.contact-card a:hover {
+  text-decoration: underline;
+}

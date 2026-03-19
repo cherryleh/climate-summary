@@ -497,13 +497,14 @@ export class StormViewerComponent implements OnInit, OnDestroy {
       : `storm_site/county/${base}_cumulative_${countySuffix}.png`;
   }
 
-  private filterStationIdsByCounty(stationIds: string[]): string[] {
+  private filterStationIdsByCounty(stationHeaders: string[]): string[] {
     const prefixes = this.getCountyPrefixes(this.selectedCounty);
-    if (!prefixes) return stationIds;
+    if (!prefixes) return stationHeaders;
 
-    return stationIds.filter(id =>
-      prefixes.some(prefix => id.startsWith(prefix))
-    );
+    return stationHeaders.filter(header => {
+      const prefix = this.getStationCountyPrefix(header);
+      return prefix ? prefixes.includes(prefix) : false;
+    });
   }
 
   private getStationColor(stationId: string): string {
@@ -861,5 +862,22 @@ export class StormViewerComponent implements OnInit, OnDestroy {
       false,
       { trigger: 'syncExtremes' } as any
     );
+  }
+
+  private extractStationCode(header: string): string | null {
+    const match = header.trim().match(/(\d{4})$/);
+    return match ? match[1] : null;
+  }
+
+  private getStationCountyPrefix(header: string): string | null {
+    const code = this.extractStationCode(header);
+    return code ? code.slice(0, 2) : null;
+  }
+
+  getSelectedSeriesCode(): string {
+    if (!this.selectedSeriesId) return '';
+
+    const match = this.selectedSeriesId.trim().match(/(\d{4})$/);
+    return match ? match[1] : '';
   }
 }

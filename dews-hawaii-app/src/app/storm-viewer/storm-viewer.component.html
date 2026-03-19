@@ -10,7 +10,7 @@
     An intense Kona low developed northwest of the islands between March 10 and 16, drawing heavy tropical moisture
     northward to produce days of severe rain and thunderstorms. This historic storm caused widespread destruction across
     the Hawaiian Islands, resulting in significant damage and major disruptions to power and utility networks. The
-    Hawaii Climate Data Portal (HCDP) has now finalized updated daily rainfall maps to help the community, researchers,
+    <a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener">Hawaii Climate Data Portal (HCDP)</a> has now finalized updated daily rainfall maps to help the community, researchers,
     and recovery teams understand the full scale and intensity of the event.
   </p>
 
@@ -231,7 +231,7 @@
 
         <a
           class="selected-station-link"
-          href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/dashboard?id={{ selectedSeriesId }}"
+          [href]="'https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/dashboard?id=' + getSelectedSeriesCode()"
           target="_blank"
           rel="noopener noreferrer">
           View HCDP Mesonet Station Data
@@ -297,3 +297,10 @@
   </section>
 
 </div>
+
+<section class="contact-section">
+  <div class="contact-card">
+    Questions? Contact us at
+    <a href="mailto:hcdp@hawaii.edu">hcdp&#64;hawaii.edu</a>
+  </div>
+</section>
