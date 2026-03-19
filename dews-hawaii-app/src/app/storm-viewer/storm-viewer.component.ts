@@ -685,10 +685,10 @@ export class StormViewerComponent implements OnInit, OnDestroy {
 
 
 
-  private formatCountyName(county: CountyFilter): string {
+  formatCountyName(county: CountyFilter): string {
     switch (county) {
       case 'all':
-        return 'All Counties';
+        return 'Statewide';
 
       case 'maui':
         return 'Maui County';

@@ -23,7 +23,12 @@
       <div class="sidebar">
         <div class="stats-wrap">
           <div class="stat-group">
-            <div class="stat-title">Daily Rainfall</div>
+            <div class="stat-title">
+              Daily Rainfall
+              <span class="stat-county">
+                – {{ formatCountyName(selectedCounty) }}
+              </span>
+            </div>
 
             <div class="stat-grid">
               <div class="stat-item">
@@ -42,7 +47,11 @@
           </div>
 
           <div class="stat-group">
-            <div class="stat-title">Cumulative Rainfall</div>
+            <div class="stat-title">Cumulative Rainfall
+              <span class="stat-county">
+                – {{ formatCountyName(selectedCounty) }}
+              </span>
+            </div>
 
             <div class="stat-grid">
               <div class="stat-item">
