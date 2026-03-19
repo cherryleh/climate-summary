@@ -46,6 +46,8 @@ export class StormViewerComponent implements OnInit, OnDestroy {
   updateFlag = false;
   isChartLoading = false;
 
+  windUpdateFlag = false;
+  isWindChartLoading = false;
   selectedCounty: CountyFilter = 'all';
   selectedSeriesId: string | null = null;
 
@@ -68,6 +70,40 @@ export class StormViewerComponent implements OnInit, OnDestroy {
       xDateFormat: '%b %e, %Y %I:%M',
       pointFormat: 'Station ID#{series.name}: <b>{point.y:.2f} in</b>',
 
+    },
+    legend: {
+      enabled: false
+    },
+    plotOptions: {
+      series: {
+        stickyTracking: false,
+        marker: { enabled: false },
+        turboThreshold: 0,
+        lineWidth: 1,
+        animation: false
+      }
+    },
+    series: []
+  };
+
+  windChartOptions: Highcharts.Options = {
+    chart: {
+      height: 400,
+      zooming: { type: 'x' }
+    },
+    title: { text: 'Mesonet Station Wind Gust' },
+    credits: { enabled: false },
+    xAxis: {
+      type: 'datetime',
+      title: { text: 'Time' }
+    },
+    yAxis: {
+      title: { text: 'Wind Gust (mph)' }
+    },
+    tooltip: {
+      shared: false,
+      xDateFormat: '%b %e, %Y %I:%M',
+      pointFormat: 'Station ID #{series.name}: <b>{point.y:.2f} mph</b>'
     },
     legend: {
       enabled: false
@@ -185,9 +221,13 @@ export class StormViewerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loadStormChart();
+    this.loadAllCharts();
   }
 
+  loadAllCharts() {
+    this.loadStormChart();
+    this.loadWindChart();
+  }
   get selectedDay() {
     return this.days[this.selectedDayIndex];
   }
@@ -203,8 +243,9 @@ export class StormViewerComponent implements OnInit, OnDestroy {
   }
 
   onCountyChange() {
-    this.loadStormChart();
+    this.loadAllCharts();
   }
+
 
   togglePlay() {
     this.isPlaying ? this.stopPlayback() : this.startPlayback();
@@ -294,12 +335,22 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     );
   }
 
-  async loadStormChart() {
-    try {
-      this.isChartLoading = true;
-      this.updateFlag = false;
+  private async loadCsvChart(
+    csvPath: string,
+    chartType: 'rain' | 'wind'
+  ): Promise<void> {
+    const isRain = chartType === 'rain';
 
-      const response = await fetch('storm_site/merged_storm_data.csv');
+    try {
+      if (isRain) {
+        this.isChartLoading = true;
+        this.updateFlag = false;
+      } else {
+        this.isWindChartLoading = true;
+        this.windUpdateFlag = false;
+      }
+
+      const response = await fetch(csvPath);
       if (!response.ok) {
         throw new Error(`Failed to fetch CSV: ${response.status}`);
       }
@@ -308,7 +359,11 @@ export class StormViewerComponent implements OnInit, OnDestroy {
       const lines = csvText.trim().split(/\r?\n/);
 
       if (lines.length < 2) {
-        this.isChartLoading = false;
+        if (isRain) {
+          this.isChartLoading = false;
+        } else {
+          this.isWindChartLoading = false;
+        }
         return;
       }
 
@@ -343,7 +398,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           const colIndex = headers.indexOf(stationId);
           const raw = cols[colIndex]?.trim();
 
-          if (this.mode === 'cumulative') {
+          if (isRain && this.mode === 'cumulative') {
             const numericValue = raw === '' ? 0 : Number(raw);
             runningTotals[stationId] += Number.isFinite(numericValue) ? numericValue : 0;
             seriesMap[stationId].push([time, runningTotals[stationId]]);
@@ -372,31 +427,177 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         stickyTracking: false
       }));
 
-      this.chartOptions.series = [];
-      this.updateFlag = true;
-
-      setTimeout(() => {
-        this.chartOptions = {
-          ...this.chartOptions,
-          title: {
-            text: this.selectedCounty === 'all'
-                  ? 'Storm Station Rainfall Time Series'
-                  : `Storm Station Rainfall Time Series – ${this.selectedCounty}`
-          },
-          series: series
-        };
+      if (isRain) {
+        this.chartOptions.series = [];
         this.updateFlag = true;
-        this.isChartLoading = false;
-      }, 10);
 
-      setTimeout(() => {
-        this.updateFlag = true;
-        this.isChartLoading = false;
-      }, 0);
+        setTimeout(() => {
+          this.chartOptions = {
+            ...this.chartOptions,
+            title: {
+              text:
+                this.selectedCounty === 'all'
+                  ? 'Mesonet Station Cumulative Rainfall Time Series'
+                  : `Mesonet Station Cumulative Rainfall Time Series – ${this.formatCountyName(this.selectedCounty)}`
+            },
+            yAxis: {
+              title: { text: this.mode === 'daily' ? 'Rainfall (in)' : 'Cumulative Rainfall (in)' }
+            },
+            series
+          };
+          this.updateFlag = true;
+          this.isChartLoading = false;
+        }, 10);
+      } else {
+        this.windChartOptions.series = [];
+        this.windUpdateFlag = true;
+
+        setTimeout(() => {
+          this.windChartOptions = {
+            ...this.windChartOptions,
+            title: {
+              text:
+                this.selectedCounty === 'all'
+                  ? 'Mesonet Station Wind Gust Time Series'
+                  : `Mesonet Station Wind Gust Time Series – ${this.formatCountyName(this.selectedCounty)}`
+            },
+            series
+          };
+          this.windUpdateFlag = true;
+          this.isWindChartLoading = false;
+        }, 10);
+      }
 
     } catch (err) {
-      console.error('Chart load error:', err);
-      this.isChartLoading = false;
+      console.error(`${chartType} chart load error:`, err);
+
+      if (isRain) {
+        this.isChartLoading = false;
+      } else {
+        this.isWindChartLoading = false;
+      }
     }
+  }
+
+  private formatCountyName(county: CountyFilter): string {
+    if (county === 'all') return 'Statewide';
+
+    return county.charAt(0).toUpperCase() + county.slice(1);
+  }
+
+  // async loadStormChart() {
+  //   try {
+  //     this.isChartLoading = true;
+  //     this.updateFlag = false;
+
+
+
+  //     const response = await fetch('storm_site/merged_storm_data.csv');
+  //     if (!response.ok) {
+  //       throw new Error(`Failed to fetch CSV: ${response.status}`);
+  //     }
+
+  //     const csvText = await response.text();
+  //     const lines = csvText.trim().split(/\r?\n/);
+
+  //     if (lines.length < 2) {
+  //       this.isChartLoading = false;
+  //       return;
+  //     }
+
+  //     const headers = lines[0].split(',').map(h => h.trim());
+  //     const allStationIds = headers.slice(1);
+  //     const stationIds = this.filterStationIdsByCounty(allStationIds);
+
+  //     const seriesMap: Record<string, [number, number | null][]> = {};
+  //     const runningTotals: Record<string, number> = {};
+
+  //     stationIds.forEach(id => {
+  //       seriesMap[id] = [];
+  //       runningTotals[id] = 0;
+  //     });
+
+  //     for (let i = 1; i < lines.length; i++) {
+  //       const cols = lines[i].split(',');
+  //       if (cols.length < headers.length) continue;
+
+  //       const timestampStr = cols[0]?.trim();
+  //       if (!timestampStr) continue;
+
+  //       const [datePart, timePart] = timestampStr.split(' ');
+  //       if (!datePart || !timePart) continue;
+
+  //       const [year, month, day] = datePart.split('-').map(Number);
+  //       const [hour, minute, second] = timePart.split(':').map(Number);
+  //       const time = new Date(year, month - 1, day, hour, minute, second).getTime();
+
+  //       for (let j = 0; j < stationIds.length; j++) {
+  //         const stationId = stationIds[j];
+  //         const colIndex = headers.indexOf(stationId);
+  //         const raw = cols[colIndex]?.trim();
+
+  //         if (this.mode === 'cumulative') {
+  //           const numericValue = raw === '' ? 0 : Number(raw);
+  //           runningTotals[stationId] += Number.isFinite(numericValue) ? numericValue : 0;
+  //           seriesMap[stationId].push([time, runningTotals[stationId]]);
+  //         } else {
+  //           const value = raw === '' ? null : Number(raw);
+  //           seriesMap[stationId].push([
+  //             time,
+  //             Number.isFinite(value) ? value : null
+  //           ]);
+  //         }
+  //       }
+  //     }
+
+  //     const colors = [
+  //       '#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e',
+  //       '#17becf', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22'
+  //     ];
+
+  //     const series: Highcharts.SeriesOptionsType[] = stationIds.map((id, idx) => ({
+  //       name: id,
+  //       type: 'line',
+  //       data: seriesMap[id],
+  //       color: colors[idx % colors.length],
+  //       lineWidth: 1,
+  //       marker: { enabled: false },
+  //       stickyTracking: false
+  //     }));
+
+  //     this.chartOptions.series = [];
+  //     this.updateFlag = true;
+
+  //     setTimeout(() => {
+  //       this.chartOptions = {
+  //         ...this.chartOptions,
+  //         title: {
+  //           text: this.selectedCounty === 'all'
+  //                 ? 'Storm Station Rainfall Time Series'
+  //                 : `Storm Station Rainfall Time Series – ${this.selectedCounty}`
+  //         },
+  //         series: series
+  //       };
+  //       this.updateFlag = true;
+  //       this.isChartLoading = false;
+  //     }, 10);
+
+  //     setTimeout(() => {
+  //       this.updateFlag = true;
+  //       this.isChartLoading = false;
+  //     }, 0);
+
+  //   } catch (err) {
+  //     console.error('Chart load error:', err);
+  //     this.isChartLoading = false;
+  //   }
+  // }
+
+  async loadStormChart() {
+    await this.loadCsvChart('storm_site/merged_storm_data.csv', 'rain');
+  }
+
+  async loadWindChart() {
+    await this.loadCsvChart('storm_site/WG_merged_storm_data.csv', 'wind');
   }
 }

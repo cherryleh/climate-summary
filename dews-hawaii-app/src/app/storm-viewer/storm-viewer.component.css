@@ -11,7 +11,8 @@
   font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-h1, h2 {
+h1,
+h2 {
   margin: 0 0 18px;
   text-align: center;
   font-size: 1.9rem;
@@ -19,23 +20,46 @@ h1, h2 {
   color: #0f172a;
 }
 
-h2{
-  margin-top: 18px;
+h2 {
+  margin-top: 0;
 }
 
+.intro {
+  width: min(1100px, 90%);
+  margin: 0 auto 28px auto;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: #334155;
+  text-align: justify;
+  background: linear-gradient(to bottom, rgba(37, 99, 235, 0.04), transparent);
+  padding: 18px 22px;
+  border-radius: 14px;
+}
+
+/* ONE parent card for map + sidebar + controls */
+.viewer-section {
+  width: min(1240px, 100%);
+  margin: 0 auto 28px auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
 
 .container {
-  width: 95%; /* Use more screen real estate on smaller monitors */
-  max-width: 1200px; /* Limit size on giant monitors */
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   display: grid;
-  grid-template-columns: 1fr 340px; /* Simplify columns */
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: 20px;
-  /* Remove fixed height: 600px; */
-  align-items: start; /* Prevents sidebar from stretching weirdly */
+  align-items: stretch;
 }
 
-
+.map,
+.sidebar {
+  height: 600px;
+}
 
 .map {
   background: #ffffff;
@@ -45,27 +69,113 @@ h2{
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Remove aspect-ratio if it's causing height issues */
-  /* aspect-ratio: 16 / 10; */
-
-  /* Ensure it expands to fill the grid but doesn't push past viewport */
-  height: 100%;
-  min-height: 460px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
 .map img {
   width: 100%;
   height: 100%;
   display: block;
-  /* This is the most important line: */
   object-fit: contain;
-  padding: 10px; /* Optional: gives the map some breathing room */
+  padding: 10px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 15px;
+}
+
+.stats-wrap {
+  flex: 0 0 auto;
+}
+
+.stat-group {
+  margin: 0 0 10px;
+  padding: 16px;
+  background: #f1f5f9;
+  border-radius: 14px;
+}
+
+.stat-title {
+  margin-bottom: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  display: block;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-item h3 {
+  margin: 0 0 4px;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.stat-item p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.summary-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #fff;
+  border-radius: 18px;
+  padding: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-title {
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.summary-text {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  line-height: 1.55;
+  text-align: justify;
+  padding-right: 6px;
+}
+
+/* controls grouped with viewer */
+.controls-panel {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .controls-bar {
-  width: min(1180px, 100%);
-  margin: 22px auto 0;
+  width: 100%;
+  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -163,41 +273,16 @@ h2{
   color: #ffffff;
 }
 
-@media (max-width: 900px) {
-  .container {
-    grid-template-columns: 1fr;
-  }
-
-  .map {
-    min-height: 300px;
-  }
-
-  .sidebar {
-    padding: 18px;
-  }
-
-  .page {
-    padding: 16px;
-  }
-}
-
-/* Play button */
 .buttons .play-button {
   border: 1px solid #0f172a;
   background: #0f172a;
   color: #ffffff;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .buttons .play-button:hover {
   background: #1e293b;
   border-color: #1e293b;
-  color: white;
+  color: #ffffff;
 }
 
 .buttons .play-button.playing {
@@ -206,18 +291,27 @@ h2{
   color: #ffffff;
 }
 
-.date {
-  margin: 0 auto 16px auto;
-  padding: 14px 18px;
+.county-controls {
+  padding-top: 4px;
+}
 
+/* chart section is separate */
+.station-data-section {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
 
+.controls-row {
   display: flex;
-  justify-content: center;
   align-items: center;
-
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: #1e293b;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
 }
 
 .chart-wrap {
@@ -227,212 +321,49 @@ h2{
 
 .chart-loading {
   display: inline;
-  margin-bottom: 10px;
   font-size: 0.95rem;
   color: #555;
 }
 
-.sidebar {
+@media (max-width: 900px) {
+  .page {
+    padding: 16px;
+  }
+
+  .viewer-section,
+  .station-data-section {
+    padding: 16px;
+  }
+
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .map,
+  .sidebar {
+    height: auto;
+    min-height: 320px;
+  }
+
+  .sidebar {
+    min-height: 420px;
+  }
+}
+
+.chart-controls {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Fill the grid cell */
-  box-sizing: border-box;
-  overflow: hidden;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
-  padding: 15px;
-}
-
-.sidebar-header {
-  padding: 18px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
-  border: 1px solid #dbeafe;
-}
-
-.date {
-  margin: 0 0 8px 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
   align-items: center;
-  text-align: center;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #0f172a;
-  line-height: 1.4;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
-.day-label {
-  margin: 0;
-  padding: 0;
-  border-bottom: none;
-  text-align: center;
-  font-size: 0.96rem;
-  font-weight: 600;
-  color: #475569;
-  letter-spacing: 0.01em;
-}
-
-
-
-
-.summary-title {
-  margin-bottom: 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #475569;
-}
-
-.summary-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.summary-text {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 8px;
-  text-align: justify;
-}
-
-.intro {
-  width: 80%;
-  margin: 0 auto 28px auto;
-
-  font-size: 1.05rem;
-  line-height: 1.5;
-  color: #334155;
-
-  text-align: justify;
-
-  /* subtle emphasis */
-  background: linear-gradient(to bottom, rgba(37, 99, 235, 0.04), transparent);
-  padding: 18px 22px;
-  border-radius: 14px;
-
-}
-
-.stat-item h3, p{
-  padding:0;
-  margin:0;
-}
-
-.stat-title{
-  margin-bottom: 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #475569;
-  display: block;
-}
-/* Container for the whole stat section */
-.stat-group {
-  margin: 10px 0;
-  padding: 16px;
-  background: #f1f5f9; /* Light slate background to contrast with white sidebar */
-  border-radius: 14px;
-}
-
-.stat-title {
-  margin-bottom: 12px;
-  font-size: 0.75rem; /* Slightly smaller for that 'metadata' look */
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #64748b; /* Muted slate */
-  display: block;
-}
-
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-item h3 {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.stat-item p {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.container {
-  width: 70%;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(320px, 380px);
-  gap: 20px;
-  align-items: stretch;
-}
-
-.map,
-.sidebar {
-  height: 600px;
-}
-
-.map {
-  background: #fff;
-  border-radius: 18px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.map img {
+.county-chart-buttons {
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
+  justify-content: center;
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.stats-wrap {
-  flex: 0 0 auto;
-}
-
-.summary-card {
-  flex: 1 1 auto;
-  min-height: 0;
-  background: #fff;
-  border-radius: 18px;
-  padding: 10px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.summary-title {
-  flex: 0 0 auto;
-  margin-bottom: 10px;
-}
-
-.summary-text {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  line-height: 1.55;
-  padding-right: 6px;
+.chart-loading {
+  font-size: 0.95rem;
+  color: #555;
 }

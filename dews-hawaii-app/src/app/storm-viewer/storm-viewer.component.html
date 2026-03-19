@@ -1,6 +1,6 @@
 <div class="page">
-
   <h1>March 10 to March 16, 2026 Storm Viewer</h1>
+
   <p class="intro">
     An intense Kona low developed northwest of the islands between March 10 and 16, drawing heavy tropical moisture
     northward to produce days of severe rain and thunderstorms. This historic storm caused widespread destruction across
@@ -8,163 +8,170 @@
     Hawaii Climate Data Portal (HCDP) has now finalized updated daily rainfall maps to help the community, researchers,
     and recovery teams understand the full scale and intensity of the event.
   </p>
-  <div class="container">
 
-    <div class="map">
-      <img [src]="imagePath">
-    </div>
+  <section class="viewer-section">
+    <div class="container">
+      <div class="map">
+        <img [src]="imagePath">
+      </div>
 
-    <div class="sidebar">
-      <!-- <div class="sidebar-header">
-        <div class="date">
-          {{ stats.date }}
-        </div>
-        <div class="day-label">
-          {{ selectedDay.label }} · {{ mode | titlecase }}
-        </div>
-      </div> -->
-      <div class="stats-wrap">
-        <div class="stat-group">
-          <div class="stat-title">Daily Rainfall</div>
+      <div class="sidebar">
+        <div class="stats-wrap">
+          <div class="stat-group">
+            <div class="stat-title">Daily Rainfall</div>
 
-          <div class="stat-grid">
-            <div class="stat-item">
-              <h3>Min</h3>
-              <p>{{ selectedStats.daily.min }}</p>
+            <div class="stat-grid">
+              <div class="stat-item">
+                <h3>Min</h3>
+                <p>{{ selectedStats.daily.min }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Avg</h3>
+                <p>{{ selectedStats.daily.avg }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Max</h3>
+                <p>{{ selectedStats.daily.max }}</p>
+              </div>
             </div>
-            <div class="stat-item">
-              <h3>Avg</h3>
-              <p>{{ selectedStats.daily.avg }}</p>
-            </div>
-            <div class="stat-item">
-              <h3>Max</h3>
-              <p>{{ selectedStats.daily.max }}</p>
+          </div>
+
+          <div class="stat-group">
+            <div class="stat-title">Cumulative Rainfall</div>
+
+            <div class="stat-grid">
+              <div class="stat-item">
+                <h3>Min</h3>
+                <p>{{ selectedStats.cumulative.min }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Avg</h3>
+                <p>{{ selectedStats.cumulative.avg }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Max</h3>
+                <p>{{ selectedStats.cumulative.max }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="stat-group">
-          <div class="stat-title">Cumulative Rainfall</div>
-
-          <div class="stat-grid">
-            <div class="stat-item">
-              <h3>Min</h3>
-              <p>{{ selectedStats.cumulative.min }}</p>
-            </div>
-            <div class="stat-item">
-              <h3>Avg</h3>
-              <p>{{ selectedStats.cumulative.avg }}</p>
-            </div>
-            <div class="stat-item">
-              <h3>Max</h3>
-              <p>{{ selectedStats.cumulative.max }}</p>
-            </div>
+        <div class="summary-card">
+          <div class="summary-title">Storm Summary</div>
+          <div class="summary-text">
+            {{ selectedStats.text }}
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="summary-card">
-        <div class="summary-title">Storm Summary</div>
-        <div class="summary-text">
-          {{ selectedStats.text }}
+    <div class="controls-panel">
+      <div class="controls-bar">
+        <div class="toggle-wrap">
+          <span>Daily</span>
+
+          <label class="switch">
+            <input type="checkbox" (change)="toggleMode()">
+            <span class="slider"></span>
+          </label>
+
+          <span>Cumulative</span>
         </div>
-      </div>
-    </div>
 
-  </div>
-
-  <!-- WITHOUT PLAY BUTTON -->
-  <!-- <div class="controls-bar">
-
-  <div class="toggle-wrap">
-    <span>Daily</span>
-
-    <label class="switch">
-      <input type="checkbox" (change)="toggleMode()">
-      <span class="slider"></span>
-    </label>
-
-    <span>Cumulative</span>
-  </div>
-
-  <div class="buttons">
-    <button
-      *ngFor="let d of days; let i=index"
-      (click)="selectDay(i)"
-      [class.active]="selectedDayIndex === i"
-    >
-      {{d.label}}
-    </button>
-  </div>
-
-</div> -->
-
-  <div class="controls-bar">
-
-    <div class="toggle-wrap">
-      <span>Daily</span>
-
-      <label class="switch">
-        <input type="checkbox" (change)="toggleMode()">
-        <span class="slider"></span>
-      </label>
-
-      <span>Cumulative</span>
-    </div>
-
-    <div class="buttons">
-      <button type="button" class="play-button" (click)="togglePlay()" [class.playing]="isPlaying">
-        {{ isPlaying ? 'Pause' : 'Play' }}
-      </button>
-
-      <button type="button" *ngFor="let d of days; let i = index" (click)="selectDay(i)"
-        [class.active]="selectedDayIndex === i">
-        {{ d.label }}
-      </button>
-
-    </div>
-    <div class="controls-bar">
-      <div class="county-filters">
-        <div class="filter-label">Filter by County</div>
         <div class="buttons">
-          <button type="button" (click)="selectedCounty = 'all'; onCountyChange()"
-            [class.active]="selectedCounty === 'all'">
-            All Counties
+          <button type="button" class="play-button" (click)="togglePlay()" [class.playing]="isPlaying">
+            {{ isPlaying ? 'Pause' : 'Play' }}
           </button>
-          <button type="button" (click)="selectedCounty = 'kauai'; onCountyChange()"
-            [class.active]="selectedCounty === 'kauai'">
-            Kauaʻi
-          </button>
-          <button type="button" (click)="selectedCounty = 'oahu'; onCountyChange()"
-            [class.active]="selectedCounty === 'oahu'">
-            Oʻahu
-          </button>
-          <button type="button" (click)="selectedCounty = 'maui'; onCountyChange()"
-            [class.active]="selectedCounty === 'maui'">
-            Maui
-          </button>
-          <button type="button" (click)="selectedCounty = 'hawaii'; onCountyChange()"
-            [class.active]="selectedCounty === 'hawaii'">
-            Hawaiʻi
+
+          <button
+            type="button"
+            *ngFor="let d of days; let i = index"
+            (click)="selectDay(i)"
+            [class.active]="selectedDayIndex === i">
+            {{ d.label }}
           </button>
         </div>
       </div>
-    </div>
 
-  </div>
-  <div class="station-data-section">
+      <div class="controls-bar county-controls">
+        <div class="county-filters">
+          <div class="buttons">
+            <button
+              type="button"
+              (click)="selectedCounty = 'all'; onCountyChange()"
+              [class.active]="selectedCounty === 'all'">
+              All Counties
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'kauai'; onCountyChange()"
+              [class.active]="selectedCounty === 'kauai'">
+              Kauaʻi
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'oahu'; onCountyChange()"
+              [class.active]="selectedCounty === 'oahu'">
+              Oʻahu
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'maui'; onCountyChange()"
+              [class.active]="selectedCounty === 'maui'">
+              Maui
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'hawaii'; onCountyChange()"
+              [class.active]="selectedCounty === 'hawaii'">
+              Hawaiʻi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="station-data-section">
     <h2>Mesonet Station Data</h2>
 
-    <div class="controls-row">
-      <label for="countySelect">County:</label>
-      <select id="countySelect" [(ngModel)]="selectedCounty" (change)="onCountyChange()">
-        <option value="all">All counties</option>
-        <option value="maui">Maui</option>
-        <option value="hawaii">Hawaiʻi</option>
-        <option value="molokai">Molokaʻi</option>
-        <option value="oahu">Oʻahu</option>
-        <option value="kauai">Kauaʻi</option>
-      </select>
+    <div class="chart-controls">
+      <div class="buttons county-chart-buttons">
+        <button
+          type="button"
+          (click)="selectedCounty = 'all'; onCountyChange()"
+          [class.active]="selectedCounty === 'all'">
+          All Counties
+        </button>
+
+        <button
+          type="button"
+          (click)="selectedCounty = 'kauai'; onCountyChange()"
+          [class.active]="selectedCounty === 'kauai'">
+          Kauaʻi
+        </button>
+
+        <button
+          type="button"
+          (click)="selectedCounty = 'oahu'; onCountyChange()"
+          [class.active]="selectedCounty === 'oahu'">
+          Oʻahu
+        </button>
+
+        <button
+          type="button"
+          (click)="selectedCounty = 'maui'; onCountyChange()"
+          [class.active]="selectedCounty === 'maui'">
+          Maui
+        </button>
+
+        <button
+          type="button"
+          (click)="selectedCounty = 'hawaii'; onCountyChange()"
+          [class.active]="selectedCounty === 'hawaii'">
+          Hawaiʻi
+        </button>
+      </div>
 
       <div *ngIf="isChartLoading" class="chart-loading">
         Loading station time series...
@@ -172,8 +179,24 @@
     </div>
 
     <div class="chart-wrap">
-      <highcharts-chart [Highcharts]="Highcharts" [options]="chartOptions" [(update)]="updateFlag" [oneToOne]="true"
-        style="width:90%; height:1000px; display:block;"></highcharts-chart>
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="chartOptions"
+        [(update)]="updateFlag"
+        [oneToOne]="true"
+        style="width:100%; height:400px; display:block;">
+      </highcharts-chart>
+
+      <div *ngIf="isWindChartLoading" class="chart-loading">Loading wind chart...</div>
+
+      <highcharts-chart
+        *ngIf="!isWindChartLoading"
+        [Highcharts]="Highcharts"
+        [options]="windChartOptions"
+        [(update)]="windUpdateFlag"
+        style="width: 100%; height: 400px; display: block;"
+      ></highcharts-chart>
     </div>
-  </div>
+  </section>
+
 </div>
