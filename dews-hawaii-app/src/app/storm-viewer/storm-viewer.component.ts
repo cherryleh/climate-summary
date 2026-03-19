@@ -12,7 +12,7 @@ Highcharts.setOptions({
 });
 
 type StormMode = 'daily' | 'cumulative';
-type CountyFilter = 'all' | 'maui' | 'hawaii' | 'molokai' | 'oahu' | 'kauai';
+type CountyFilter = 'all' | 'maui' | 'hawaii' | 'molokai' | 'honolulu' | 'kauai';
 
 interface RainStats {
   date: string;
@@ -201,7 +201,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           daily: { date: 'March 10, 2026', min: '0.0 in', avg: '0.0 in', max: '0.0 in'},
           cumulative: { date: 'March 10, 2026', min: '0.0 in', avg: '0.0 in', max: '0.0 in'}
         },
-        oahu: {
+        honolulu: {
           daily: { date: 'March 10, 2026', min: '0.0 in', avg: '0.2 in', max: '0.6 in'},
           cumulative: { date: 'March 10, 2026', min: '0.0 in', avg: '0.2 in', max: '0.6 in'}
         },
@@ -228,7 +228,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           daily: { date: 'March 11, 2026', min: '0.0 in', avg: '0.3 in', max: '1.4 in'},
           cumulative: { date: 'March 11, 2026', min: '0.0 in', avg: '0.3 in', max: '1.4 in'}
         },
-        oahu: {
+        honolulu: {
           daily: { date: 'March 11, 2026', min: '0.9 in', avg: '2.2 in', max: '4.8 in'},
           cumulative: { date: 'March 11, 2026', min: '1.0 in', avg: '2.4 in', max: '5.4 in'}
         },
@@ -255,7 +255,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           daily: { date: 'March 12, 2026', min: '0.0 in', avg: '0.4 in', max: '1.0 in'},
           cumulative: { date: 'March 12, 2026', min: '0.1 in', avg: '0.7 in', max: '1.9 in'}
         },
-        oahu: {
+        honolulu: {
           daily: { date: 'March 12, 2026', min: '0.4 in', avg: '1.9 in', max: '4.3 in'},
           cumulative: { date: 'March 12, 2026', min: '1.5 in', avg: '4.3 in', max: '8.4 in'}
         },
@@ -282,7 +282,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           daily: { date: 'March 13, 2026', min: '0.0 in', avg: '1.1 in', max: '9.9 in'},
           cumulative: { date: 'March 13, 2026', min: '0.3 in', avg: '1.8 in', max: '10.7 in'}
         },
-        oahu: {
+        honolulu: {
           daily: { date: 'March 13, 2026', min: '2.3 in', avg: '6.8 in', max: '13.8 in'},
           cumulative: { date: 'March 13, 2026', min: '3.8 in', avg: '11.1 in', max: '22.0 in'}
         },
@@ -309,7 +309,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           daily: { date: 'March 14, 2026', min: '1.5 in', avg: '8.2 in', max: '23.0 in'},
           cumulative: { date: 'March 14, 2026', min: '1.9 in', avg: '10.0 in', max: '28.8 in'}
         },
-        oahu: {
+        honolulu: {
           daily: { date: 'March 14, 2026', min: '0.8 in', avg: '1.7 in', max: '4.9 in'},
           cumulative: { date: 'March 14, 2026', min: '4.5 in', avg: '12.7 in', max: '27.0 in'}
         },
@@ -336,7 +336,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           daily: { date: 'March 15, 2026', min: '0.1 in', avg: '1.5 in', max: '6.3 in'},
           cumulative: { date: 'March 15, 2026', min: '3.3 in', avg: '11.5 in', max: '29.5 in'}
         },
-        oahu: {
+        honolulu: {
           daily: { date: 'March 15, 2026', min: '0.0 in', avg: '0.1 in', max: '0.5 in'},
           cumulative: { date: 'March 15, 2026', min: '4.6 in', avg: '12.8 in', max: '27.1 in'}
         },
@@ -363,7 +363,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.8 in', max: '3.0 in'},
           cumulative: { date: 'March 16, 2026', min: '3.6 in', avg: '12.3 in', max: '30.9 in'}
         },
-        oahu: {
+        honolulu: {
           daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.0 in', max: '0.0 in'},
           cumulative: { date: 'March 16, 2026', min: '4.6 in', avg: '12.8 in', max: '27.1 in'}
         },
@@ -452,7 +452,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
       case 'hawaii':
         return ['02'];
 
-      case 'oahu':
+      case 'honolulu':
         return ['05'];
 
       case 'kauai':
@@ -467,16 +467,16 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     switch (county) {
       case 'hawaii':
         return 'Ha';
-      case 'oahu':
+      case 'honolulu':
         return 'Oa';
       case 'maui':
         return 'Ma';
       case 'molokai':
-        return 'Ma'; // Maui County map/image
+        return 'Ma';
       case 'kauai':
         return 'Ka';
       default:
-        return null; // all counties
+        return null;
     }
   }
 
@@ -696,8 +696,8 @@ export class StormViewerComponent implements OnInit, OnDestroy {
       case 'hawaii':
         return 'Hawaiʻi';
 
-      case 'oahu':
-        return 'Oʻahu';
+      case 'honolulu':
+        return 'Honolulu';
 
       case 'kauai':
         return 'Kauaʻi';
