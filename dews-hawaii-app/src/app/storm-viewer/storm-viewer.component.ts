@@ -51,6 +51,13 @@ export class StormViewerComponent implements OnInit, OnDestroy {
   selectedCounty: CountyFilter = 'all';
   selectedSeriesId: string | null = null;
 
+  private readonly stationColors = [
+    '#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e',
+    '#17becf', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22'
+  ];
+
+  private stationColorMap: Record<string, string> = {};
+
   chartOptions: Highcharts.Options = {
     chart: {
       height: 400,
@@ -146,7 +153,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         all: {
           daily: { date: 'March 10, 2026', min: '0.5 in', avg: '1.2 in', max: '1.8 in' },
           cumulative: { date: 'March 10, 2026', min: '0.5 in', avg: '1.2 in', max: '1.8 in' },
-          text: 'The storm began its impact on the western end of the state, with Kauai recording the highest island-wide rainfall totals for the day. A standout observation was recorded at the Lāwaʻi National Tropical Botanical Garden (NTBG), which saw 2.92 inches of rain. This was a remarkably high value for a low-land leeward location, made possible by the storm’s strong southerly flow that drove moisture directly into typically sheltered areas. While Kauai was being saturated, the central and eastern islands, including Maui, Molokai, and the Big Island, remained relatively dry as the primary moisture band had not yet progressed eastward.'
+          text: 'The storm’s impact began at the western end of the state with Kauaʻi recording the highest islandwide rainfall totals for the day. A notable observation was recorded at the Lāwaʻi National Tropical Botanical Garden (NTBG) Hawaiʻi Mesonet station, which received 2.92 inches of rain. This remarkably high value for a lowland leeward location was the result of the storm’s strong southerly flow that produced significant rainfall in typically rain-shadowed areas. While parts of Kauaʻi were receiving heavy rainfall, the central and eastern islands, including Maui, Molokaʻi, and Hawaiʻi Island, remained relatively.'
         }
       }
     },
@@ -157,7 +164,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         all: {
           daily: { date: 'March 11, 2026', min: '0.5 in', avg: '1.2 in', max: '1.8 in' },
           cumulative: { date: 'March 11, 2026', min: '0.5 in', avg: '2.1 in', max: '3.6 in' },
-          text: 'On the second day of the storm, the rainfall was primarily concentrated over Oahu, although it began to spread onto Maui as the system drifted. Maui County technically claimed the highest total island rainfall as the leading edge of the plume moved in, but the individual peak was found at the Kaʻala station on Oahu with 4.71 inches. The NWS notes indicated an increasingly unstable atmosphere as the "Kona Low" environment deepened. During this time, the Big Island and Kauai saw significantly lower rainfall totals compared to the central islands as the core of the moisture focused on the middle of the chain.'
+          text: 'On the second day of the storm, the rainfall was primarily concentrated over Oʻahu, although it began to spread onto Maui as the system slowly shifted eastward. Maui County  claimed the highest islandwide rainfall, but the individual peak was found at the Kaʻala Hawaiʻi Mesonet station on Oʻahu with 4.71 inches. The National Weather Service noted an increasingly unstable atmosphere as the "Kona Low" environment deepened. During this time, the Big Island and Kauaʻi saw significantly lower rainfall totals compared to the central islands as the core of the storm was focused over the middle of the state.'
         }
       }
     },
@@ -168,7 +175,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         all: {
           daily: { date: 'March 12, 2026', min: '0.5 in', avg: '1.6 in', max: '2.5 in' },
           cumulative: { date: 'March 12, 2026', min: '0.5 in', avg: '3.2 in', max: '5.1 in' },
-          text: 'The storm continued to stall over the central islands, with rainfall remaining heavy on Oahu before firmly anchoring itself over Maui. Maui recorded the highest rainfall for the day, led by the Keōpukaloa station with 3.71 inches. The slow movement of the system allowed for continuous saturation of the terrain. As the system transitioned its weight toward the east, Kauai and the southern districts of the Big Island did not receive much rainfall, remaining on the fringes of the moisture-rich convergence zone.'
+          text: 'The storm stalled over the central islands, with rainfall remaining heavy on Oʻahu while spreading over Maui. Maui recorded the highest rainfall for the day, led by the Puʻu Kukui  with 4.01 inches. The slow movement of the system and high intensity rains began to saturate the terrain in some areas. Kauaʻi and the southern districts of Hawaiʻi Island remained on the fringes of the storm.'
         }
       }
     },
@@ -190,7 +197,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         all: {
           daily: { date: 'March 14, 2026', min: '0.5 in', avg: '2.0 in', max: '3.0 in' },
           cumulative: { date: 'March 14, 2026', min: '0.5 in', avg: '5.4 in', max: '8.4 in' },
-          text: "March 14 was the most extreme day of the entire event, with Maui receiving catastrophic rainfall totals. The station at Nāhuku recorded the highest daily total at 27.99 inches, but the most significant measurements came from high-elevation sites: Kuiki (160) recorded 26.09 inches and Haleakalā Summit (153) recorded 19.59 inches in a single 24-hour period. By this evening, the cumulative total at Kuiki reached nearly 50 inches. This day also featured the highest recorded wind speed of the storm, which reached 48.75 mph at the Kaiāulu Puʻuwaʻawaʻa station on the Big Island at 04:20 AM. Meanwhile, Oahu, Kauai, and Molokai did not get much rainfall as the storm's energy was almost entirely localized over the windward slopes of Haleakalā."
+          text: "March 14 was a day of extreme rainfall and high winds on Maui and Hawaiʻi Island. Rainfall on the east slope of Haleakalā was estimated to have been as high as 40 inches. Daily rainfall totals from high-elevation sites included Kuiki with 26.09 inches and Haleakalā Summit with 19.46 inches. By that evening, the cumulative total at Kuiki reached nearly 50 inches. This day also featured the highest recorded wind speed of the storm at the Kaiāulu Puʻuwaʻawaʻa Hawaiʻi Mesonet station on Hawaiʻi Island (see the Puʻuwaʻawaʻa Extreme Wind focus box below). Meanwhile, Kauaʻi was the only major island not experiencing heavy rainfall."
         }
       }
     },
@@ -201,7 +208,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         all: {
           daily: { date: 'March 15, 2026', min: '0.5 in', avg: '1.1 in', max: '1.8 in' },
           cumulative: { date: 'March 15, 2026', min: '0.5 in', avg: '6.1 in', max: '7.9 in' },
-          text: "The storm finally began to migrate off Maui and onto the Big Island, which recorded the highest island-wide rainfall for the day. Puʻuwaʻawaʻa recorded a daily peak of 6.90 inches as the system slowly lost its organized core. As the moisture plume shifted southeast, the islands of Oahu, Kauai, and Molokai saw clearing conditions and very little additional precipitation. Although the rainfall was shifting islands, Maui’s high-elevation terrain continued to experience gusty conditions as the atmosphere began to stabilize."
+          text: "Rainfall decreased on Maui, while Hawaiʻi Island recorded the highest islandwide rainfall for the day. The Puʻuwaʻawaʻa Hawaiʻi Mesonet station recorded a daily peak of 6.84 inches.  Maui’s high-elevation terrain continued to experience gusty winds. Oʻahu, Kauaʻi, and Molokaʻi saw clearing conditions."
         }
       }
     },
@@ -212,7 +219,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         all: {
           daily: { date: 'March 16, 2026', min: '0.5 in', avg: '0.8 in', max: '1.2 in' },
           cumulative: { date: 'March 16, 2026', min: '0.5 in', avg: '6.9 in', max: '8.7 in' },
-          text: "On the final day of the event, the Big Island continued to see the highest rainfall as the remnants of the moisture plume passed over its southern slopes. Puʻuwaʻawaʻa recorded an additional 2.44 inches, bringing the total event duration to a close. The cumulative rainfall maps show a final state-wide maximum at Kuiki on Maui, which totaled 51.90 inches over the seven-day period. By the afternoon, all other islands from Kauai through Maui had returned to dry conditions with no significant rainfall reported as the storm finally dissipated into the central Pacific."
+          text: "On the final day of the event, Hawaiʻi Island continued to receive the most rainfall. The cumulative rainfall maps show a final storm total maximum of 62 inches at a point on the eastern flank of Haleakalā on Maui near the Kuiki Hawaiʻi Mesonet station, which recorded a storm total of 53.05 inches. "
         }
       }
     }
@@ -346,6 +353,16 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     );
   }
 
+  private getStationColor(stationId: string): string {
+    if (!this.stationColorMap[stationId]) {
+      const assignedCount = Object.keys(this.stationColorMap).length;
+      this.stationColorMap[stationId] =
+        this.stationColors[assignedCount % this.stationColors.length];
+    }
+
+    return this.stationColorMap[stationId];
+  }
+
   private async loadCsvChart(
     csvPath: string,
     chartType: 'rain' | 'wind'
@@ -423,20 +440,15 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         }
       }
 
-      const colors = [
-        '#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e',
-        '#17becf', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22'
-      ];
-
-      const series: Highcharts.SeriesOptionsType[] = stationIds.map((id, idx) => ({
-        name: id,
-        type: 'line',
-        data: seriesMap[id],
-        color: colors[idx % colors.length],
-        lineWidth: 1,
-        marker: { enabled: false },
-        stickyTracking: false
-      }));
+        const series: Highcharts.SeriesOptionsType[] = stationIds.map((id) => ({
+          name: id,
+          type: 'line',
+          data: seriesMap[id],
+          color: this.getStationColor(id),
+          lineWidth: 1,
+          marker: { enabled: false },
+          stickyTracking: false
+        }));
 
         // Inside the isRain block of loadCsvChart
         if (isRain) {
@@ -505,16 +517,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getStationColor(stationId: string): string {
-    let hash = 0;
-    for (let i = 0; i < stationId.length; i++) {
-      hash = stationId.charCodeAt(i) + ((hash << 5) - hash);
-    }
 
-    const hue = Math.abs(hash % 360);
-
-    return `hsl(${hue}, 70%, 50%)`;
-  }
 
   private formatCountyName(county: CountyFilter): string {
     switch (county) {
