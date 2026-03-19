@@ -330,7 +330,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
         },
         maui: {
           daily: { date: 'March 15, 2026', min: '0.1 in', avg: '0.5 in', max: '1.6 in'},
-          cumulative: { date: 'March 15, 2026', min: '6.3 in', avg: '17.3 in', max: '61.4 in'}
+          cumulative: { date: 'March 15, 2026', min: '6.3 in', avg: '16.4 in', max: '59.9 in'}
         },
         hawaii: {
           daily: { date: 'March 15, 2026', min: '0.1 in', avg: '1.5 in', max: '6.3 in'},
@@ -341,7 +341,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           cumulative: { date: 'March 15, 2026', min: '4.6 in', avg: '12.8 in', max: '27.1 in'}
         },
         kauai: {
-          daily: { date: 'March 15, 2026', min: '0.0 in', avg: '0.5 in', max: '1.4 in'},
+          daily: { date: 'March 15, 2026', min: '0.0 in', avg: '0.5 in', max: '1.3 in'},
           cumulative: { date: 'March 15, 2026', min: '1.8 in', avg: '9.9 in', max: '22.0 in'}
         }
       }
@@ -353,22 +353,22 @@ export class StormViewerComponent implements OnInit, OnDestroy {
       statsByCounty: {
         all: {
           daily: {date: 'March 16, 2026', min: '0.0 in', avg: '0.6 in', max: '3.0 in'},
-          cumulative: {date: 'March 16, 2026', min: '1.8 in', avg: '61.4 in', max: '13.0 in'}
+          cumulative: {date: 'March 16, 2026', min: '1.8 in', avg: '13.0 in', max: '61.4 in'}
         },
         maui: {
-          daily: { date: 'March 16, 2026', min: '0.1 in', avg: '1.2 in', max: '1.8 in'},
+          daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.3 in', max: '2.4 in'},
           cumulative: { date: 'March 16, 2026', min: '6.3 in', avg: '17.3 in', max: '61.4 in'}
         },
         hawaii: {
-          daily: { date: 'March 16, 2026', min: '0.1 in', avg: '1.5 in', max: '6.3 in'},
+          daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.8 in', max: '3.0 in'},
           cumulative: { date: 'March 16, 2026', min: '3.6 in', avg: '12.3 in', max: '30.9 in'}
         },
         oahu: {
-          daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.1 in', max: '0.5 in'},
+          daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.0 in', max: '0.0 in'},
           cumulative: { date: 'March 16, 2026', min: '4.6 in', avg: '12.8 in', max: '27.1 in'}
         },
         kauai: {
-          daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.5 in', max: '1.3 in'},
+          daily: { date: 'March 16, 2026', min: '0.0 in', avg: '0.1 in', max: '0.8 in'},
           cumulative: { date: 'March 16, 2026', min: '1.8 in', avg: '10.0 in', max: '22.2 in'}
         }
       }

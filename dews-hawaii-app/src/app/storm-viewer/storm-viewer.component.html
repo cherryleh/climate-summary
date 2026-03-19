@@ -72,34 +72,40 @@
 
     <div class="controls-panel">
       <div class="controls-bar">
-        <div class="toggle-wrap">
-          <span>Daily</span>
 
-          <label class="switch">
-            <input type="checkbox" (change)="toggleMode()">
-            <span class="slider"></span>
-          </label>
+        <div class="control-group">
+          <div class="control-label">Mode</div>
+          <div class="toggle-wrap">
+            <span>Daily</span>
 
-          <span>Cumulative</span>
+            <label class="switch">
+              <input type="checkbox" (change)="toggleMode()">
+              <span class="slider"></span>
+            </label>
+
+            <span>Cumulative</span>
+          </div>
         </div>
 
-        <div class="buttons">
-          <button type="button" class="play-button" (click)="togglePlay()" [class.playing]="isPlaying">
-            {{ isPlaying ? 'Pause' : 'Play' }}
-          </button>
+        <div class="control-group">
+          <div class="control-label">Timeline</div>
+          <div class="buttons">
+            <button type="button" class="play-button" (click)="togglePlay()" [class.playing]="isPlaying">
+              {{ isPlaying ? 'Pause' : 'Play' }}
+            </button>
 
-          <button
-            type="button"
-            *ngFor="let d of days; let i = index"
-            (click)="selectDay(i)"
-            [class.active]="selectedDayIndex === i">
-            {{ d.label }}
-          </button>
+            <button
+              type="button"
+              *ngFor="let d of days; let i = index"
+              (click)="selectDay(i)"
+              [class.active]="selectedDayIndex === i">
+              {{ d.label }}
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div class="controls-bar county-controls">
-        <div class="county-filters">
+        <div class="control-group">
+          <div class="control-label">County Filter</div>
           <div class="buttons">
             <button
               type="button"
@@ -133,6 +139,7 @@
             </button>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -245,7 +252,7 @@
         <br><br>
         Rainfall was even higher at the Kuiki Hawaiʻi Mesonet station on the east rim of Haleakalā crater, where 36.42
         inches fell in 24 hours beginning at 6:00 PM on March 13. This also greatly exceeded the NOAA 24-hour
-        1000-year estimate of 28.5 inches.
+        1000-year estimate of 28.5 inches. For more data and details, see the <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/dashboard?id=0160" target="_blank">Kuiki Hawaiʻi Mesonet station website</a>.
       </div>
 
         <div class="highlight-image-grid">
@@ -270,7 +277,7 @@
         This storm generated extreme winds in some areas. The highest wind speeds were measured on Hawaiʻi Island on
         March 14. That day, the Kaiāulu Puʻuwaʻawaʻa Hawaiʻi Mesonet station recorded wind speeds that frequently
         exceeded 100 mph between midnight and 6:45 AM, averaged 105 mph between 4:10 AM and 4:25 AM, and experienced
-        a peak wind gust of 135.4 mph at 4:20 AM.
+        a peak wind gust of 135.4 mph at 4:20 AM. For more data and details, see the <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/dashboard?id=0242" target="_blank">Kaiāulu Puʻuwaʻawaʻa Hawaiʻi Mesonet station website</a>.
       </div>
 
       <div class="highlight-image-grid wind-image-grid">

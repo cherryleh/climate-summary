@@ -549,3 +549,263 @@ h2 {
   width: auto;
   object-fit: contain;
 }
+
+.controls-bar {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.control-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+
+.control-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.county-controls {
+  padding-top: 4px;
+}
+
+.station-layout {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+.station-data-section {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.chart-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.county-chart-buttons {
+  width: 100%;
+  justify-content: center;
+}
+
+.chart-wrap {
+  width: 100%;
+  min-height: 0;
+}
+
+.chart-wrap highcharts-chart {
+  display: block;
+  width: 100%;
+}
+
+.chart-loading {
+  font-size: 0.95rem;
+  color: #555;
+  text-align: center;
+}
+
+.selected-station {
+  position: sticky;
+  top: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+  min-width: 0;
+}
+
+.selected-station-label {
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.selected-station-id {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #1d4ed8;
+  margin-bottom: 14px;
+  word-break: break-word;
+}
+
+.selected-station-link {
+  display: inline-block;
+  text-decoration: none;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.selected-station-link:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.selected-station-placeholder {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+@media (max-width: 1100px) {
+  .station-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .station-data-section {
+    max-width: 100%;
+  }
+
+  .selected-station {
+    position: static;
+    top: auto;
+    order: -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 16px;
+  }
+
+  .viewer-section,
+  .station-data-section {
+    padding: 16px;
+  }
+
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .map,
+  .sidebar {
+    height: auto;
+    min-height: 320px;
+  }
+
+  .sidebar {
+    min-height: 420px;
+  }
+
+  .station-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .chart-controls {
+    align-items: stretch;
+    margin-bottom: 14px;
+  }
+
+  .county-chart-buttons {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .county-chart-buttons button {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 120px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .chart-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .chart-wrap highcharts-chart {
+    min-width: 0;
+  }
+
+  .selected-station {
+    position: static;
+    padding: 16px;
+  }
+
+  .selected-station-id {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .station-data-section {
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .chart-controls {
+    gap: 10px;
+  }
+
+  .county-chart-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .county-chart-buttons button {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 10px;
+    font-size: 0.88rem;
+  }
+
+  .selected-station {
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .selected-station-link {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .county-chart-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .county-chart-buttons button {
+    font-size: 0.9rem;
+  }
+}
