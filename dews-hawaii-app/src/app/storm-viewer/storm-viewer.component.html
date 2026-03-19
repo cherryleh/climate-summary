@@ -23,20 +23,42 @@
           {{ selectedDay.label }} · {{ mode | titlecase }}
         </div>
       </div> -->
-      <div class="stat-group">
-        <div class="stat-title">Daily Rainfall</div>
-        <div class="stat-grid">
-          <div class="stat-item">
-            <h3>Min</h3>
-            <p>{{stats.min}}</p>
+      <div class="stats-wrap">
+        <div class="stat-group">
+          <div class="stat-title">Daily Rainfall</div>
+
+          <div class="stat-grid">
+            <div class="stat-item">
+              <h3>Min</h3>
+              <p>{{ selectedStats.daily.min }}</p>
+            </div>
+            <div class="stat-item">
+              <h3>Avg</h3>
+              <p>{{ selectedStats.daily.avg }}</p>
+            </div>
+            <div class="stat-item">
+              <h3>Max</h3>
+              <p>{{ selectedStats.daily.max }}</p>
+            </div>
           </div>
-          <div class="stat-item">
-            <h3>Avg</h3>
-            <p>{{stats.avg}}</p>
-          </div>
-          <div class="stat-item">
-            <h3>Max</h3>
-            <p>{{stats.max}}</p>
+        </div>
+
+        <div class="stat-group">
+          <div class="stat-title">Cumulative Rainfall</div>
+
+          <div class="stat-grid">
+            <div class="stat-item">
+              <h3>Min</h3>
+              <p>{{ selectedStats.cumulative.min }}</p>
+            </div>
+            <div class="stat-item">
+              <h3>Avg</h3>
+              <p>{{ selectedStats.cumulative.avg }}</p>
+            </div>
+            <div class="stat-item">
+              <h3>Max</h3>
+              <p>{{ selectedStats.cumulative.max }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -44,7 +66,7 @@
       <div class="summary-card">
         <div class="summary-title">Storm Summary</div>
         <div class="summary-text">
-          {{ selectedDay.stats.text }}
+          {{ selectedStats.text }}
         </div>
       </div>
     </div>
@@ -116,10 +138,6 @@
           <button type="button" (click)="selectedCounty = 'oahu'; onCountyChange()"
             [class.active]="selectedCounty === 'oahu'">
             Oʻahu
-          </button>
-          <button type="button" (click)="selectedCounty = 'molokai'; onCountyChange()"
-            [class.active]="selectedCounty === 'molokai'">
-            Molokaʻi
           </button>
           <button type="button" (click)="selectedCounty = 'maui'; onCountyChange()"
             [class.active]="selectedCounty === 'maui'">
