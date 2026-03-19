@@ -51,6 +51,9 @@ export class StormViewerComponent implements OnInit, OnDestroy {
   selectedCounty: CountyFilter = 'all';
   selectedSeriesId: string | null = null;
 
+  chartRef?: Highcharts.Chart;
+  windChartRef?: Highcharts.Chart;
+
   private readonly stationColors = [
     '#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e',
     '#17becf', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22'
@@ -67,7 +70,14 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     credits: { enabled: false },
     xAxis: {
       type: 'datetime',
-      title: { text: 'Time' }
+      title: { text: 'Time' },
+      events: {
+        setExtremes: (e) => {
+          if (this.chartRef && this.windChartRef) {
+            this.syncExtremes(this.chartRef, this.windChartRef, e);
+          }
+        }
+      }
     },
     yAxis: {
       title: { text: 'Rainfall (in)' }
@@ -113,7 +123,14 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     credits: { enabled: false },
     xAxis: {
       type: 'datetime',
-      title: { text: 'Time' }
+      title: { text: 'Time' },
+      events: {
+        setExtremes: (e) => {
+          if (this.windChartRef && this.chartRef) {
+            this.syncExtremes(this.windChartRef, this.chartRef, e);
+          }
+        }
+      }
     },
     yAxis: {
       title: { text: 'Wind Gust (mph)' }
@@ -658,5 +675,32 @@ export class StormViewerComponent implements OnInit, OnDestroy {
 
   async loadWindChart() {
     await this.loadCsvChart('storm_site/WG_merged_storm_data.csv', 'wind');
+  }
+
+  chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
+    this.chartRef = chart;
+  };
+
+  windChartCallback: Highcharts.ChartCallbackFunction = (chart) => {
+    this.windChartRef = chart;
+  };
+
+  private syncExtremes(
+    sourceChart: Highcharts.Chart,
+    targetChart: Highcharts.Chart,
+    e: Highcharts.AxisSetExtremesEventObject
+  ): void {
+    if (!targetChart?.xAxis?.[0]) return;
+
+    // prevent recursive loop
+    if ((e as any).trigger === 'syncExtremes') return;
+
+    targetChart.xAxis[0].setExtremes(
+      e.min,
+      e.max,
+      true,
+      false,
+      { trigger: 'syncExtremes' } as any
+    );
   }
 }
