@@ -132,73 +132,98 @@
     </div>
   </section>
 
-  <section class="station-data-section">
-    <h2>Mesonet Station Data</h2>
+  <div class="station-layout">
+    <section class="station-data-section">
+      <h2>Mesonet Station Data</h2>
 
-    <div class="chart-controls">
-      <div class="buttons county-chart-buttons">
-        <button
-          type="button"
-          (click)="selectedCounty = 'all'; onCountyChange()"
-          [class.active]="selectedCounty === 'all'">
-          All Counties
-        </button>
+      <div class="chart-controls">
+        <div class="buttons county-chart-buttons">
+          <button
+            type="button"
+            (click)="selectedCounty = 'all'; onCountyChange()"
+            [class.active]="selectedCounty === 'all'">
+            All Counties
+          </button>
 
-        <button
-          type="button"
-          (click)="selectedCounty = 'kauai'; onCountyChange()"
-          [class.active]="selectedCounty === 'kauai'">
-          Kauaʻi
-        </button>
+          <button
+            type="button"
+            (click)="selectedCounty = 'kauai'; onCountyChange()"
+            [class.active]="selectedCounty === 'kauai'">
+            Kauaʻi
+          </button>
 
-        <button
-          type="button"
-          (click)="selectedCounty = 'oahu'; onCountyChange()"
-          [class.active]="selectedCounty === 'oahu'">
-          Oʻahu
-        </button>
+          <button
+            type="button"
+            (click)="selectedCounty = 'oahu'; onCountyChange()"
+            [class.active]="selectedCounty === 'oahu'">
+            Oʻahu
+          </button>
 
-        <button
-          type="button"
-          (click)="selectedCounty = 'maui'; onCountyChange()"
-          [class.active]="selectedCounty === 'maui'">
-          Maui
-        </button>
+          <button
+            type="button"
+            (click)="selectedCounty = 'maui'; onCountyChange()"
+            [class.active]="selectedCounty === 'maui'">
+            Maui
+          </button>
 
-        <button
-          type="button"
-          (click)="selectedCounty = 'hawaii'; onCountyChange()"
-          [class.active]="selectedCounty === 'hawaii'">
-          Hawaiʻi
-        </button>
+          <button
+            type="button"
+            (click)="selectedCounty = 'hawaii'; onCountyChange()"
+            [class.active]="selectedCounty === 'hawaii'">
+            Hawaiʻi
+          </button>
+        </div>
+
+        <div *ngIf="isChartLoading" class="chart-loading">
+          Loading station time series...
+        </div>
       </div>
 
-      <div *ngIf="isChartLoading" class="chart-loading">
-        Loading station time series...
+      <div class="chart-wrap">
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [options]="chartOptions"
+          [(update)]="updateFlag"
+          [oneToOne]="true"
+          [callbackFunction]="chartCallback"
+          style="width:100%; height:400px; display:block;">
+        </highcharts-chart>
+
+        <div *ngIf="isWindChartLoading" class="chart-loading">Loading wind chart...</div>
+
+        <highcharts-chart
+          *ngIf="!isWindChartLoading"
+          [Highcharts]="Highcharts"
+          [options]="windChartOptions"
+          [(update)]="windUpdateFlag"
+          [callbackFunction]="windChartCallback"
+          style="width: 100%; height: 400px; display: block;"
+        ></highcharts-chart>
       </div>
-    </div>
+    </section>
 
-    <div class="chart-wrap">
-      <highcharts-chart
-        [Highcharts]="Highcharts"
-        [options]="chartOptions"
-        [(update)]="updateFlag"
-        [oneToOne]="true"
-        [callbackFunction]="chartCallback"
-        style="width:100%; height:400px; display:block;">
-      </highcharts-chart>
+    <aside class="selected-station">
+      <div class="selected-station-label">Station Information</div>
 
-      <div *ngIf="isWindChartLoading" class="chart-loading">Loading wind chart...</div>
+      <ng-container *ngIf="selectedSeriesId; else noSelection">
+        <div class="selected-station-id">{{ selectedSeriesId }}</div>
 
-      <highcharts-chart
-        *ngIf="!isWindChartLoading"
-        [Highcharts]="Highcharts"
-        [options]="windChartOptions"
-        [(update)]="windUpdateFlag"
-        [callbackFunction]="windChartCallback"
-        style="width: 100%; height: 400px; display: block;"
-      ></highcharts-chart>
-    </div>
-  </section>
+        <a
+          class="selected-station-link"
+          href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/dashboard?id={{ selectedSeriesId }}"
+          target="_blank"
+          rel="noopener noreferrer">
+          View HCDP Mesonet Station Data
+        </a>
+      </ng-container>
+
+      <ng-template #noSelection>
+        <div class="selected-station-placeholder">
+          Select a line on the chart to view station details.
+        </div>
+      </ng-template>
+    </aside>
+  </div>
+
 
 </div>

@@ -93,26 +93,35 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     },
     plotOptions: {
       series: {
-        stickyTracking: false,
-        marker: { enabled: false },
-        turboThreshold: 0,
-        boostThreshold: Number.MAX_VALUE,
-        lineWidth: 1,
-        animation: false,
-        states: {
+        stickyTracking: true,
+        marker: { enabled: false,
+          states: {
           hover: {
             enabled: true,
-            lineWidthPlus: 2 // Makes the hovered line thicker
-          },
-          inactive: {
-            enabled: true,
-            opacity: 0.15 // Dims the other lines
+            radius: 6,
+            radiusPlus: 6
+          }
+         },},
+        turboThreshold: 0,
+        lineWidth: 1,
+        animation: false,
+
+        point: {
+          events: {
+            click: (event) => {
+              const seriesName = event.point.series.name;
+              this.onSeriesClick(seriesName);
+            }
           }
         }
       }
     },
     series: []
   };
+
+  onSeriesClick(seriesId: string) {
+    this.selectedSeriesId = seriesId;
+  }
 
   windChartOptions: Highcharts.Options = {
     chart: {
@@ -145,11 +154,19 @@ export class StormViewerComponent implements OnInit, OnDestroy {
     },
     plotOptions: {
       series: {
-        stickyTracking: false,
+        stickyTracking: true,
         marker: { enabled: false },
         turboThreshold: 0,
         lineWidth: 1,
-        animation: false
+        animation: false,
+        point: {
+          events: {
+            click: (event) => {
+              const seriesName = event.point.series.name;
+              this.onSeriesClick(seriesName);
+            }
+          }
+        }
       }
     },
     series: []
@@ -464,7 +481,7 @@ export class StormViewerComponent implements OnInit, OnDestroy {
           color: this.getStationColor(id),
           lineWidth: 1,
           marker: { enabled: false },
-          stickyTracking: false
+          stickyTracking: true
         }));
 
         // Inside the isRain block of loadCsvChart
@@ -485,15 +502,28 @@ export class StormViewerComponent implements OnInit, OnDestroy {
               },
               plotOptions: {
                 series: {
-                  // 2. CRITICAL: Disable boost for counties to allow the "inactive" state to work
+                  stickyTracking: true,
+                  marker: { enabled: false },
+                  turboThreshold: 0,
+                  lineWidth: 1,
+                  animation: false,
                   boostThreshold: isCountyMode ? 0 : 5000,
                   states: {
                     inactive: {
-                      opacity: isCountyMode ? 0.15 : 1, // Dim other lines
+                      opacity: isCountyMode ? 0.15 : 1,
                       enabled: isCountyMode
                     },
                     hover: {
-                      lineWidthPlus: 2 // Make hovered line thicker
+                      enabled: true,
+                      lineWidthPlus: 2
+                    }
+                  },
+                  point: {
+                    events: {
+                      click: (event) => {
+                        const seriesName = event.point.series.name;
+                        this.onSeriesClick(seriesName);
+                      }
                     }
                   }
                 }
@@ -679,10 +709,20 @@ export class StormViewerComponent implements OnInit, OnDestroy {
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     this.chartRef = chart;
+
+    setTimeout(() => {
+      chart.reflow();
+      chart.redraw(false);
+    }, 0);
   };
 
   windChartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     this.windChartRef = chart;
+
+    setTimeout(() => {
+      chart.reflow();
+      chart.redraw(false);
+    }, 0);
   };
 
   private syncExtremes(

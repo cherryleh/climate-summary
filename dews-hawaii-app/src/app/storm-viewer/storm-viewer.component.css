@@ -295,16 +295,6 @@ h2 {
   padding-top: 4px;
 }
 
-/* chart section is separate */
-.station-data-section {
-  width: min(1240px, 100%);
-  margin: 0 auto;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 24px;
-  padding: 22px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-}
 
 .controls-row {
   display: flex;
@@ -348,6 +338,15 @@ h2 {
   .sidebar {
     min-height: 420px;
   }
+
+  .station-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .selected-station {
+    position: static;
+    top: auto;
+  }
 }
 
 .chart-controls {
@@ -366,4 +365,78 @@ h2 {
 .chart-loading {
   font-size: 0.95rem;
   color: #555;
+}
+
+
+.station-layout {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+.station-data-section {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.selected-station {
+  position: sticky;
+  top: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+}
+
+.selected-station-label {
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.selected-station-id {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #1d4ed8;
+  margin-bottom: 14px;
+  word-break: break-word;
+}
+
+.selected-station-link {
+  display: inline-block;
+  text-decoration: none;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.selected-station-link:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.selected-station-placeholder {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 12px;
 }
