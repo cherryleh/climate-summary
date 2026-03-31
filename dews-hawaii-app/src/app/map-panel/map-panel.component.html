@@ -1,6 +1,4 @@
 <div class="map">
-  <!-- === Selection Overlay === -->
-
   <svg viewBox="0 0 560 320" class="map-svg" role="img" aria-label="Hawaiʻi islands (abstract)">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
@@ -15,7 +13,6 @@
       </pattern>
     </defs>
 
-    <!-- everything below is wrapped inside -->
     <g class="map-content">
       <rect x="0" y="0" width="560" height="320" fill="url(#grid)" />
 
@@ -38,11 +35,7 @@
         [attr.stroke]="strokeColor(feature)"
         [attr.stroke-width]="strokeWidth(feature)"
         [attr.filter]="filterGlow(feature)"
-        (click)="
-          viewMode === 'islands'
-            ? pickCounty(getCountyForIsland(feature.name))
-            : pickDivision(feature.key)
-        "
+        (click)="viewMode === 'islands' ? pickIsland(feature.name) : pickDivision(feature.key)"
         (mouseenter)="onHover(feature, $event)"
         (mouseleave)="onLeave()"
       ></path>
@@ -76,13 +69,10 @@
     </g>
   </svg>
 
-
   <div class="colorbar legend" *ngIf="rasterHref">
     <div class="colorbar-wrap">
       <canvas id="colorbarCanvas" width="20" height="150" *ngIf="selectedDataset !== 'Drought'"></canvas>
       <div id="colorbarLegend"></div>
-
     </div>
   </div>
-
 </div>

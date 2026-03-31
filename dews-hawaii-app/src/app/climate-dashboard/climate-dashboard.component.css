@@ -476,3 +476,11 @@
     min-height: 420px;
   }
 }
+
+.dropdown {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}

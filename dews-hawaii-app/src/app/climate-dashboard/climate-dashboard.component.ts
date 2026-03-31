@@ -24,6 +24,8 @@ export type Scope = 'divisions' | 'moku' | 'ahupuaa' | 'watershed';
 
 type Dataset = 'Rainfall' | 'Temperature' | 'Drought';
 
+type ScopedOption = { label: string; value: string };
+
 interface Island {
   id: string;
   name: string;
@@ -86,7 +88,7 @@ function canonIsland(name: string): string {
   return name
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '')
-    .replace(/['’ʻ`]/g, '')
+    .replace(/['‘’ʻ`]/gu, '')
     .toLowerCase()
     .trim();
 }
@@ -112,7 +114,7 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   selectedDivision = signal<string | null>(null);
   viewMode = signal<'islands' | 'divisions'>('islands');
-  selectedCounty = signal<string | null>(null);
+  selectedIsland = signal<string | null>(null);
   stats = signal<{ mean?: number; anomaly?: number; pchange?: number; rank?: number; dry_pct?: number } | null>(null);
 
   getCountyForIsland = getCountyForIsland;
@@ -151,11 +153,11 @@ export class ClimateDashboardComponent implements OnDestroy {
   selectedScope = signal<Scope | null>(null);
   setScope(scope: Scope | null) {
     this.selectedScope.set(scope);
-    if (this.selectedCounty()) {
+    if (this.selectedIsland()) {
       // Redraw boundaries but don't refresh stats unless a division is already selected
-      const county = this.selectedCounty()!;
+      const island = this.selectedIsland()!;
       const prevDivision = this.selectedDivision();
-      this.pickCounty(county);
+      this.pickIsland(island);
       if (prevDivision) this.loadStats();
     }
   }
@@ -180,10 +182,10 @@ export class ClimateDashboardComponent implements OnDestroy {
     return name;
   });
 
-  countyLabel = computed(() => {
-    const county = this.selectedCounty();
-    if (!county) return null;
-    return `${county} County`;
+  islandLabel = computed(() => {
+    const island = this.selectedIsland();
+    if (!island) return null;
+    return `${island} Island`;
   });
 
 
@@ -195,128 +197,132 @@ export class ClimateDashboardComponent implements OnDestroy {
     return { id, name, short: name, divisions: DIVISIONS[name] || [], feature: null, key: id };
   }
 
-  pickCounty(county: string) {
-    this.selectedCounty.set(county);
+  pickIsland(island: string) {
+    this.selectedIsland.set(island);
     this.selectedDivision.set(null);
-    if (!this.selectedScope() || this.selectedDivision()) {
-      this.loadStats();
-    }
 
-    const members = COUNTY_GROUPS[county] || [county];
-    const groupCanon = new Set(members.map(canonIsland));
+    const islandCanon = canonIsland(island);
     const scope = this.selectedScope();
 
     if (!scope) {
-      // --- County outlines only ---
+      // --- Single island outline ---
       this.viewMode.set('islands');
+
       this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
-        const fcCounty: FeatureCollection = {
+        const fcIsland: FeatureCollection = {
           type: 'FeatureCollection',
           features: fc.features.filter((f: any) => {
             const name = this.getProp(f.properties, ['isle', 'island', 'name']) || '';
-            return groupCanon.has(canonIsland(name));
+            return canonIsland(name) === islandCanon;
           })
         };
 
         const projection = geoIdentity().reflectY(true).fitExtent(
           [[-130, 10], [560, 320]],
-          fcCounty
+          fcIsland
         );
 
         const path = geoPath(projection as any);
-        this.project = (projection as any);
+        this.project = projection as any;
         this.updateRasterRect();
 
-        const features = fcCounty.features.map((f: any) => {
-          const name = this.getProp(f.properties, ['isle', 'island', 'name']) || county;
+        const features = fcIsland.features.map((f: any) => {
+          const name = this.getProp(f.properties, ['isle', 'island', 'name']) || island;
           const id = canonIsland(name);
-          return { id, key: id, name, short: name, divisions: DIVISIONS[name] || [], feature: f } as Island;
+          return {
+            id,
+            key: id,
+            name,
+            short: name,
+            divisions: DIVISIONS[name] || [],
+            feature: f
+          } as Island;
         });
 
         const pathById: Record<string, string> = {};
         const centroidById: Record<string, [number, number]> = {};
+
         for (const d of features) {
           pathById[d.id] = path(d.feature)!;
           centroidById[d.id] = path.centroid(d.feature) as [number, number];
         }
+
         this.islands.set(features);
         this.pathById.set(pathById);
         this.centroidById.set(centroidById);
       });
-    } else {
-      // --- Scoped polygons (division/moku/ahupuaʻa) ---
-      this.viewMode.set('divisions');
-      const file = scope === 'moku'
-        ? 'moku.geojson'
-        : scope === 'ahupuaa'
-          ? 'ahupuaa.geojson'
-          : scope === 'watershed'
-            ? 'watershed.geojson'
-            : 'hawaii_islands_divisions.geojson';
 
+    } else {
+      // --- Scoped polygons (moku, ahupuaa, etc.) ---
+      this.viewMode.set('divisions');
+
+      const file =
+        scope === 'moku' ? 'moku.geojson' :
+        scope === 'ahupuaa' ? 'ahupuaa.geojson' :
+        scope === 'watershed' ? 'watershed.geojson' :
+        'hawaii_islands_divisions.geojson';
 
       this.http.get<any>(file).subscribe(fc => {
-        const fcCounty: FeatureCollection = {
+        const fcIsland: FeatureCollection = {
           type: 'FeatureCollection',
           features: fc.features.filter((f: any) => {
-            const featureIslandRaw = this.getProp(f.properties, ['mokupuni', 'island', 'isle', 'Island', 'ISLAND']);
-            return groupCanon.has(canonIsland(String(featureIslandRaw)));
+            const featureIsland = this.getProp(f.properties, ['mokupuni', 'island', 'isle', 'Island', 'ISLAND']);
+            return canonIsland(String(featureIsland)) === islandCanon;
           })
         };
 
         const projection = geoIdentity().reflectY(true).fitExtent(
           [[-130, 10], [560, 320]],
-          fcCounty
+          fcIsland
         );
 
         const path = geoPath(projection as any);
-        this.project = (projection as any);
+        this.project = projection as any;
         this.updateRasterRect();
 
-        const features = fcCounty.features.map((f: any) => {
+        const features = fcIsland.features.map((f: any) => {
           const p = f.properties || {};
+
           const name =
             scope === 'ahupuaa'
-              ? (this.getProp(p, ['ahupuaa', 'Ahupuaʻa', 'Ahupuaa', 'AHUPUAA', 'AHUPUAA_N']) || 'Ahupuaʻa')
+              ? this.getProp(p, ['ahupuaa', 'Ahupuaʻa', 'Ahupuaa', 'AHUPUAA', 'AHUPUAA_N'])
               : scope === 'moku'
-                ? (this.getProp(p, ['moku', 'Moku', 'MOKU']) || 'Moku')
-                : scope === 'watershed'
-                  ? (this.getProp(p, ['watershed', 'Watershed', 'WATERSHED', 'name']) || 'Watershed')
-                  : (this.getProp(p, ['division', 'Division', 'name', 'NAME']) || 'Division');
+              ? this.getProp(p, ['moku', 'Moku', 'MOKU'])
+              : scope === 'watershed'
+              ? this.getProp(p, ['watershed', 'Watershed', 'WATERSHED', 'name'])
+              : this.getProp(p, ['division', 'Division', 'name', 'NAME']);
 
-
-          const islandRaw = this.getProp(p, ['mokupuni', 'island', 'isle', 'Island', 'ISLAND']) || county;
-          const islandCanon = canonIsland(String(islandRaw));
           const key = `${islandCanon}::${name}`;
           const id = `${islandCanon}-${name}`.toLowerCase().replace(/\s+/g, '-');
 
-          return { id, key, name, short: name, island: islandCanon, divisions: [], feature: f } as Island;
+          return {
+            id,
+            key,
+            name,
+            short: name,
+            island: islandCanon,
+            divisions: [],
+            feature: f
+          } as Island;
         });
 
         const pathById: Record<string, string> = {};
         const centroidById: Record<string, [number, number]> = {};
+
         for (const d of features) {
           pathById[d.id] = path(d.feature)!;
           centroidById[d.id] = path.centroid(d.feature) as [number, number];
         }
+
         this.islands.set(features);
         this.pathById.set(pathById);
         this.centroidById.set(centroidById);
       });
     }
 
-    // Chart data
-    if (this.selectedDataset() === 'Drought') {
-      this.loadDroughtDistribution();
-    }
-
-    if (this.selectedDataset() === 'Rainfall') {
-      this.loadRainfallData();
-    } else if (this.selectedDataset() === 'Temperature') {
-      this.loadTemperatureData();
-    } else if (this.selectedDataset() === 'Drought') {
-      this.loadDroughtDistribution();
-    }
+    // reload data
+    this.loadStats();
+    this.loadRainfallData();
   }
 
 
@@ -334,12 +340,12 @@ export class ClimateDashboardComponent implements OnDestroy {
     // your existing "new_body" construction
     const newBody: any = { email };
 
-    const countySel = this.selectedCounty();
+    const islandSel = this.selectedIsland();
     const scope = this.selectedScope();
     const divisionKey = this.selectedDivision();
 
-    if (countySel) newBody.county = [this.countyToApi(countySel)];
-    else newBody.county = ['hawaii', 'honolulu', 'kauai', 'maui'];
+    if (islandSel) newBody.island = [this.islandToApi(islandSel)];
+    else newBody.island = ['hawaii', 'honolulu', 'kauai', 'maui'];
 
     if (scope && divisionKey) {
       const name = this.extractScopedName(divisionKey);
@@ -379,7 +385,7 @@ export class ClimateDashboardComponent implements OnDestroy {
         return throwError(() => err);
       })
     ).subscribe(({ mode }) => {
-      const label = this.selectedDivisionName() || this.countyLabel() || 'Statewide';
+      const label = this.selectedDivisionName() || this.islandLabel() || 'Statewide';
       alert(`${mode === 'created' ? 'Subscribed' : 'Updated subscription'} for ${this.selectedDataset()} — ${label}.`);
     });
   }
@@ -423,7 +429,7 @@ export class ClimateDashboardComponent implements OnDestroy {
 
   private async loadStats(divisionArg?: string | null){
     const dataset = this.selectedDataset();
-    const county = this.selectedCounty();
+    const island = this.selectedIsland();
     const division = divisionArg || this.selectedDivision();
     const scope = this.selectedScope();
 
@@ -434,7 +440,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     else if (scope === 'moku') prefix = 'moku';
     else if (scope === 'watershed') prefix = 'watershed';
     else if (scope === 'divisions') prefix = 'climate';   // climate divisions
-    else if (this.selectedCounty()) prefix = 'county';    // county level
+    else if (this.selectedIsland()) prefix = 'island';    // island level
 
     const suffix = dataset.toLowerCase(); // rainfall | temperature
     const file = `${suffix}/${prefix}_${suffix}_stats.csv`;
@@ -470,14 +476,13 @@ export class ClimateDashboardComponent implements OnDestroy {
       });
     }
 
-    if (!record && county) {
+    if (!record && island) {
       record = rows.find(r => {
         const full = r['division_full'] || r['Division'] || '';
-        const [csvIsland, csvCounty] = full.split('::').map(normalize);
-        const cty = normalize(county);
+        const [csvIsland, csvName] = full.split('::').map(normalize);
+        const iso = normalize(island);
 
-        // Match either island or county name equal to the selected county
-        return csvIsland === cty || csvCounty === cty;
+        return csvIsland === iso || csvName === iso;
       });
     }
 
@@ -486,7 +491,7 @@ export class ClimateDashboardComponent implements OnDestroy {
       record = rows.find(r => normalize(r['division_full'] || '') === 'statewide');
     }
 
-    console.log('Resolved level:', division ? 'division' : county ? 'county' : 'statewide');
+    console.log('Resolved level:', division ? 'division' : island ? 'island' : 'statewide');
     console.log('Matched record:', record);
 
     if (record) {
@@ -832,15 +837,15 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
   private loadRainfallData() {
-    const county = this.selectedCounty();
-    const file = county ? 'rainfall/county_rainfall.csv' : 'rainfall/statewide_rainfall.csv';
+    const island = this.selectedIsland();
+    const file = island ? 'rainfall/island_rainfall.csv' : 'rainfall/statewide_rainfall.csv';
 
     this.http.get(file, { responseType: 'text' }).subscribe(csv => {
-      const data = this.parseCsv(csv, county ? 'county' : 'state');
+      const data = this.parseCsv(csv, island ? 'island' : 'state');
 
-      if (county) {
+      if (island) {
         const filtered = data
-          .filter(r => r.county?.trim().toLowerCase() === county.trim().toLowerCase())
+          .filter(r => this.normalizeKey(r.island || '') === this.normalizeKey(island))
           .map(r => ({ month: r.month, value: r.value }));
         this.tsData.set(filtered);
       } else {
@@ -853,15 +858,15 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
   private loadTemperatureData() {
-    const county = this.selectedCounty();
-    const file = county ? 'temperature/county_temperature.csv' : 'temperature/statewide_temperature.csv';
+    const island = this.selectedIsland();
+    const file = island ? 'temperature/island_temperature.csv' : 'temperature/statewide_temperature.csv';
 
     this.http.get(file, { responseType: 'text' }).subscribe(csv => {
-      const data = this.parseCsv(csv, county ? 'county' : 'state');
+      const data = this.parseCsv(csv, island ? 'island' : 'state');
 
-      if (county) {
+      if (island) {
         const filtered = data
-          .filter(r => r.county?.trim().toLowerCase() === county.trim().toLowerCase())
+          .filter(r => r.island?.trim().toLowerCase() === island.trim().toLowerCase())
           .map(r => ({ month: r.month, value: r.value }));
         this.tsData.set(filtered);
       } else {
@@ -880,7 +885,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.http.get(`spi/island_spi${scale}.csv`, { responseType: 'text' })
       .subscribe(csv => {
         this.islandSPI = this.parseCsv(csv, 'island');
-        if (this.selectedCounty()) this.pickCounty(this.selectedCounty()!);
+        if (this.selectedIsland()) this.pickIsland(this.selectedIsland()!);
 
       });
 
@@ -907,7 +912,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.http.get(`spi/statewide_spi${scale}.csv`, { responseType: 'text' })
       .subscribe(csv => {
         this.statewideSPI = this.parseCsv(csv, 'state');
-        if (!this.selectedCounty() && !this.selectedDivision()) {
+        if (!this.selectedIsland() && !this.selectedDivision()) {
           const stateData = this.statewideSPI
             .filter(r => r.state.toLowerCase() === 'statewide')
             .map(r => ({ month: r.month, value: r.value }));
@@ -1041,15 +1046,15 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.loadStats(d);
 
     if (!d) {
-      // If no division was chosen, fallback to county/statewide
-      const county = this.selectedCounty();
-      if (county && this.selectedDataset() === 'Drought') {
+      // If no division was chosen, fallback to island/statewide
+      const island = this.selectedIsland();
+      if (island && this.selectedDataset() === 'Drought') {
         const newSeries = this.spiSeries().map(s => {
           const parsed = this.divisionSPIByScale[s.scale] || [];
           return {
             scale: s.scale,
             data: parsed
-              .filter((r: any) => r['county']?.trim().toLowerCase() === county.trim().toLowerCase())
+              .filter((r: any) => r['island']?.trim().toLowerCase() === island.trim().toLowerCase())
               .map((r: any) => ({ month: r.month, value: r.value }))
           };
         });
@@ -1119,7 +1124,7 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
   reset() {
-    this.selectedCounty.set(null);
+    this.selectedIsland.set(null);
     this.selectedDivision.set(null);
     this.viewMode.set('islands');
     this.loadStats();
@@ -1197,7 +1202,7 @@ export class ClimateDashboardComponent implements OnDestroy {
     // --- Force statewide stats reload explicitly ---
     setTimeout(() => {
       this.selectedScope.set(null);
-      this.selectedCounty.set(null);
+      this.selectedIsland.set(null);
       this.selectedDivision.set(null);
       console.log('Reset: fetching statewide stats');
       this.loadStats(null);
@@ -1243,10 +1248,10 @@ export class ClimateDashboardComponent implements OnDestroy {
       .replace(/\s+/g, '_'); // wahiawa, north_kauai, etc.
   }
 
-  private countyToApi(county: string): string {
-    // Your county labels might be "Honolulu", "Hawaiʻi", etc.
+  private islandToApi(island: string): string {
+    // Your island labels might be "Honolulu", "Hawaiʻi", etc.
     // API examples use lowercase: hawaii, honolulu
-    return this.slugifySelection(county).replace('_county', '');
+    return this.slugifySelection(island).replace('_island', '');
   }
 
   private extractScopedName(key: string): string {
@@ -1296,25 +1301,25 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.countyMenuOpen.set(false);
   }
 
-  chooseCounty(county: string | null) {
+  chooseIsland(island: string | null) {
     this.closeCountyMenu();
 
-    if (!county) {
+    if (!island) {
       this.reset();
       return;
     }
 
-    this.pickCounty(county);
+    this.pickIsland(island);
   }
-  selectedCountyDisplay = computed(() => this.selectedCounty() || 'Statewide');
+  selectedCountyDisplay = computed(() => this.selectedIsland() || 'Statewide');
 
   get fullSelectionLabel(): string {
-    const county = this.selectedCounty();
+    const island = this.selectedIsland();
     const rawDivision = this.selectedDivision();
     // Provide a fallback string '' if selectedScope() is null
     const scope = this.selectedScope() ?? '';
 
-    if (!county && !rawDivision) return 'Statewide';
+    if (!island && !rawDivision) return 'Statewide';
 
     if (rawDivision) {
       const cleanName = rawDivision.includes('::')
@@ -1331,9 +1336,29 @@ export class ClimateDashboardComponent implements OnDestroy {
       const suffix = labels[scope] || '';
 
       // Return "County - Name Suffix"
-      return `${county} - ${cleanName} ${suffix}`.trim();
+      return `${island} - ${cleanName} ${suffix}`.trim();
     }
 
-    return county || 'Statewide';
+    return island || 'Statewide';
   }
+
+
+
+  trackByScopedOption = (_: number, opt: ScopedOption) => opt.value;
+
+  availableScopedOptions = computed<ScopedOption[]>(() => {
+    const scope = this.selectedScope();
+    const island = this.selectedIsland();
+
+    if ((scope !== 'watershed' && scope !== 'ahupuaa') || !island) return [];
+
+    return this.islands()
+      .filter(f => !!f.key && !!f.name && f.key.includes('::'))
+      .map(f => ({
+        label: f.name,
+        value: f.key
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  });
+
 }

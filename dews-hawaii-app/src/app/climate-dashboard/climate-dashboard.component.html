@@ -20,7 +20,7 @@
             <div class="eyebrow">Climate snapshot</div>
             <div class="title">
               August 2025 {{ selectedDataset() }} –
-              {{ selectedDivisionName() || countyLabel() || 'Statewide' }}
+              {{ selectedDivisionName() || islandLabel() || 'Statewide' }}
 
 
             </div>
@@ -49,15 +49,15 @@
 
         <!-- Statement -->
         <div class="info-box" *ngIf="selectedDataset() === 'Rainfall'">
-          {{ selectedDivisionName() || countyLabel() || 'Statewide' }} received 2.0 inches of rainfall statewide — 3.2 inches (62%) below the August average, marking the driest August in the last 30 years.
+          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} received 2.0 inches of rainfall statewide — 3.2 inches (62%) below the August average, marking the driest August in the last 30 years.
         </div>
 
         <div class="info-box" *ngIf="selectedDataset() === 'Temperature'">
-          {{ selectedDivisionName() || countyLabel() || 'Statewide' }} averaged 70°F statewide — 0.5°F above the August average, ranking as the 11th warmest August in the last 30 years.
+          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} averaged 70°F statewide — 0.5°F above the August average, ranking as the 11th warmest August in the last 30 years.
         </div>
 
         <div class="info-box" *ngIf="selectedDataset() === 'Drought'">
-          {{ selectedDivisionName() || countyLabel() || 'Statewide' }} saw dry conditions with 67% of land area seeing at least abnormally dry conditions, and 21% seeing severe drought or worse conditions.
+          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} saw dry conditions with 67% of land area seeing at least abnormally dry conditions, and 21% seeing severe drought or worse conditions.
         </div>
 
 
@@ -72,16 +72,15 @@
             [value]="formatAnomaly(stats()?.anomaly, selectedDataset())"
             [percent]="((stats()?.pchange | number:'1.0-0') ?? '') + '%'">
           </app-stat-box>
-
           <app-stat-box
             label="Rank"
             [value]="formatRank(stats()?.rank)"
-            note="Driest out of 35 years">
+            note="Driest out of 106 years">
           </app-stat-box>
 
           <app-stat-box
-            label="Dry Area (%)"
-            [value]="((stats()?.dry_pct | number:'1.0-0') ?? '') + '%'">
+            label="?"
+            value = "test">
           </app-stat-box>
         </div>
 
@@ -95,6 +94,7 @@
             label="Anomaly"
             [value]="formatAnomaly(stats()?.anomaly, selectedDataset())">
           </app-stat-box>
+
           <app-stat-box
             label="Rank"
             [value]="formatRank(stats()?.rank)"
@@ -102,8 +102,8 @@
           </app-stat-box>
 
           <app-stat-box
-            label="Dry Area (%)"
-            [value]="((stats()?.dry_pct | number:'1.0-0') ?? '') + '%'">
+            label="?"
+            value = "test">
           </app-stat-box>
         </div>
 
@@ -165,7 +165,7 @@
         <div class="selection-bar">
           <div class="selection-toolbar">
             <div class="toolbar-group county-anchor">
-              <span class="toolbar-label">County</span>
+              <span class="toolbar-label">Island</span>
 
               <button class="chip chip-option chip-selected county-current" type="button">
                 {{ selectedCountyDisplay() }}
@@ -180,45 +180,45 @@
               </button>
 
               <div class="county-menu" *ngIf="countyMenuOpen()">
-                <div class="menu-title">Choose a county</div>
+                <div class="menu-title">Choose an island</div>
 
                 <button
                   class="menu-item"
                   type="button"
-                  [class.menu-item-active]="!selectedCounty()"
-                  (click)="chooseCounty(null)">
+                  [class.menu-item-active]="!selectedIsland()"
+                  (click)="chooseIsland(null)">
                   Statewide
                 </button>
 
                 <button
                   class="menu-item"
                   type="button"
-                  [class.menu-item-active]="selectedCounty() === 'Hawaiʻi'"
-                  (click)="chooseCounty('Hawaiʻi')">
+                  [class.menu-item-active]="selectedIsland() === 'Hawaiʻi'"
+                  (click)="chooseIsland('Hawaiʻi')">
                   Hawaiʻi
                 </button>
 
                 <button
                   class="menu-item"
                   type="button"
-                  [class.menu-item-active]="selectedCounty() === 'Maui'"
-                  (click)="chooseCounty('Maui')">
+                  [class.menu-item-active]="selectedIsland() === 'Maui'"
+                  (click)="chooseIsland('Maui')">
                   Maui
                 </button>
 
                 <button
                   class="menu-item"
                   type="button"
-                  [class.menu-item-active]="selectedCounty() === 'Honolulu'"
-                  (click)="chooseCounty('Honolulu')">
-                  Honolulu
+                  [class.menu-item-active]="selectedIsland() === 'Oʻahu'"
+                  (click)="chooseIsland('Oʻahu')">
+                  Oʻahu
                 </button>
 
                 <button
                   class="menu-item"
                   type="button"
-                  [class.menu-item-active]="selectedCounty() === 'Kauaʻi'"
-                  (click)="chooseCounty('Kauaʻi')">
+                  [class.menu-item-active]="selectedIsland() === 'Kauaʻi'"
+                  (click)="chooseIsland('Kauaʻi')">
                   Kauaʻi
                 </button>
               </div>
@@ -261,11 +261,37 @@
                 </button>
               </div>
             </div>
+            <div
+              class="toolbar-group"
+              *ngIf="selectedScope() === 'watershed' || selectedScope() === 'ahupuaa'">
 
+              <div
+                class="toolbar-group"
+                *ngIf="(selectedScope() === 'watershed' || selectedScope() === 'ahupuaa') && selectedIsland()">
+
+                <span class="toolbar-label">
+                  {{ selectedScope() === 'watershed' ? 'Watershed' : 'Ahupuaʻa' }}
+                </span>
+
+                <select
+                  class="dropdown"
+                  [ngModel]="selectedDivision()"
+                  (ngModelChange)="pickDivision($event)">
+
+                  <option [ngValue]="null">Select</option>
+
+                  <option
+                    *ngFor="let opt of availableScopedOptions(); trackBy: trackByScopedOption"
+                    [ngValue]="opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
             <button
               class="btn btn-reset-inline"
               type="button"
-              *ngIf="selectedCounty() || selectedScope() || selectedDivision()"
+              *ngIf="selectedIsland() || selectedScope() || selectedDivision()"
               (click)="closeCountyMenu(); reset()">
               Reset
             </button>
@@ -273,13 +299,10 @@
         </div>
 
         <div class="map-wrap map-wrap-panel">
-
-
           <app-map-panel
-            class="map-panel-inner"
             [selectedDataset]="selectedDataset()"
             [selectedScope]="selectedScope()"
-            [selectedCounty]="selectedCounty()"
+            [selectedIsland]="selectedIsland()"
             [selectedDivision]="selectedDivision()"
             [viewMode]="viewMode()"
             [rasterHref]="rasterHref()"
@@ -287,8 +310,7 @@
             [islands]="islands()"
             [pathById]="pathById()"
             [centroidById]="centroidById()"
-            (countySelected)="pickCounty($event)"
-            (scopeSelected)="setScope($event)"
+            (islandSelected)="pickIsland($event)"
             (divisionSelected)="pickDivision($event)"
             (resetSelection)="reset()"
           ></app-map-panel>

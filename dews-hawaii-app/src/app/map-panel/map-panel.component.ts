@@ -8,7 +8,7 @@ type Dataset = 'Rainfall' | 'Temperature' | 'Drought';
 @Component({
   selector: 'app-map-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],  
+  imports: [CommonModule, FormsModule],
   templateUrl: './map-panel.component.html',
   styleUrls: ['./map-panel.component.css']
 })
@@ -16,7 +16,7 @@ export class MapPanelComponent implements OnInit {
   // ===== Inputs =====
   @Input() selectedDataset!: Dataset;
   @Input() selectedScope!: string | null;
-  @Input() selectedCounty!: string | null;
+  @Input() selectedIsland!: string | null;
   @Input() selectedDivision!: string | null;
   @Input() viewMode!: 'islands' | 'divisions';
   @Input() rasterHref!: string | null;
@@ -26,18 +26,17 @@ export class MapPanelComponent implements OnInit {
   @Input() centroidById!: Record<string, [number, number]>;
 
   // ===== Outputs =====
-  @Output() countySelected = new EventEmitter<string>();
-  @Output() divisionSelected = new EventEmitter<string | null>();  
+  @Output() islandSelected = new EventEmitter<string>();
+  @Output() divisionSelected = new EventEmitter<string | null>();
   @Output() resetSelection = new EventEmitter<void>();
   @Output() scopeSelected = new EventEmitter<Scope>();
 
-  // ===== State =====
+
   hoveredFeature = signal<string | null>(null);
   hoveredLabel = signal<{ name: string; x: number; y: number } | null>(null);
 
   ngOnInit() {}
 
-  // ===== Hover handling =====
   onHover(feature: any, event: MouseEvent) {
     const scope = this.selectedScope;
     if (scope === 'ahupuaa' || scope === 'watershed') {
@@ -59,9 +58,8 @@ export class MapPanelComponent implements OnInit {
     this.hoveredLabel.set(null);
   }
 
-  // ===== Actions =====
-  pickCounty(name: string) {
-    this.countySelected.emit(name);
+  pickIsland(name: string) {
+    this.islandSelected.emit(name);
   }
 
   pickDivision(key: string) {
@@ -76,7 +74,7 @@ export class MapPanelComponent implements OnInit {
   strokeColor(feature: any): string {
     if (
       (this.viewMode === 'divisions' && this.selectedDivision === feature.key) ||
-      (this.viewMode === 'islands' && this.selectedCounty === this.getCountyForIsland(feature.name))
+      (this.viewMode === 'islands' && this.selectedIsland === feature.name)
     ) {
       return 'var(--primary)';
     }
@@ -87,7 +85,7 @@ export class MapPanelComponent implements OnInit {
   strokeWidth(feature: any): number {
     if (
       (this.viewMode === 'divisions' && this.selectedDivision === feature.key) ||
-      (this.viewMode === 'islands' && this.selectedCounty === this.getCountyForIsland(feature.name))
+    (this.viewMode === 'islands' && this.selectedIsland === feature.name)
     ) {
       return 2;
     }
@@ -97,7 +95,7 @@ export class MapPanelComponent implements OnInit {
   filterGlow(feature: any): string | null {
     if (
       (this.viewMode === 'divisions' && this.selectedDivision === feature.key) ||
-      (this.viewMode === 'islands' && this.selectedCounty === this.getCountyForIsland(feature.name))
+      (this.viewMode === 'islands' && this.selectedIsland === feature.name)
     ) {
       return 'url(#glow)';
     }
@@ -105,7 +103,7 @@ export class MapPanelComponent implements OnInit {
   }
 
   // ===== Utility =====
-  public getCountyForIsland(islandName: string): string {  
+  public getCountyForIsland(islandName: string): string {
     const COUNTY_BY_ISLAND: Record<string, string> = {
       'Kauaʻi': 'Kauaʻi',
       'Oʻahu': 'Honolulu',
