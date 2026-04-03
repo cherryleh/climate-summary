@@ -69,6 +69,17 @@
     </g>
   </svg>
 
+  <div class="selection-overlay">
+    <div class="eyebrow">Selection:</div>
+  <div class="main">
+      {{ selectionLabel || 'Statewide' }}
+    </div>
+
+    <div class="disclaimer" *ngIf="showDivisionDisclaimer">
+      * Some climate divisions span multiple islands. Selecting one may include data from all associated areas.
+    </div>
+  </div>
+
   <div class="colorbar legend" *ngIf="rasterHref">
     <div class="colorbar-wrap">
       <canvas id="colorbarCanvas" width="20" height="150" *ngIf="selectedDataset !== 'Drought'"></canvas>

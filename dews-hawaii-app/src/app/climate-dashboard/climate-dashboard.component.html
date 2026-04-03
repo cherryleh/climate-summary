@@ -79,7 +79,7 @@
           </app-stat-box>
 
           <app-stat-box
-            label="?"
+            label="Year-to-Date"
             value = "test">
           </app-stat-box>
         </div>
@@ -102,7 +102,7 @@
           </app-stat-box>
 
           <app-stat-box
-            label="?"
+            label="Max temp"
             value = "test">
           </app-stat-box>
         </div>
@@ -204,6 +204,30 @@
                   [class.menu-item-active]="selectedIsland() === 'Maui'"
                   (click)="chooseIsland('Maui')">
                   Maui
+                </button>
+
+                <button
+                  class="menu-item"
+                  type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Kaho‘olawe'"
+                  (click)="chooseIsland('Kaho‘olawe')">
+                  Kaho‘olawe
+                </button>
+
+                <button
+                  class="menu-item"
+                  type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Lānaʻi'"
+                  (click)="chooseIsland('Lānaʻi')">
+                  Lānaʻi
+                </button>
+
+                <button
+                  class="menu-item"
+                  type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Molokaʻi'"
+                  (click)="chooseIsland('Molokaʻi')">
+                  Molokaʻi
                 </button>
 
                 <button
@@ -313,7 +337,8 @@
             (islandSelected)="pickIsland($event)"
             (divisionSelected)="pickDivision($event)"
             (resetSelection)="reset()"
-          ></app-map-panel>
+          [selectionLabel]="selectionLabel()"></app-map-panel>
+
         </div>
       </section>
 

@@ -24,7 +24,8 @@ export class MapPanelComponent implements OnInit {
   @Input() islands: any[] = [];
   @Input() pathById!: Record<string, string>;
   @Input() centroidById!: Record<string, [number, number]>;
-
+  @Input() selectionLabel: string | null = null;
+  @Input() showDivisionDisclaimer: boolean = false;
   // ===== Outputs =====
   @Output() islandSelected = new EventEmitter<string>();
   @Output() divisionSelected = new EventEmitter<string | null>();

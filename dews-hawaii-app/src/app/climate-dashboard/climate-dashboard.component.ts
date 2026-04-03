@@ -132,12 +132,17 @@ export class ClimateDashboardComponent implements OnDestroy {
     else if (d === 'Drought') this.loadDroughtDistribution(); // <--- Use the new loader
   }
 
-  private normalizeKey(name: string): string {
-    return name
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '')
-      .replace(/['’ʻ`]/g, '')
+  normalizeKey(str: string): string {
+    if (!str) return '';
+    return str
       .toLowerCase()
+      // 1. Decompose characters to separate base letters from diacritics (macrons)
+      .normalize('NFD')
+      // 2. Remove the diacritic characters (like the line over the 'a' in Lāna‘i)
+      .replace(/[\u0300-\u036f]/g, '')
+      // 3. Remove all types of apostrophes, quotes, and the ʻokina
+      .replace(/['ʻ‘`’]/g, '')
+      // 4. Trim any extra whitespace
       .trim();
   }
 
@@ -476,20 +481,35 @@ export class ClimateDashboardComponent implements OnDestroy {
       });
     }
 
+    // Inside loadStats() in climate-dashboard.component.ts
     if (!record && island) {
-      record = rows.find(r => {
-        const full = r['division_full'] || r['Division'] || '';
-        const [csvIsland, csvName] = full.split('::').map(normalize);
-        const iso = normalize(island);
+      const iso = this.normalizeKey(island); // e.g., "oahu"
 
-        return csvIsland === iso || csvName === iso;
+      record = rows.find(r => {
+        // 1. Get the value from the CSV (checking common header names)
+        const fullValue = r['division_full'] || r['Division'] || '';
+
+        // 2. Normalize it for comparison
+        const normalizedCSV = this.normalizeKey(fullValue);
+
+        // DEBUG LOG: This helps you see exactly why "oahu" isn't matching "O'ahu"
+        console.log(`Comparing App: "${iso}" vs CSV: "${normalizedCSV}" (Original: "${fullValue}")`);
+
+        // 3. Handle both "Island::Name" format and "Island" format
+        if (fullValue.includes('::')) {
+          const parts = fullValue.split('::').map(p => this.normalizeKey(p));
+          return parts.includes(iso);
+        }
+
+        return normalizedCSV === iso;
       });
     }
 
     if (!record) {
-      // === Statewide ===
+      // Ensure "statewide" matching is also robust
       record = rows.find(r => normalize(r['division_full'] || '') === 'statewide');
     }
+
 
     console.log('Resolved level:', division ? 'division' : island ? 'island' : 'statewide');
     console.log('Matched record:', record);
@@ -1342,6 +1362,18 @@ export class ClimateDashboardComponent implements OnDestroy {
     return island || 'Statewide';
   }
 
+  selectionLabel = computed(() => {
+    const island = this.selectedIsland();
+    const division = this.selectedDivisionName();
+
+    if (island && division) {
+      return `${island} > ${division}`;
+    }
+
+    if (island) return island;
+
+    return 'Statewide';
+  });
 
 
   trackByScopedOption = (_: number, opt: ScopedOption) => opt.value;

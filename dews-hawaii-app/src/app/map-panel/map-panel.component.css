@@ -65,7 +65,7 @@ select.input option {
   height: 100%;
   display: block;
 }
-
+/*
 .selection-overlay {
   position: absolute;
   top: 16px;
@@ -79,7 +79,7 @@ select.input option {
   box-shadow: 0 4px 8px rgba(0,0,0,0.08);
   font-size: 13px;
   line-height: 1.4;
-}
+} */
 
 .chips {
   display: flex;
@@ -153,34 +153,33 @@ select.input option {
 }
 
 .selection-overlay {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  font-size: 13px;
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  width: clamp(200px, 36%, 260px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
 .selection-overlay .eyebrow {
-  font-weight: 600;
-  text-transform: uppercase;
   font-size: 11px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--sub);
+  margin-bottom: 4px;
 }
 
-.selection-overlay .chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.selection-overlay .main {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
 }
 
-.selection-overlay .chip {
+.selection-overlay .sub {
   font-size: 13px;
-  padding: 4px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.selection-overlay .chip:hover {
-  background: #e5f4fa;
+  color: var(--sub);
 }

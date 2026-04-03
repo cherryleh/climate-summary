@@ -1,7 +1,9 @@
+from dateutil import parser
 import os
 import re
 import glob
 import argparse
+from matplotlib.dates import relativedelta
 import requests
 import pandas as pd
 import numpy as np
@@ -10,120 +12,90 @@ import rasterio
 from urllib.parse import urlencode
 from datetime import datetime
 from rasterstats import zonal_stats
+import pytz
+import sys
 
-DATASETS = {
-    "rainfall_new": {
-        "url": "https://api.hcdp.ikewai.org/raster",
-        "climo_url": "./data/climo/rainfall/monthly_rainfall_clim_statewide_1991-2020_8.tif",
-        "params": {"datatype": "rainfall", "production": "new", "period": "month"},
-    },
-    "rainfall_legacy": {
-        "url": "https://api.hcdp.ikewai.org/raster",
-        "climo_url": "./data/climo/rainfall/monthly_rainfall_clim_statewide_1991-2020_8.tif",
-        "params": {"datatype": "rainfall", "production": "legacy", "period": "month"},
-    },
-    "temperature": {
-        "url": "https://api.hcdp.ikewai.org/raster",
-        "climo_url": "./data/climo/temperature/monthly_air_temp_clim_statewide_1991-2020_8.tif",
-        "params": {"datatype": "temperature", "aggregation": "mean", "period": "month"},
-    },
-}
+API_KEY = os.environ.get('HCDP_API_TOKEN')
+local_dep_dir = os.environ.get('DEPENDENCY_DIR')
 
-DATE = datetime(2025, 8, 1)
-MONTH = DATE.month
-RASTER_DIR = "./data"
-
-def get_key_from_environment(file_path, key):
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-    pattern = rf'{key}\s*:\s*[\'"]([^\'"]+)[\'"]'
-    match = re.search(pattern, content)
-    return match.group(1) if match else None
+# DATASETS = {
+#     "rainfall_new": {
+#         "url": "https://api.hcdp.ikewai.org/raster",
+#         "climo_url": "./data/climo/rainfall/monthly_rainfall_clim_statewide_1991-2020_8.tif",
+#         "params": {"datatype": "rainfall", "production": "new", "period": "month"},
+#     },
+#     "rainfall_legacy": {
+#         "url": "https://api.hcdp.ikewai.org/raster",
+#         "climo_url": "./data/climo/rainfall/monthly_rainfall_clim_statewide_1991-2020_8.tif",
+#         "params": {"datatype": "rainfall", "production": "legacy", "period": "month"},
+#     },
+#     "temperature": {
+#         "url": "https://api.hcdp.ikewai.org/raster",
+#         "climo_url": "./data/climo/temperature/monthly_air_temp_clim_statewide_1991-2020_8.tif",
+#         "params": {"datatype": "temperature", "aggregation": "mean", "period": "month"},
+#     },
+# }
 
 
-API_KEY = get_key_from_environment("../src/environments/environment.ts", "apiToken")
-
-def fetch_tifs(dataset, start_year=1991, end_year=datetime.now().year, month=8):
-    """Download August GeoTIFFs for a dataset from start_year–end_year."""
-    info = DATASETS[dataset]
-    headers = {"Authorization": f"Bearer {API_KEY}"}
-    os.makedirs(RASTER_DIR, exist_ok=True)
-
-    for year in range(start_year, end_year + 1):
-        params = info["params"].copy()
-        params["date"] = f"{year}-{month:02d}-01"
-        query = urlencode(params)
-        url = f"{info['url']}?{query}"
-
-        if dataset in ["rainfall_new", "rainfall_legacy"]:
-            dataset_name = "rainfall"
-        else:
-            dataset_name = dataset
-
-        out_path = os.path.join(RASTER_DIR, f"{dataset_name}_{year}_{month:02d}.tif")
-
-        if os.path.exists(out_path):
-            print(f"Skipping {out_path} (already exists)")
-            continue
-
-        print(f"Fetching {dataset} for {params['date']}...")
-        res = requests.get(url, headers=headers)
-        if res.status_code == 200:
-            with open(out_path, "wb") as f:
-                f.write(res.content)
-            print(f"Saved {out_path}")
-        else:
-            print(f"{res.status_code} for {url}")
 
 def convert_units(value, dataset):
-    """Convert rainfall mm→inches and temperature °C→°F."""
+    """Convert rainfall mm to inches and temperature C to F"""
     if value is None or np.isnan(value):
         return np.nan
     if dataset == "rainfall":
-        return value / 25.4  # mm → inches
+        return value / 25.4
     elif dataset == "temperature":
-        return (value * 9/5) + 32  # °C → °F
+        return (value * 9/5) + 32
     return value
 
 
-def get_stats(division, dataset="rainfall"):
-    """Compute rainfall or temperature statistics for a division shapefile."""
-    shapefile = f"../public/shapefiles/{division}.shp"
-    raster_folder = f"{RASTER_DIR}/"
-    lookup_key = "rainfall_new" if dataset == "rainfall" else dataset
-    climo_file = DATASETS[lookup_key]["climo_url"]
-    tif_path = "/Users/cherryleheu/Documents/HCDP/Data/monthly/SPI_historical/SPI_historical_new/spi1_2025_08.tif"
+def get_stats(division, dataset, year, month):
+    """Compute rainfall or temperature statistics for a island or division shapefile."""
+    shapefile = os.path.join(local_dep_dir, f"shapefiles/{division}.shp")
+    climo_file = os.path.join(local_dep_dir, f"climo/{dataset}/{dataset}_1991-2020_{month:02d}.tif")
+    # tif_path = "/Users/cherryleheu/Documents/HCDP/Data/monthly/SPI_historical/SPI_historical_new/spi1_2025_08.tif"
 
     print(f"\n--- Processing {division} ({dataset}) ---")
 
-    # --- Load shapefile ---
     gdf = gpd.read_file(shapefile).copy()
 
     island_col = next((c for c in gdf.columns if c.lower() in ["island", "mokupuni", "isle", "islandname"]), None)
-    name_col = next((c for c in gdf.columns if c.lower() in ["name", "division", "moku", "climate_div", "ahupuaa", "county"]), None)
+    name_col = next((c for c in gdf.columns if c.lower() in ["name", "division", "moku", "climate_div", "ahupuaa", "county", "name_hwn"]), None)
 
     if island_col and name_col:
-        # Dissolve by both to keep data clean, then create the Maui::Name string
+        # 1. Flag rows that share BOTH the same island and the same name
+        is_same_island_dup = gdf.duplicated(subset=[island_col, name_col], keep=False)
+
+        # 2. Create a sequential counter (1, 2, 3...) for these specific groups
+        cum_count = gdf.groupby([island_col, name_col]).cumcount() + 1
+
+        # 3. Append the counter to the name column ONLY for the flagged duplicates
+        gdf.loc[is_same_island_dup, name_col] = (
+            gdf.loc[is_same_island_dup, name_col].astype(str) + " " + cum_count[is_same_island_dup].astype(str)
+        )
+
+        # 4. Now perform the dissolve (same-island duplicates are now uniquely named so they won't merge)
         gdf = gdf.dissolve(by=[island_col, name_col], as_index=False)
         gdf["division_full"] = gdf.apply(lambda r: f"{r[island_col]}::{r[name_col]}", axis=1)
+
     elif name_col:
         gdf = gdf.dissolve(by=name_col, as_index=False)
         gdf["division_full"] = gdf[name_col].astype(str)
     else:
         raise ValueError(f"No valid name column found in {division}.shp")
 
-    # --- 2. Climatology Stats ---
+    # Climatology
     climo_zs = zonal_stats(vectors=gdf, raster=climo_file, stats=["mean"], nodata=None)
     gdf["climo_mean"] = [convert_units(c["mean"], dataset) for c in climo_zs]
 
-    # --- 3. Historical Time Series Loop ---
+    # Loop through all historical rasters to get ranks
     all_records = []
-    for tif in sorted(glob.glob(os.path.join(raster_folder, f"{dataset}_*_08.tif"))):
+    for tif in sorted(glob.glob(os.path.join(local_dep_dir, f"{dataset}_*_{month:02d}.tif"))):
         parts = os.path.basename(tif).replace(".tif", "").split("_")
-        year, month = parts[1], parts[2]
-        date = f"{year}-{month}"
-        if year == "1990":
-            continue
+        curr_year, curr_month = parts[1], parts[2]
+        curr_date = f"{curr_year}-{curr_month}"
+        # if year == "1990":
+        #     continue
 
         stats = zonal_stats(vectors=gdf, raster=tif, stats=["mean"], nodata=None)
 
@@ -142,7 +114,7 @@ def get_stats(division, dataset="rainfall"):
 
             all_records.append({
                 "division_full": row["division_full"],
-                "date": date,
+                "date": curr_date,
                 "mean": mean_val,
                 "anomaly": anomaly,
                 "pchange": pchange,
@@ -176,33 +148,30 @@ def get_stats(division, dataset="rainfall"):
 
     df["rank"] = df.groupby("division_full")["anomaly"].rank(method="min")
     # merged = df.merge(gdf[["division_full", "pct_drought"]], on="division_full", how="left")
-    latest_df = df[df["date"] == "2025-08"].reset_index(drop=True)
-
+    latest_df = df[df["date"] == f"{year}-{month:02d}"].reset_index(drop=True)
     out_csv = f"../public/{dataset}/{division}_{dataset}_stats.csv"
     latest_df.to_csv(out_csv, index=False)
     print(f"Saved {out_csv}")
 
-def get_statewide_stats(dataset="rainfall"):
+def get_statewide_stats(dataset, year, month):
     """Compute statewide mean, anomaly, percent change, and drought percentage."""
-    raster_folder = f"{RASTER_DIR}/"
-    lookup_key = "rainfall_new" if dataset == "rainfall" else dataset
-    climo_file = DATASETS[lookup_key]["climo_url"]
-    tif_path = "/Users/cherryleheu/Documents/HCDP/Data/monthly/SPI_historical/SPI_historical_new/spi1_2025_08.tif"
+    climo_file = climo_file = os.path.join(local_dep_dir, f"climo/{dataset}/{dataset}_1991-2020_{month:02d}.tif")
+    # tif_path = f"/Users/cherryleheu/Documents/HCDP/Data/monthly/SPI_historical/SPI_historical_new/spi1_2025_{month:02d}.tif"
 
     print(f"\n--- Processing statewide ({dataset}) ---")
 
-    # --- Load climatology ---
+    # Load climo
     with rasterio.open(climo_file) as src:
         clim = src.read(1).astype(float)
         clim = np.where(src.nodata == src.read(1), np.nan, clim)
         climo_mean = convert_units(np.nanmean(clim), dataset)
 
-    # --- Loop through all historical rasters to get mean and anomaly ---
+    # Loop through historical
     all_records = []
-    for tif in sorted(glob.glob(os.path.join(raster_folder, f"{dataset}_*_08.tif"))):
+    for tif in sorted(glob.glob(os.path.join(local_dep_dir, f"{dataset}_*_{month:02d}.tif"))):
         parts = os.path.basename(tif).replace(".tif", "").split("_")
-        year, month = parts[1], parts[2]
-        date = f"{year}-{month}"
+        curr_year, curr_month = parts[1], parts[2]
+        curr_date = f"{curr_year}-{curr_month}"
 
         with rasterio.open(tif) as src:
             arr = src.read(1).astype(float)
@@ -213,8 +182,7 @@ def get_statewide_stats(dataset="rainfall"):
         pchange = ((mean_val - climo_mean) / climo_mean) * 100 if dataset == "rainfall" else anomaly
 
         all_records.append({
-            "date": date,
-            "year": int(year),
+            "date": curr_date,
             "mean": mean_val,
             "anomaly": anomaly,
             "pchange": pchange,
@@ -222,27 +190,24 @@ def get_statewide_stats(dataset="rainfall"):
 
     df = pd.DataFrame(all_records)
 
-    # --- Rank logic (dry for rainfall, warm for temperature) ---
     ascending = True if dataset == "rainfall" else False
     df["rank"] = df["anomaly"].rank(method="min", ascending=ascending)
 
-    # --- Extract 2025-08 record ---
-    latest = df[df["date"] == "2025-08"].copy()
+    latest = df[df["date"] == f"{year_value}-{month:02d}"].copy()
     if latest.empty:
-        print("No data found for 2025-08")
+        print(f"No data found for {year_value}-{month:02d}")
         return
 
-    # --- Compute drought percentage ---
-    if os.path.exists(tif_path):
-        with rasterio.open(tif_path) as src:
-            spi = src.read(1).astype(float)
-            spi = np.where(spi == src.nodata, np.nan, spi)
-            dry_pct = (np.sum(spi < -0.5) / np.isfinite(spi).sum()) * 100
-    else:
-        dry_pct = np.nan
+    # if os.path.exists(tif_path):
+    #     with rasterio.open(tif_path) as src:
+    #         spi = src.read(1).astype(float)
+    #         spi = np.where(spi == src.nodata, np.nan, spi)
+    #         dry_pct = (np.sum(spi < -0.5) / np.isfinite(spi).sum()) * 100
+    # else:
+    #     dry_pct = np.nan
 
     latest["division_full"] = "Statewide"
-    latest["dry_pct"] = dry_pct
+    # latest["dry_pct"] = dry_pct
 
     out_csv = f"../public/{dataset}/statewide_{dataset}_stats.csv"
     latest.to_csv(out_csv, index=False)
@@ -250,38 +215,33 @@ def get_statewide_stats(dataset="rainfall"):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Compute rainfall and temperature stats for all divisions")
-    parser.add_argument("--fetch", action="store_true", help="Download GeoTIFFs before computing stats")
-    args = parser.parse_args()
-
-    divisions = ["island", "moku", "ahupuaa", "watershed"]
+    divisions = ["island", "climate", "moku", "ahupuaa", "watershed"]
     datasets = ["rainfall", "temperature"]
 
-    if args.fetch:
-        for dataset in datasets:
-            if dataset == "rainfall":
-                fetch_tifs("rainfall_legacy", start_year=1920, end_year=1989, month=8)
-                fetch_tifs("rainfall_new", start_year=1991, end_year=2025, month=8)
-            else:
-              fetch_tifs(dataset, start_year=1990, end_year=2025, month=8)
+    hst = pytz.timezone('HST')
+    date = None
+
+    if len(sys.argv) > 1:
+      input_date = sys.argv[1]
+      date = parser.parse(input_date).astimezone(hst)
+    else:
+      today = datetime.now(hst)
+      today = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+      date = today - relativedelta(days = 1)
+
+    month_value = date.month
+    year_value = date.year
+
     for dataset in datasets:
         try:
-            get_statewide_stats(dataset)
+            get_statewide_stats(dataset, year_value, month_value)
         except Exception as e:
             print(f"Error processing statewide ({dataset}): {e}")
     for division in divisions:
         for dataset in datasets:
             try:
-                get_stats(division, dataset)
+                get_stats(division, dataset, year_value, month_value)
             except Exception as e:
                 print(f"Error processing {division} ({dataset}): {e}")
 
 
-    print("Cleaning up downloaded TIFFs...")
-    for f in glob.glob(f"{RASTER_DIR}/*.tif"):
-        try:
-            os.remove(f)
-        except Exception as e:
-            print(f"Could not remove {f}: {e}")
-
-# python your_script_name.py --fetch
