@@ -1,2 +1,2 @@
-date,year,mean,anomaly,pchange,rank,division_full
-2025-03,2025,4.223866479683852,-2.629174521654626,-38.36507794337022,31.0,Statewide
+date,mean,anomaly,pchange,rank,ytd_pnormal,division_full
+2025-03,4.223866479683852,-2.629174521654626,-38.36507794337022,31.0,67.35754310667616,Statewide

@@ -42,8 +42,6 @@ export class DataHighchartComponent implements OnChanges {
 
     if (isDistribution) {
       categories = this.data.map(d => d.month);
-
-      // We re-order these so the stacks grow logically from the 0 center
       const config = [
         // Drought categories (Factor 1 = Above the line)
         { name: 'D0 Abnormally Dry', color: '#FFFF00', factor: 1 },
@@ -64,7 +62,6 @@ export class DataHighchartComponent implements OnChanges {
         name: c.name,
         type: 'area',
         color: c.color,
-        // Calculate numeric values and apply the flip factor
         data: this.data.map(d => {
             const val = parseFloat((d as any)[c.name] || '0');
             return Number((val * c.factor).toFixed(2));
@@ -129,6 +126,18 @@ export class DataHighchartComponent implements OnChanges {
           threshold: 0 // This ensures positive values stack up and negative stack down
         },
         column: { borderWidth: 0 }
+      },
+      subtitle: {
+        text: isDistribution ? 'Hover over the chart to see specific area percentages' : '',
+        align: 'center',
+        style: {
+          color: '#666666',
+          fontSize: '12px',
+          fontStyle: 'italic'
+        }
+      },
+      legend: {
+        enabled: false
       },
       series: series
     };

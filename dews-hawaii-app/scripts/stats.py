@@ -1,10 +1,9 @@
+from calendar import month
+
 from dateutil import parser
 import os
-import re
 import glob
-import argparse
 from matplotlib.dates import relativedelta
-import requests
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -14,29 +13,10 @@ from datetime import datetime
 from rasterstats import zonal_stats
 import pytz
 import sys
+import gc
 
 API_KEY = os.environ.get('HCDP_API_TOKEN')
 local_dep_dir = os.environ.get('DEPENDENCY_DIR')
-
-# DATASETS = {
-#     "rainfall_new": {
-#         "url": "https://api.hcdp.ikewai.org/raster",
-#         "climo_url": "./data/climo/rainfall/monthly_rainfall_clim_statewide_1991-2020_8.tif",
-#         "params": {"datatype": "rainfall", "production": "new", "period": "month"},
-#     },
-#     "rainfall_legacy": {
-#         "url": "https://api.hcdp.ikewai.org/raster",
-#         "climo_url": "./data/climo/rainfall/monthly_rainfall_clim_statewide_1991-2020_8.tif",
-#         "params": {"datatype": "rainfall", "production": "legacy", "period": "month"},
-#     },
-#     "temperature": {
-#         "url": "https://api.hcdp.ikewai.org/raster",
-#         "climo_url": "./data/climo/temperature/monthly_air_temp_clim_statewide_1991-2020_8.tif",
-#         "params": {"datatype": "temperature", "aggregation": "mean", "period": "month"},
-#     },
-# }
-
-
 
 def convert_units(value, dataset):
     """Convert rainfall mm to inches and temperature C to F"""
@@ -48,19 +28,55 @@ def convert_units(value, dataset):
         return (value * 9/5) + 32
     return value
 
+def make_ytd(year, month):
+  input_dir = os.path.join(local_dep_dir, "rainfall")
+  first_file = os.path.join(input_dir, f"rainfall_{year}_01.tif")
+
+  if not os.path.exists(first_file):
+      print(f"Warning: Missing starting file {first_file} for YTD calculation.")
+      return None
+
+  with rasterio.open(first_file) as src:
+      meta = src.meta.copy()
+      first_data = src.read(1, masked=True)
+      land_mask = first_data.mask
+      ytd_sum = np.zeros(first_data.shape, dtype='float32')
+
+  for m in range(1, month + 1):
+      file_path = os.path.join(input_dir, f"rainfall_{year}_{m:02d}.tif")
+      if os.path.exists(file_path):
+          with rasterio.open(file_path) as src:
+              data = src.read(1).astype('float32')
+              # Safeguard against nodata values being added to the sum
+              if src.nodata is not None:
+                  data[data == src.nodata] = 0
+              ytd_sum += data
+
+  # Re-apply the mask with standard nodata
+  ytd_sum[land_mask] = -9999
+
+  meta.update(dtype='float32', nodata=-9999)
+  output_path = os.path.join(input_dir, f'YTD_{year}_{month:02d}.tif')
+
+  with rasterio.open(output_path, 'w', **meta) as dst:
+      dst.write(ytd_sum, 1)
+
+  return output_path
 
 def get_stats(division, dataset, year, month):
     """Compute rainfall or temperature statistics for a island or division shapefile."""
+    print(f"\n--- Processing {division} - {dataset} ---")
+
     shapefile = os.path.join(local_dep_dir, f"shapefiles/{division}.shp")
     climo_file = os.path.join(local_dep_dir, f"climo/{dataset}/{dataset}_1991-2020_{month:02d}.tif")
-    # tif_path = "/Users/cherryleheu/Documents/HCDP/Data/monthly/SPI_historical/SPI_historical_new/spi1_2025_08.tif"
 
-    print(f"\n--- Processing {division} ({dataset}) ---")
 
     gdf = gpd.read_file(shapefile).copy()
 
     island_col = next((c for c in gdf.columns if c.lower() in ["island", "mokupuni", "isle", "islandname"]), None)
     name_col = next((c for c in gdf.columns if c.lower() in ["name", "division", "moku", "climate_div", "ahupuaa", "county", "name_hwn"]), None)
+
+    gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.001, preserve_topology=True)
 
     if island_col and name_col:
         # 1. Flag rows that share BOTH the same island and the same name
@@ -84,13 +100,14 @@ def get_stats(division, dataset, year, month):
     else:
         raise ValueError(f"No valid name column found in {division}.shp")
 
+
     # Climatology
     climo_zs = zonal_stats(vectors=gdf, raster=climo_file, stats=["mean"], nodata=None)
     gdf["climo_mean"] = [convert_units(c["mean"], dataset) for c in climo_zs]
 
     # Loop through all historical rasters to get ranks
     all_records = []
-    for tif in sorted(glob.glob(os.path.join(local_dep_dir, f"{dataset}_*_{month:02d}.tif"))):
+    for tif in sorted(glob.glob(os.path.join(local_dep_dir, dataset, f"{dataset}_*_{month:02d}.tif"))):
         parts = os.path.basename(tif).replace(".tif", "").split("_")
         curr_year, curr_month = parts[1], parts[2]
         curr_date = f"{curr_year}-{curr_month}"
@@ -119,36 +136,40 @@ def get_stats(division, dataset, year, month):
                 "anomaly": anomaly,
                 "pchange": pchange,
             })
+        del stats
+        gc.collect()
 
-    # if os.path.exists(tif_path):
-    #     def pct_less_than_half(values):
-    #         vals = np.array(values, dtype=float)
-    #         vals = vals[np.isfinite(vals)]
-    #         return (np.sum(vals < -0.5) / len(vals)) * 100 if len(vals) > 0 else np.nan
 
-    #     with rasterio.open(tif_path) as src:
-    #         mask = src.read_masks(1)
-    #         nodata = src.nodata
-
-    #     percent_stats = zonal_stats(
-    #         vectors=gdf,
-    #         raster=tif_path,
-    #         stats=None,
-    #         add_stats={"pct_drought": pct_less_than_half},
-    #         nodata=nodata
-    #     )
-    #     gdf["pct_drought"] = [s["pct_drought"] for s in percent_stats]
-    # else:
-    #     gdf["pct_drought"] = np.nan
-
-    # --- Merge + Export ---
     df = pd.DataFrame(all_records)
     if "division_full" not in df.columns:
         raise ValueError("division_full column missing from records dataframe")
 
     df["rank"] = df.groupby("division_full")["anomaly"].rank(method="min")
-    # merged = df.merge(gdf[["division_full", "pct_drought"]], on="division_full", how="left")
     latest_df = df[df["date"] == f"{year}-{month:02d}"].reset_index(drop=True)
+
+    if dataset == "rainfall":
+      current_ytd_path = make_ytd(year, month)
+      climo_ytd_path = os.path.join(local_dep_dir, "climo", "rainfall_ytd", f"YTD_rain_month_{month:02d}.tif")
+
+      current_ytd_zs = zonal_stats(vectors=gdf, raster=current_ytd_path, stats=["mean"], nodata=-9999)
+      climo_ytd_zs = zonal_stats(vectors=gdf, raster=climo_ytd_path, stats=["mean"], nodata=-9999)
+
+      ytd_pnormals = []
+      # Zip lets us loop through both lists at the same time
+      for curr, climo in zip(current_ytd_zs, climo_ytd_zs):
+          curr_mean = curr['mean']
+          climo_mean = climo['mean']
+
+          # Prevent division by zero and handle missing data (None)
+          if curr_mean is not None and climo_mean is not None and climo_mean != 0:
+              pnormal = (curr_mean / climo_mean) * 100
+          else:
+              pnormal = np.nan
+
+          ytd_pnormals.append(pnormal)
+
+      latest_df["ytd_pnormal"] = ytd_pnormals
+
     out_csv = f"../public/{dataset}/{division}_{dataset}_stats.csv"
     latest_df.to_csv(out_csv, index=False)
     print(f"Saved {out_csv}")
@@ -156,7 +177,6 @@ def get_stats(division, dataset, year, month):
 def get_statewide_stats(dataset, year, month):
     """Compute statewide mean, anomaly, percent change, and drought percentage."""
     climo_file = climo_file = os.path.join(local_dep_dir, f"climo/{dataset}/{dataset}_1991-2020_{month:02d}.tif")
-    # tif_path = f"/Users/cherryleheu/Documents/HCDP/Data/monthly/SPI_historical/SPI_historical_new/spi1_2025_{month:02d}.tif"
 
     print(f"\n--- Processing statewide ({dataset}) ---")
 
@@ -168,7 +188,7 @@ def get_statewide_stats(dataset, year, month):
 
     # Loop through historical
     all_records = []
-    for tif in sorted(glob.glob(os.path.join(local_dep_dir, f"{dataset}_*_{month:02d}.tif"))):
+    for tif in sorted(glob.glob(os.path.join(local_dep_dir, dataset, f"{dataset}_*_{month:02d}.tif"))):
         parts = os.path.basename(tif).replace(".tif", "").split("_")
         curr_year, curr_month = parts[1], parts[2]
         curr_date = f"{curr_year}-{curr_month}"
@@ -193,18 +213,34 @@ def get_statewide_stats(dataset, year, month):
     ascending = True if dataset == "rainfall" else False
     df["rank"] = df["anomaly"].rank(method="min", ascending=ascending)
 
-    latest = df[df["date"] == f"{year_value}-{month:02d}"].copy()
+    latest = df[df["date"] == f"{year}-{month:02d}"].copy()
     if latest.empty:
         print(f"No data found for {year_value}-{month:02d}")
         return
 
-    # if os.path.exists(tif_path):
-    #     with rasterio.open(tif_path) as src:
-    #         spi = src.read(1).astype(float)
-    #         spi = np.where(spi == src.nodata, np.nan, spi)
-    #         dry_pct = (np.sum(spi < -0.5) / np.isfinite(spi).sum()) * 100
-    # else:
-    #     dry_pct = np.nan
+    if dataset == "rainfall":
+      current_ytd_path = make_ytd(year, month)
+      climo_ytd_path = os.path.join(local_dep_dir, "climo", "rainfall_ytd", f"YTD_rain_month_{month:02d}.tif")
+
+      # Read current YTD statewide average
+      with rasterio.open(current_ytd_path) as src:
+          curr_arr = src.read(1).astype(float)
+          curr_arr = np.where(curr_arr == -9999, np.nan, curr_arr) # Handle nodata
+          curr_mean = np.nanmean(curr_arr)
+
+      # Read climo YTD statewide average
+      with rasterio.open(climo_ytd_path) as src:
+          climo_arr = src.read(1).astype(float)
+          climo_arr = np.where(climo_arr == -9999, np.nan, climo_arr) # Handle nodata
+          climo_mean = np.nanmean(climo_arr)
+
+      # Calculate percent normal
+      if not np.isnan(curr_mean) and not np.isnan(climo_mean) and climo_mean != 0:
+          pnormal = (curr_mean / climo_mean) * 100
+      else:
+          pnormal = np.nan
+
+      latest["ytd_pnormal"] = pnormal
 
     latest["division_full"] = "Statewide"
     # latest["dry_pct"] = dry_pct
@@ -216,6 +252,7 @@ def get_statewide_stats(dataset, year, month):
 
 if __name__ == "__main__":
     divisions = ["island", "climate", "moku", "ahupuaa", "watershed"]
+    # divisions = ["watershed"]
     datasets = ["rainfall", "temperature"]
 
     hst = pytz.timezone('HST')

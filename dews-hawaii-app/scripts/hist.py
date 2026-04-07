@@ -57,11 +57,7 @@ def get_averages_for_dataset(division, id_col, dataset, target_dates, raster_fol
     # Filter for rasters that actually exist in the 5-year target range
     available_tifs = []
     for date_str in target_dates:
-        tif_path = os.path.join(local_dep_dir, f"{dataset}_{date_str}.tif")
-
-        if not os.path.exists(tif_path):
-            # Fallback path if needed, though identical to the above based on your snippet
-            tif_path = os.path.join(local_dep_dir, f"{dataset}_{date_str}.tif")
+        tif_path = os.path.join(local_dep_dir, dataset, f"{dataset}_{date_str}.tif")
 
         if os.path.exists(tif_path):
             available_tifs.append((date_str, tif_path))
@@ -104,11 +100,57 @@ def get_averages_for_dataset(division, id_col, dataset, target_dates, raster_fol
     df = df.reindex(sorted(df.columns), axis=1)
 
     out_dir = f"../public/{dataset}/"
+    os.makedirs(out_dir, exist_ok=True)
 
     out_csv = os.path.join(out_dir, f"{division}_{dataset}.csv")
     df.to_csv(out_csv)
     print(f"Saved {out_csv} ({len(df)} rows)")
 
+def get_statewide_averages_for_dataset(dataset, target_dates, raster_folder):
+    """
+    Compute mean values for the entire state (raster-wide) for a specific dataset.
+    Exports to a CSV with a pivoted date format.
+    """
+    print(f"Processing statewide for {dataset}...")
+
+    records = []
+    for date_str in target_dates:
+        tif_path = os.path.join(raster_folder, dataset, f"{dataset}_{date_str}.tif")
+
+        if os.path.exists(tif_path):
+            with rasterio.open(tif_path) as src:
+                arr = src.read(1).astype(float)
+                # Handle nodata to avoid skewing the mean
+                if src.nodata is not None:
+                    arr = np.where(arr == src.nodata, np.nan, arr)
+
+                mean_val = np.nanmean(arr)
+
+                if not np.isnan(mean_val):
+                    if dataset == "rainfall":
+                        mean_val = mean_val / 25.4  # mm to inches
+                    elif dataset == "temperature":
+                        mean_val = (mean_val * 1.8) + 32  # Celsius to Fahrenheit
+
+                records.append({"division": "Statewide", "date": date_str, f"mean_{dataset}": mean_val})
+
+    if not records:
+        print(f"No {dataset} rasters found for statewide extraction in the last 5 years.")
+        return
+
+    df = (
+        pd.DataFrame(records)
+        .pivot(index="division", columns="date", values=f"mean_{dataset}")
+    )
+
+    df = df.reindex(sorted(df.columns), axis=1)
+
+    out_dir = f"../public/{dataset}/"
+    os.makedirs(out_dir, exist_ok=True)
+
+    out_csv = os.path.join(out_dir, f"statewide_{dataset}.csv")
+    df.to_csv(out_csv)
+    print(f"Saved {out_csv} ({len(df)} rows)")
 
 def generate_target_months(end_date, years=5):
   """Generates a list of 'YYYY_MM' strings for the past `years` from end_date."""
@@ -141,8 +183,19 @@ if __name__ == "__main__":
     print(f"Executing stats from {target_months[0]} to {target_months[-1]}...")
 
     # Process everything
-    for division, id_col in DIVISION_ID_COLS.items():
-        for dataset in datasets:
+    for dataset in datasets:
+        # 1. Process Statewide First
+        try:
+            get_statewide_averages_for_dataset(
+                dataset=dataset,
+                target_dates=target_months,
+                raster_folder=local_dep_dir
+            )
+        except Exception as e:
+            print(f"Error processing statewide ({dataset}): {e}")
+
+        # 2. Process Divisions
+        for division, id_col in DIVISION_ID_COLS.items():
             try:
                 get_averages_for_dataset(
                     division=division,

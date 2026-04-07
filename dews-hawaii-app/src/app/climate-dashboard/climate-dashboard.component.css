@@ -531,3 +531,6 @@ app-map-panel {
   min-height: 480px;
 }
 
+image {
+  image-rendering: pixelated;
+}

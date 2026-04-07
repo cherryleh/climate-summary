@@ -432,70 +432,41 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
 
-  private async loadStats(divisionArg?: string | null){
+  private async loadStats(divisionArg?: string | null) {
     const dataset = this.selectedDataset();
     const island = this.selectedIsland();
     const division = divisionArg || this.selectedDivision();
     const scope = this.selectedScope();
 
-    // --- Determine which CSV file to load ---
-    let prefix = 'statewide'; // default fallback
-
+    let prefix = 'statewide';
     if (scope === 'ahupuaa') prefix = 'ahupuaa';
     else if (scope === 'moku') prefix = 'moku';
     else if (scope === 'watershed') prefix = 'watershed';
-    else if (scope === 'divisions') prefix = 'climate';   // climate divisions
-    else if (this.selectedIsland()) prefix = 'island';    // island level
+    else if (scope === 'divisions') prefix = 'climate';
+    else if (island) prefix = 'island';
 
-    const suffix = dataset.toLowerCase(); // rainfall | temperature
+    const suffix = dataset.toLowerCase();
     const file = `${suffix}/${prefix}_${suffix}_stats.csv`;
 
-    console.log(`Fetching stats CSV: ${file}`);
-
-    if (!file) return;
-
-    const csv = await firstValueFrom(this.http.get(`${file}`, { responseType: 'text' }));
-
+    const csv = await firstValueFrom(this.http.get(file, { responseType: 'text' }));
     const rows = d3.csvParse(csv);
-    console.log('CSV headers:', rows.columns);
 
-    // --- Determine which record to show ---
     let record: any = null;
 
-    const normalize = (str: string) =>
-      (str || '')
-        .normalize('NFD')
-        .replace(/\p{Diacritic}/gu, '')
-        .replace(/['’ʻ`]/g, '')
-        .toLowerCase()
-        .trim();
-
     if (division) {
-      // === Division / Moku / Ahupuaʻa ===
-      const [divIslandRaw, divNameRaw] = division.split('::').map(normalize);
-
-      record = rows.find(r => {
-        const full = r['division_full'] || r['Division'] || r['name'] || '';
-        const [csvIslandRaw, csvNameRaw] = full.split('::').map(normalize);
-        return csvIslandRaw === divIslandRaw && csvNameRaw === divNameRaw;
-      });
+      record = rows.find(r =>
+        this.normalizeKey(r['division_full'] || r['Division'] || r['name'] || '') ===
+        this.normalizeKey(division)
+      );
     }
 
-    // Inside loadStats() in climate-dashboard.component.ts
     if (!record && island) {
-      const iso = this.normalizeKey(island); // e.g., "oahu"
+      const iso = this.normalizeKey(island);
 
       record = rows.find(r => {
-        // 1. Get the value from the CSV (checking common header names)
         const fullValue = r['division_full'] || r['Division'] || '';
-
-        // 2. Normalize it for comparison
         const normalizedCSV = this.normalizeKey(fullValue);
 
-        // DEBUG LOG: This helps you see exactly why "oahu" isn't matching "O'ahu"
-        console.log(`Comparing App: "${iso}" vs CSV: "${normalizedCSV}" (Original: "${fullValue}")`);
-
-        // 3. Handle both "Island::Name" format and "Island" format
         if (fullValue.includes('::')) {
           const parts = fullValue.split('::').map(p => this.normalizeKey(p));
           return parts.includes(iso);
@@ -506,25 +477,18 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
     if (!record) {
-      // Ensure "statewide" matching is also robust
-      record = rows.find(r => normalize(r['division_full'] || '') === 'statewide');
+      record = rows.find(r =>
+        this.normalizeKey(r['division_full'] || '') === 'statewide'
+      );
     }
 
-
-    console.log('Resolved level:', division ? 'division' : island ? 'island' : 'statewide');
-    console.log('Matched record:', record);
-
-    if (record) {
-      this.stats.set({
-        mean: +record.mean,
-        anomaly: +record.anomaly,
-        pchange: +record.pchange,
-        rank: +record.rank,
-        dry_pct: +record.dry_pct || +record.pct_drought,
-      });
-    }
-
-
+    this.stats.set(record ? {
+      mean: +record.mean,
+      anomaly: +record.anomaly,
+      pchange: +record.pchange,
+      rank: +record.rank,
+      dry_pct: +record.dry_pct || +record.pct_drought,
+    } : null);
   }
 
 
@@ -1134,10 +1098,6 @@ export class ClimateDashboardComponent implements OnDestroy {
         })
         .map(r => ({ month: r.month, value: r.value }));
 
-      console.log('Division chart file:', file);
-      console.log('Selected division:', d);
-      console.log('Division name:', divisionName);
-      console.log('Filtered rows:', filtered.length);
 
       this.tsData.set(filtered);
     });

@@ -41,7 +41,7 @@ def fetch_tifs(dataset_prefix, dataset_dict, start_year, end_year, month):
   for year in range(start_year, end_year + 1):
     date_str = f"{year}-{month:02d}"
     filename = f"{dataset_prefix}_{year}_{month:02d}.tif"
-    outf = join(local_dep_dir, filename)
+    outf = join(local_dep_dir, dataset_prefix, filename)
 
     if os.path.exists(outf):
         print(f"Skipping {date_str} (File already exists)")
