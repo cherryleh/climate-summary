@@ -280,11 +280,17 @@ export class ClimateDashboardComponent implements OnDestroy {
 
             let isMatch = canonF === islandCanon || canonF.includes(islandCanon);
             if (!isMatch && scope === 'divisions') {
-
               const isMauiNui = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(islandCanon);
               const regionCanon = isMauiNui ? 'maui' : islandCanon;
 
               isMatch = canonF === regionCanon || canonF.includes(regionCanon);
+            }
+
+            if (islandCanon === 'maui') {
+              const featureName = String(this.getProp(p, ['division', 'Division', 'name', 'NAME', 'moku', 'Moku', 'MOKU', 'ahupuaa', 'Ahupuaʻa', 'wuname', 'watershed']) || '');
+              if (canonIsland(featureName) === 'hilo') {
+                isMatch = true; // Keep Hilo!
+              }
             }
 
             return isMatch;
@@ -314,9 +320,15 @@ export class ClimateDashboardComponent implements OnDestroy {
 
           if (scope === 'divisions') {
             const isMauiNui = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(islandCanon);
+
             if (isMauiNui) {
-              prefixCanon = 'maui';
-              displayIsland = 'Maui';
+              if (canonIsland(name) === 'hilo') {
+                prefixCanon = 'hawaii';
+                displayIsland = 'Hawaiʻi';
+              } else {
+                prefixCanon = 'maui';
+                displayIsland = 'Maui';
+              }
             }
           }
 
