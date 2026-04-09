@@ -285,7 +285,7 @@ if __name__ == "__main__":
   else:
       today = datetime.now(hst)
       today = today.replace(hour=0, minute=0, second=0, microsecond=0)
-      date = today - relativedelta(days=1)
+      date = today - relativedelta(months=1)
 
   month_value = date.month
   year_value = date.year
