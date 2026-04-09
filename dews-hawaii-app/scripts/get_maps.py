@@ -92,7 +92,7 @@ def process_rainfall(year, month):
       "items": legend_items
   }
 
-  json_path = os.path.join(OUTPUT_DIR, "rainfall_legend.json")
+  json_path = os.path.join(OUTPUT_DIR, "tifs","rainfall_legend.json")
   with open(json_path, 'w') as f:
       json.dump(legend_data, f, indent=4)
   print(f"Saved Legend: {json_path}")

@@ -19,10 +19,8 @@
           <div>
             <div class="eyebrow">Climate snapshot</div>
             <div class="title">
-              August 2025 {{ selectedDataset() }} –
+              {{ currentDateLabel() }} {{ selectedDataset() }} –
               {{ selectedDivisionName() || islandLabel() || 'Statewide' }}
-
-
             </div>
           </div>
 
@@ -75,7 +73,7 @@
           <app-stat-box
             label="Rank"
             [value]="formatRank(stats()?.rank)"
-            note="Driest out of 107 years">
+            [note]="'Driest out of ' + rainfallYears() + ' years'">
           </app-stat-box>
 
           <app-stat-box
@@ -99,7 +97,7 @@
           <app-stat-box
             label="Rank"
             [value]="formatRank(stats()?.rank)"
-            note="Warmest out of 35 years">
+            [note]="'Warmest out of ' + temperatureYears() + ' years'">
           </app-stat-box>
 
           <app-stat-box
@@ -158,7 +156,7 @@
             <div class="eyebrow">Map</div>
             <div class="title">Select a geography for area-specific climate insights</div>
             <div class="tiny muted">
-              {{ selectedDataset() }} August 2025
+              {{ selectedDataset() }} {{ currentDateLabel() }}
             </div>
           </div>
         </div>

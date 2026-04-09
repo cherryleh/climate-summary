@@ -213,7 +213,7 @@ def get_statewide_stats(dataset, year, month):
     df = pd.DataFrame(all_records)
 
     ascending = True if dataset == "rainfall" else False
-    df["rank"] = df["anomaly"].rank(method="min", ascending=ascending)
+    df["rank"] = df["anomaly"].rank(method="min")
     num_rows = len(df)
     latest = df[df["date"] == f"{year}-{month:02d}"].copy()
     if latest.empty:

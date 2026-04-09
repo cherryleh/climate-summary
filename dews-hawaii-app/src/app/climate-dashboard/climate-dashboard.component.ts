@@ -689,6 +689,10 @@ export class ClimateDashboardComponent implements OnDestroy {
     this.buildLegend(legendDiv, colors, labels);
   }
 
+  currentDateLabel = signal<string>('');
+  rainfallYears = signal<number>(-999);
+  temperatureYears = signal<number>(-999);
+
   async ngOnInit(): Promise<void> {
     // Base islands
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
@@ -745,6 +749,34 @@ export class ClimateDashboardComponent implements OnDestroy {
         this.loadRasterOnce('Rainfall');
       }
     });
+
+    this.http.get<any>('metadata.json').subscribe({
+      next: (metadata) => {
+        if (metadata && metadata.date) {
+          const dateObj = new Date(metadata.date);
+          const formattedDate = dateObj.toLocaleDateString('en-US', {
+            month: 'long',
+            year: 'numeric',
+            timeZone: 'Pacific/Honolulu'
+          });
+          this.currentDateLabel.set(formattedDate);
+          if (metadata.num_rows_rainfall) {
+            this.rainfallYears.set(metadata.num_rows_rainfall);
+          }
+          if (metadata.num_rows_temperature) {
+            this.temperatureYears.set(metadata.num_rows_temperature);
+          }
+        }
+      },
+      error: (err) => {
+        // This will print the exact error to your browser's F12 Developer Console
+        console.error('Failed to load metadata.json:', err);
+
+        // Optional: Set a fallback label if the fetch fails
+        this.currentDateLabel.set('Date Unavailable');
+      }
+    });
+
   }
 
   // ===== Chart time-range filter =====
