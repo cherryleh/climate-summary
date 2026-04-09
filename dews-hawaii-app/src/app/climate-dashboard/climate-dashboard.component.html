@@ -75,12 +75,13 @@
           <app-stat-box
             label="Rank"
             [value]="formatRank(stats()?.rank)"
-            note="Driest out of 106 years">
+            note="Driest out of 107 years">
           </app-stat-box>
 
           <app-stat-box
-            label="Year-to-Date"
-            value = "test">
+            *ngIf="dataset() === 'Rainfall'"
+            label="YTD % of Normal"
+            [value]="(stats()?.ytd_pnormal | number:'1.1-1') + '%'">
           </app-stat-box>
         </div>
 
@@ -252,13 +253,6 @@
               <span class="toolbar-label">Division</span>
 
               <div class="segmented small-segmented">
-                <button
-                  class="seg-btn"
-                  type="button"
-                  [class.active]="selectedScope() === 'divisions'"
-                  (click)="closeCountyMenu(); setScope('divisions')">
-                  Climate
-                </button>
 
                 <button
                   class="seg-btn"
@@ -274,6 +268,14 @@
                   [class.active]="selectedScope() === 'ahupuaa'"
                   (click)="closeCountyMenu(); setScope('ahupuaa')">
                   Ahupuaʻa
+                </button>
+
+                <button
+                  class="seg-btn"
+                  type="button"
+                  [class.active]="selectedScope() === 'divisions'"
+                  (click)="closeCountyMenu(); setScope('divisions')">
+                  Climate
                 </button>
 
                 <button

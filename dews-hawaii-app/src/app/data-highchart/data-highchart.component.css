@@ -1,6 +1,11 @@
-.chart-wrap {
-  height: 400px;
-  display: flex;
-  flex-direction: column;
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
+highcharts-chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

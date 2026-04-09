@@ -100,7 +100,7 @@ export class ClimateDashboardComponent implements OnDestroy {
   selectedDivision = signal<string | null>(null);
   viewMode = signal<'islands' | 'divisions'>('islands');
   selectedIsland = signal<string | null>(null);
-  stats = signal<{ mean?: number; anomaly?: number; pchange?: number; rank?: number; dry_pct?: number } | null>(null);
+  stats = signal<{ mean?: number; anomaly?: number; pchange?: number; rank?: number; ytd_pnormal?: number } | null>(null);
 
   dataset = signal<Dataset>('Rainfall');
   selectedDataset() { return this.dataset(); }
@@ -314,7 +314,6 @@ export class ClimateDashboardComponent implements OnDestroy {
               ? this.getProp(p, ['wuname', 'name_hwn', 'watershed', 'Watershed', 'WATERSHED', 'name'])
               : this.getProp(p, ['division', 'Division', 'name', 'NAME']);
 
-          // --- FORCE MAUI NUI DIVISIONS TO USE 'MAUI' ---
           let prefixCanon = islandCanon;
           let displayIsland = island;
 
@@ -526,18 +525,17 @@ export class ClimateDashboardComponent implements OnDestroy {
       anomaly: +record.anomaly,
       pchange: +record.pchange,
       rank: +record.rank,
-      dry_pct: +record.dry_pct || +record.pct_drought,
+      ytd_pnormal: +record.ytd_pnormal
     } : null);
   }
 
 
   private async loadRasterOnce(dataset: Dataset) {
     try {
-      // --- Select file ---
       let file = '';
-      if (dataset === 'Rainfall') file = 'tifs/rf_pdiff_cat_08.tif';
-      else if (dataset === 'Temperature') file = 'tifs/tmean_diff_cat_08.tif';
-      else if (dataset === 'Drought') file = 'tifs/spi3_2025_08_category.tif';
+      if (dataset === 'Rainfall') file = 'tifs/rainfall_pdiff_cat.tif';
+      else if (dataset === 'Temperature') file = 'tifs/temperature_diff_cat.tif';
+      else if (dataset === 'Drought') file = 'tifs/spi3_cat.tif';
 
       // --- Open the GeoTIFF ---
       const tiff = await GeoTIFF.fromUrl(file);
@@ -575,22 +573,15 @@ export class ClimateDashboardComponent implements OnDestroy {
         Math.abs(v) > 1e20;
 
 
-      const droughtColors = [
-        "#730000", "#FF0000", "#FF9900", "#FFD37F", "#FFFF00",
-        "#FFFFFF", "#99CCFF", "#3399FF", "#0066CC", "#003366", "#001933"
-      ];
-
-      const rainfallColors = [
-        "#730000",
-        "#FF0000",
-        "#FF6600",
-        "#FFCC66",
-        "#FFFFFF",
-        "#CCE5FF",
-        "#99CCFF",
-        "#0066CC",
-        "#001933"
-      ];
+      const config = this.rainfallConfig();
+      const palettes: Record<Dataset, string[]> = {
+        Drought: [/* ... */],
+        Temperature: [/* ... */],
+        Rainfall: config ? config.items.map((item: any) => item.color) : [
+          "#730000", "#FF0000", "#FF6600", "#FFCC66", "#FFFFFF",
+          "#CCE5FF", "#99CCFF", "#0066CC", "#001933"
+        ]
+      };
 
 
       // --- Draw image pixel by pixel ---
@@ -608,8 +599,15 @@ export class ClimateDashboardComponent implements OnDestroy {
             "#FFFFFF", "#99CCFF", "#3399FF", "#0066CC", "#003366", "#001933"
           ],
           Rainfall: [
-            "#730000", "#FF0000", "#FF6600", "#FFCC66", "#FFFFFF",
-            "#CCE5FF", "#99CCFF", "#0066CC", "#001933"
+            "#730000", // Index 0: < -70%
+            "#FF0000", // Index 1: -70 to -50
+            "#FF6600", // Index 2: -50 to -30
+            "#FFCC66", // Index 3: -30 to -10
+            "#FFFFFF", // Index 4: -10 to +10
+            "#CCE5FF", // Index 5: +10 to +30
+            "#99CCFF", // Index 6: +30 to +50
+            "#0066CC", // Index 7: +50 to +70
+            "#001933"  // Index 8: > +70
           ],
           Temperature: [
             "#001933", "#0066CC", "#99CCFF", "#FFFFFF",
@@ -670,8 +668,28 @@ export class ClimateDashboardComponent implements OnDestroy {
     return undefined;
   }
 
-  // ===== Lifecycle =====
-  ngOnInit(): void {
+  rainfallConfig = signal<any>(null);
+
+  private async loadRainfallDataConfig() {
+    const config = await firstValueFrom(this.http.get<any>('tifs/rainfall_legend.json'));
+    this.rainfallConfig.set(config);
+    return config;
+  }
+
+  private drawDynamicRainfallLegend(config: any) {
+    const legendDiv = document.getElementById('colorbarLegend') as HTMLDivElement | null;
+    if (!legendDiv) return;
+
+    legendDiv.innerHTML = '';
+    const items = [...config.items];
+
+    const colors = items.map(i => i.color);
+    const labels = items.map(i => i.label);
+
+    this.buildLegend(legendDiv, colors, labels);
+  }
+
+  async ngOnInit(): Promise<void> {
     // Base islands
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
       const projection = geoIdentity().reflectY(true).fitExtent(
@@ -719,6 +737,14 @@ export class ClimateDashboardComponent implements OnDestroy {
     }
 
     this.loadStats();
+
+    await this.loadRainfallDataConfig();
+
+    this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
+      if (this.selectedDataset() === 'Rainfall') {
+        this.loadRasterOnce('Rainfall');
+      }
+    });
   }
 
   // ===== Chart time-range filter =====
@@ -761,19 +787,23 @@ export class ClimateDashboardComponent implements OnDestroy {
         return;
       }
 
-      // --- Rainfall ---
       if (dataset === 'Rainfall') {
         if (canvas) canvas.style.display = 'none';
-        legendDiv.innerHTML = '';
-        const rainfallColors = [
-          "#730000", "#FF0000", "#FF6600", "#FFCC66", "#FFFFFF",
-          "#CCE5FF", "#99CCFF", "#0066CC", "#001933"
-        ];
-        const rainfallLabels = [
-          "< -70%", "-70% to -50%", "-50% to -30%", "-30% to -10%",
-          "-10% to +10%", "+10% to +30%", "+30% to +50%", "+50% to +70%", "> +70%"
-        ];
-        this.buildLegend(legendDiv, rainfallColors, rainfallLabels);
+        const config = this.rainfallConfig();
+
+        if (config) {
+          this.drawDynamicRainfallLegend(config);
+        } else {
+          const rainfallColors = [
+            "#730000", "#FF0000", "#FF6600", "#FFCC66", "#FFFFFF",
+            "#CCE5FF", "#99CCFF", "#0066CC", "#001933"
+          ];
+          const rainfallLabels = [
+            "< -70%", "-70% to -50%", "-50% to -30%", "-30% to -10%",
+            "-10% to +10%", "+10% to +30%", "+30% to +50%", "+50% to +70%", "> +70%"
+          ];
+          this.buildLegend(legendDiv, rainfallColors, rainfallLabels);
+        }
         return;
       }
 

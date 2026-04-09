@@ -17,7 +17,8 @@ local_dep_dir = os.environ.get('DEPENDENCY_DIR', './') # Default to current dire
 datasets = [
     ({"datatype": "rainfall", "production": "legacy"}, "rainfall_legacy"),
     ({"datatype": "rainfall", "production": "new"}, "rainfall_new"),
-    ({"datatype": "temperature", "aggregation":"mean"}, "temperature")
+    ({"datatype": "temperature", "aggregation":"mean"}, "temperature"),
+    ({"datatype": "spi", "timescale": "timescale003"}, "spi3")
 ]
 
 def dataset2params(dataset):
@@ -97,7 +98,15 @@ if __name__ == "__main__":
       month=month_value
   )
 
-  #Get monthly tifs for the last five years
+  fetch_tifs(
+      dataset_prefix="spi3",
+      dataset_dict=datasets[3][0],
+      start_year=year_value,
+      end_year=year_value,
+      month=month_value
+  )
+
+  # Get monthly tifs for the last five years
   start_year_5yr = year_value - 5
 
   for yr in range(start_year_5yr, year_value + 1):
@@ -123,3 +132,6 @@ if __name__ == "__main__":
               end_year=yr,
               month=mo
           )
+
+  #Fetch spi3
+

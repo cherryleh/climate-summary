@@ -14,9 +14,11 @@ from rasterstats import zonal_stats
 import pytz
 import sys
 import gc
+import json
 
 API_KEY = os.environ.get('HCDP_API_TOKEN')
 local_dep_dir = os.environ.get('DEPENDENCY_DIR')
+output_dir = os.environ.get('OUTPUT_DIR')
 
 def convert_units(value, dataset):
     """Convert rainfall mm to inches and temperature C to F"""
@@ -170,7 +172,7 @@ def get_stats(division, dataset, year, month):
 
       latest_df["ytd_pnormal"] = ytd_pnormals
 
-    out_csv = f"../public/{dataset}/{division}_{dataset}_stats.csv"
+    out_csv = os.path.join(output_dir, f"{division}_{dataset}_stats.csv")
     latest_df.to_csv(out_csv, index=False)
     print(f"Saved {out_csv}")
 
@@ -212,7 +214,7 @@ def get_statewide_stats(dataset, year, month):
 
     ascending = True if dataset == "rainfall" else False
     df["rank"] = df["anomaly"].rank(method="min", ascending=ascending)
-
+    num_rows = len(df)
     latest = df[df["date"] == f"{year}-{month:02d}"].copy()
     if latest.empty:
         print(f"No data found for {year_value}-{month:02d}")
@@ -245,40 +247,67 @@ def get_statewide_stats(dataset, year, month):
     latest["division_full"] = "Statewide"
     # latest["dry_pct"] = dry_pct
 
-    out_csv = f"../public/{dataset}/statewide_{dataset}_stats.csv"
+    out_csv = os.path.join(output_dir, f"statewide_{dataset}_stats.csv")
     latest.to_csv(out_csv, index=False)
     print(f"Saved {out_csv}")
+    return num_rows
+
+def export_metadata(date, stats_dict):
+  produced = datetime.now(hst).replace(microsecond=0).isoformat()
+
+  # Base metadata
+  data = {
+      "date": date.isoformat(),
+      "produced": produced
+  }
+
+  # Merge the row counts into the data dictionary
+  data.update(stats_dict)
+
+  json_path = os.path.join(output_dir, "metadata.json")
+
+  with open(json_path, 'w', encoding='utf-8') as f:
+      json.dump(data, f, indent=4)
+
+  print(f"Metadata saved to {json_path}")
 
 
 if __name__ == "__main__":
-    divisions = ["island", "climate", "moku", "ahupuaa", "watershed"]
-    # divisions = ["watershed"]
-    datasets = ["rainfall", "temperature"]
+  divisions = ["island", "climate", "moku", "ahupuaa", "watershed"]
+  datasets = ["rainfall", "temperature"]
 
-    hst = pytz.timezone('HST')
-    date = None
+  hst = pytz.timezone('HST')
+  date = None
 
-    if len(sys.argv) > 1:
+  if len(sys.argv) > 1:
       input_date = sys.argv[1]
       date = parser.parse(input_date).astimezone(hst)
-    else:
+  else:
       today = datetime.now(hst)
-      today = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-      date = today - relativedelta(days = 1)
+      today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+      date = today - relativedelta(days=1)
 
-    month_value = date.month
-    year_value = date.year
+  month_value = date.month
+  year_value = date.year
 
-    for dataset in datasets:
-        try:
-            get_statewide_stats(dataset, year_value, month_value)
-        except Exception as e:
-            print(f"Error processing statewide ({dataset}): {e}")
-    for division in divisions:
-        for dataset in datasets:
-            try:
-                get_stats(division, dataset, year_value, month_value)
-            except Exception as e:
-                print(f"Error processing {division} ({dataset}): {e}")
+  # Dictionary to store num_rows for each dataset
+  num_rows_dict = {}
 
+  for dataset in datasets:
+      try:
+          # Capture the return value in the dictionary
+          count = get_statewide_stats(dataset, year_value, month_value)
+          num_rows_dict[f"num_rows_{dataset}"] = count
+      except Exception as e:
+          print(f"Error processing statewide ({dataset}): {e}")
+          num_rows_dict[f"num_rows_{dataset}"] = None
 
+  for division in divisions:
+      for dataset in datasets:
+          try:
+              get_stats(division, dataset, year_value, month_value)
+          except Exception as e:
+              print(f"Error processing {division} ({dataset}): {e}")
+
+  # Pass the dictionary instead of a single integer
+  export_metadata(date, num_rows_dict)

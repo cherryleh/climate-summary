@@ -83,7 +83,7 @@ def get_averages_for_dataset(division, id_col, dataset, target_dates, raster_fol
             else:
                 mean_val = np.nan
 
-            records.append({"division": div, "date": date_str, f"mean_{dataset}": mean_val})
+            records.append({"division": div, "date": date_str.replace("_", "-"), f"mean_{dataset}": mean_val})
 
     if not records:
         print("No data extracted.")
@@ -132,7 +132,7 @@ def get_statewide_averages_for_dataset(dataset, target_dates, raster_folder):
                     elif dataset == "temperature":
                         mean_val = (mean_val * 1.8) + 32  # Celsius to Fahrenheit
 
-                records.append({"division": "Statewide", "date": date_str, f"mean_{dataset}": mean_val})
+                records.append({"division": "Statewide", "date": date_str.replace("_", "-"), f"mean_{dataset}": mean_val})
 
     if not records:
         print(f"No {dataset} rasters found for statewide extraction in the last 5 years.")

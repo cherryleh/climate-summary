@@ -13,7 +13,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
     [options]="chartOptions"
     [(update)]="updateFlag"
     [oneToOne]="true"
-    style="width:100%; height:350px; display:block;"
+    style="width:100%; height:100%; display:block;"
   ></highcharts-chart>
   `
 })
@@ -85,7 +85,7 @@ export class DataHighchartComponent implements OnChanges {
 
     this.chartOptions = {
       chart: {
-        height: 400,
+        height: '47%',
         type: isDistribution ? 'area' : undefined
       },
       title: { text: '' },
