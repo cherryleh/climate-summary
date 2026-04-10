@@ -479,8 +479,11 @@ export class ClimateDashboardComponent implements OnDestroy {
     else if (scope === 'divisions') prefix = 'climate';
     else if (island) prefix = 'island';
 
+    const folder = dataset === 'Drought' ? 'spi' : dataset.toLowerCase();
     const suffix = dataset.toLowerCase();
-    const file = `${suffix}/${prefix}_${suffix}_stats.csv`;
+
+    // This forces the path to 'spi/statewide_drought_stats.csv'
+    const file = `${folder}/${prefix}_${suffix}_stats.csv`;
 
     const csv = await firstValueFrom(this.http.get(file, { responseType: 'text' }));
     const rows = d3.csvParse(csv);

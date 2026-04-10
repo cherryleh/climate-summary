@@ -138,6 +138,8 @@ def process_drought(year, month):
         categorical[cond] = i
 
     save_raster(os.path.join(OUTPUT_DIR, "tifs",  "spi3_cat.tif"), categorical, profile)
+    #Need to save to dependencies too as this will be used for the stats calculations
+    save_raster(os.path.join(LOCAL_DEP_DIR, "spi3", f"spi3_cat.tif"), categorical, profile)
 
 
 if __name__ == "__main__":

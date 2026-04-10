@@ -172,7 +172,7 @@ def get_stats(division, dataset, year, month):
 
       latest_df["ytd_pnormal"] = ytd_pnormals
 
-    out_csv = os.path.join(output_dir, f"{division}_{dataset}_stats.csv")
+    out_csv = os.path.join(output_dir, dataset, f"{division}_{dataset}_stats.csv")
     latest_df.to_csv(out_csv, index=False)
     print(f"Saved {out_csv}")
 
@@ -247,7 +247,7 @@ def get_statewide_stats(dataset, year, month):
     latest["division_full"] = "Statewide"
     # latest["dry_pct"] = dry_pct
 
-    out_csv = os.path.join(output_dir, f"statewide_{dataset}_stats.csv")
+    out_csv = os.path.join(output_dir, dataset, f"statewide_{dataset}_stats.csv")
     latest.to_csv(out_csv, index=False)
     print(f"Saved {out_csv}")
     return num_rows
@@ -271,6 +271,116 @@ def export_metadata(date, stats_dict):
 
   print(f"Metadata saved to {json_path}")
 
+def get_statewide_drought_stats(year, month):
+    """Compute statewide drought category percentages."""
+    print(f"\n--- Processing statewide (drought) ---")
+
+    tif_path = os.path.join(local_dep_dir, "spi3", f"spi3_cat.tif")
+    if not os.path.exists(tif_path):
+        print(f"Warning: Missing drought file {tif_path}")
+        return 0
+
+    cat_map = {
+        0: "D4", 1: "D3", 2: "D2", 3: "D1", 4: "D0",
+        5: "Near Normal",
+        6: "W0", 7: "W1", 8: "W2", 9: "W3", 10: "W4"
+    }
+
+    with rasterio.open(tif_path) as src:
+        data = src.read(1)
+        nodata = src.nodata
+
+    valid_mask = (data != nodata)
+    valid_data = data[valid_mask]
+    total_pixels = valid_data.size
+
+    record = {
+        "date": f"{year}-{month:02d}",
+        "division_full": "Statewide"
+    }
+
+    if total_pixels > 0:
+        unique, counts = np.unique(valid_data, return_counts=True)
+        counts_dict = dict(zip(unique, counts))
+
+        for val, code in cat_map.items():
+            count = counts_dict.get(val, 0)
+            record[code] = (count / total_pixels) * 100
+    else:
+        for val, code in cat_map.items():
+            record[code] = np.nan
+
+    df = pd.DataFrame([record])
+    out_csv = os.path.join(output_dir, "spi", "statewide_drought_stats.csv")
+    df.to_csv(out_csv, index=False)
+    print(f"Saved {out_csv}")
+
+    return len(df)
+
+def get_drought_stats(division, year, month):
+    """Compute percentage of pixels in each SPI category for divisions."""
+    print(f"\n--- Processing {division} - drought ---")
+
+    shapefile = os.path.join(local_dep_dir, f"shapefiles/{division}.shp")
+    tif_path = os.path.join(local_dep_dir, "spi3", f"spi3_cat.tif")
+
+    if not os.path.exists(tif_path):
+        print(f"Warning: Missing drought file {tif_path}")
+        return
+
+    cat_map = {
+        0: "D4", 1: "D3", 2: "D2", 3: "D1", 4: "D0",
+        5: "Near Normal",
+        6: "W0", 7: "W1", 8: "W2", 9: "W3", 10: "W4"
+    }
+
+    gdf = gpd.read_file(shapefile).copy()
+    island_col = next((c for c in gdf.columns if c.lower() in ["island", "mokupuni", "isle", "islandname"]), None)
+    name_col = next((c for c in gdf.columns if c.lower() in ["name", "division", "moku", "climate_div", "ahupuaa", "county", "name_hwn"]), None)
+
+    gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.001, preserve_topology=True)
+
+    if island_col and name_col:
+        is_same_island_dup = gdf.duplicated(subset=[island_col, name_col], keep=False)
+        cum_count = gdf.groupby([island_col, name_col]).cumcount() + 1
+        gdf.loc[is_same_island_dup, name_col] = (
+            gdf.loc[is_same_island_dup, name_col].astype(str) + " " + cum_count[is_same_island_dup].astype(str)
+        )
+        gdf = gdf.dissolve(by=[island_col, name_col], as_index=False)
+        gdf["division_full"] = gdf.apply(lambda r: f"{r[island_col]}::{r[name_col]}", axis=1)
+    elif name_col:
+        gdf = gdf.dissolve(by=name_col, as_index=False)
+        gdf["division_full"] = gdf[name_col].astype(str)
+    else:
+        raise ValueError(f"No valid name column found in {division}.shp")
+
+    with rasterio.open(tif_path) as src:
+        nodata = src.nodata
+
+    zs = zonal_stats(gdf, tif_path, categorical=True, nodata=nodata)
+
+    all_records = []
+    for i, stats in enumerate(zs):
+        division_name = gdf.iloc[i]["division_full"]
+        # Handle cases where stats might be empty if geometry is entirely outside raster
+        total = sum(stats.values()) if stats else 0
+
+        record = {
+            "date": f"{year}-{month:02d}",
+            "division_full": division_name,
+        }
+
+        for val, code in cat_map.items():
+            count = stats.get(val, 0) if stats else 0
+            pct = (count / total) * 100 if total > 0 else np.nan
+            record[code] = pct
+
+        all_records.append(record)
+
+    df = pd.DataFrame(all_records)
+    out_csv = os.path.join(output_dir, "spi", f"{division}_drought_stats.csv")
+    df.to_csv(out_csv, index=False)
+    print(f"Saved {out_csv}")
 
 if __name__ == "__main__":
   divisions = ["island", "climate", "moku", "ahupuaa", "watershed"]
@@ -301,6 +411,12 @@ if __name__ == "__main__":
       except Exception as e:
           print(f"Error processing statewide ({dataset}): {e}")
           num_rows_dict[f"num_rows_{dataset}"] = None
+  try:
+      count = get_statewide_drought_stats(year_value, month_value)
+      num_rows_dict["num_rows_drought"] = count
+  except Exception as e:
+      print(f"Error processing statewide (drought): {e}")
+      num_rows_dict["num_rows_drought"] = None
 
   for division in divisions:
       for dataset in datasets:
@@ -308,6 +424,10 @@ if __name__ == "__main__":
               get_stats(division, dataset, year_value, month_value)
           except Exception as e:
               print(f"Error processing {division} ({dataset}): {e}")
+          try:
+              get_drought_stats(division, year_value, month_value)
+          except Exception as e:
+              print(f"Error processing {division} (drought): {e}")
 
   # Pass the dictionary instead of a single integer
   export_metadata(date, num_rows_dict)
