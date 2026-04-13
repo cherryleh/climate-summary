@@ -35,25 +35,6 @@ interface Island {
   island?: string;
 }
 
-// Island → County (only what we need)
-// const COUNTY_BY_ISLAND: Record<string, string> = {
-//   'Kauaʻi': 'Kauaʻi',
-//   'Oʻahu': 'Honolulu',
-//   'Molokaʻi': 'Maui',
-//   'Lānaʻi': 'Maui',
-//   'Maui': 'Maui',
-//   'Kahoʻolawe': 'Maui',
-//   'Hawaiʻi': 'Hawaiʻi'
-// };
-
-// interface County {
-//   id: string;
-//   name: string;
-//   short: string;
-//   feature: any;
-//   key: string;
-// }
-
 
 // County → list of islands
 const COUNTY_GROUPS: Record<string, string[]> = {
@@ -62,11 +43,6 @@ const COUNTY_GROUPS: Record<string, string[]> = {
   'Maui': ['Maui', 'Molokaʻi', 'Lānaʻi', 'Kahoʻolawe'],
   'Hawaiʻi': ['Hawaiʻi']
 };
-
-
-// function getCountyForIsland(islandName: string): string {
-//   return COUNTY_BY_ISLAND[islandName] ?? islandName;
-// }
 
 function canonIsland(name: string): string {
   if (!name) return '';
@@ -88,7 +64,6 @@ function canonIsland(name: string): string {
 export class ClimateDashboardComponent implements OnDestroy {
   constructor(private http: HttpClient, private ngZone: NgZone,private emailSvc: EmailSubscriptionService) { }
 
-  // ===== Map data/state =====
   islands = signal<Island[]>([]);
   pathById = signal<Record<string, string>>({});
   centroidById = signal<Record<string, [number, number]>>({});
@@ -100,8 +75,16 @@ export class ClimateDashboardComponent implements OnDestroy {
   selectedDivision = signal<string | null>(null);
   viewMode = signal<'islands' | 'divisions'>('islands');
   selectedIsland = signal<string | null>(null);
-  stats = signal<{ mean?: number; anomaly?: number; pchange?: number; rank?: number; ytd_pnormal?: number } | null>(null);
-
+  stats = signal<{
+    mean?: number;
+    anomaly?: number;
+    pchange?: number;
+    rank?: number;
+    ytd_pnormal?: number;
+    d0?: number; d1?: number; d2?: number; d3?: number; d4?: number;
+    w0?: number; w1?: number; w2?: number; w3?: number; w4?: number;
+    near_normal?: number;
+  } | null>(null);
   dataset = signal<Dataset>('Rainfall');
   selectedDataset() { return this.dataset(); }
 
@@ -119,13 +102,9 @@ export class ClimateDashboardComponent implements OnDestroy {
     if (!str) return '';
     return str
       .toLowerCase()
-      // 1. Decompose characters to separate base letters from diacritics (macrons)
       .normalize('NFD')
-      // 2. Remove the diacritic characters (like the line over the 'a' in Lāna‘i)
       .replace(/[\u0300-\u036f]/g, '')
-      // 3. Remove all types of apostrophes, quotes, and the ʻokina
       .replace(/['ʻ‘`’]/g, '')
-      // 4. Trim any extra whitespace
       .trim();
   }
 
@@ -177,13 +156,13 @@ export class ClimateDashboardComponent implements OnDestroy {
   });
 
 
-  private islandStubForCounty(county: string): Island | null {
-    const members = COUNTY_GROUPS[county];
-    if (!members || !members.length) return null;
-    const name = members[0];
-    const id = name.toLowerCase().replace(/\s+/g, '-');
-    return { id, name, short: name, divisions: [], feature: null, key: id };
-  }
+  // private islandStubForCounty(county: string): Island | null {
+  //   const members = COUNTY_GROUPS[county];
+  //   if (!members || !members.length) return null;
+  //   const name = members[0];
+  //   const id = name.toLowerCase().replace(/\s+/g, '-');
+  //   return { id, name, short: name, divisions: [], feature: null, key: id };
+  // }
 
   pickIsland(island: string) {
     this.selectedIsland.set(island);
@@ -250,13 +229,10 @@ export class ClimateDashboardComponent implements OnDestroy {
         scope === 'watershed' ? 'watershed.geojson' :
         'hawaii_islands_divisions.geojson';
 
-      // Fetch BOTH the simplified island borders (for the bounding box) and the divisions
       forkJoin({
         baseIslands: this.http.get<any>('hawaii_islands_simplified.geojson'),
         divisions: this.http.get<any>(file)
       }).subscribe(({ baseIslands, divisions }) => {
-
-        // 1. Isolate the base island geometry to set a strict bounding box
         const fcIslandBase: FeatureCollection = {
           type: 'FeatureCollection',
           features: baseIslands.features.filter((f: any) => {
@@ -265,7 +241,6 @@ export class ClimateDashboardComponent implements OnDestroy {
           })
         };
 
-        // 2. Lock the map's projection/zoom strictly using the base island's boundaries
         const projection = geoIdentity().reflectY(true).fitExtent(
           [[-130, 10], [560, 320]],
           fcIslandBase
@@ -301,7 +276,6 @@ export class ClimateDashboardComponent implements OnDestroy {
         this.project = projection as any;
         this.updateRasterRect();
 
-        // 4. Map the division features exactly as you did before
         const features = fcDivisions.features.map((f: any) => {
           const p = f.properties || {};
 
@@ -365,10 +339,8 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
 
-  // ===== Chart data (sidebar) =====
   tsData = signal<{ month: string; value: number }[]>([]);
 
-  // ===== Email form =====
   email = signal<string>('');
   private emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   isEmailValid = computed(() => this.emailRegex.test(this.email().trim()));
@@ -391,7 +363,7 @@ export class ClimateDashboardComponent implements OnDestroy {
       if (scope === 'moku') newBody.moku = [name];
       else if (scope === 'ahupuaa') newBody.ahupuaa = [name];
       else if (scope === 'watershed') newBody.watershed = [name];
-      // (divisions) only if API supports it
+
     }
 
     this.emailSvc.emailLookup(email).pipe(
@@ -442,7 +414,6 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
 
-  // ===== Raster (GeoTIFF) =====
   rasterHref = signal<string | null>(null); // Object URL to a PNG/WEBP
   rasterRect = signal<{ x: number; y: number; width: number; height: number } | null>(null);
   private rasterBBox: [number, number, number, number] | null = null; // [minX, minY, maxX, maxY]
@@ -528,7 +499,10 @@ export class ClimateDashboardComponent implements OnDestroy {
       anomaly: +record.anomaly,
       pchange: +record.pchange,
       rank: +record.rank,
-      ytd_pnormal: +record.ytd_pnormal
+      ytd_pnormal: +record.ytd_pnormal,
+      d4: +record.D4, d3: +record.D3, d2: +record.D2, d1: +record.D1, d0: +record.D0,
+      w4: +record.W4, w3: +record.W3, w2: +record.W2, w1: +record.W1, w0: +record.W0,
+      near_normal: +record['Near Normal']
     } : null);
   }
 
@@ -781,6 +755,67 @@ export class ClimateDashboardComponent implements OnDestroy {
     });
 
   }
+
+  // Existing Drought Stats
+  currentDroughtStats = computed(() => {
+    const data = this.stats();
+    if (!data) return null;
+
+    const d4 = Number(data.d4) || 0;
+    const d3 = Number(data.d3) || 0;
+    const d2 = Number(data.d2) || 0;
+    const d1 = Number(data.d1) || 0;
+    const d0 = Number(data.d0) || 0;
+
+    const totalDry = d0 + d1 + d2 + d3 + d4;
+
+    return {
+      d4: Math.round(d4),
+      d3: Math.round(d3 + d4),
+      d2: Math.round(d2 + d3 + d4),
+      d1: Math.round(d1 + d2 + d3 + d4),
+      d0: Math.round(totalDry),
+      totalBase: totalDry // Raw unrounded sum for precise comparison
+    };
+  });
+
+  // New Wet Stats
+  currentWetStats = computed(() => {
+    const data = this.stats();
+    if (!data) return null;
+
+    const w4 = Number(data.w4) || 0;
+    const w3 = Number(data.w3) || 0;
+    const w2 = Number(data.w2) || 0;
+    const w1 = Number(data.w1) || 0;
+    const w0 = Number(data.w0) || 0;
+
+    const totalWet = w0 + w1 + w2 + w3 + w4;
+
+    return {
+      w4: Math.round(w4),
+      w3: Math.round(w3 + w4),
+      w2: Math.round(w2 + w3 + w4),
+      w1: Math.round(w1 + w2 + w3 + w4),
+      w0: Math.round(totalWet),
+      totalBase: totalWet // Raw unrounded sum for precise comparison
+    };
+  });
+
+  // Determines which condition is currently heavier
+  dominantCondition = computed<'drought' | 'wet'>(() => {
+    const dStats = this.currentDroughtStats();
+    const wStats = this.currentWetStats();
+
+    if (!dStats || !wStats) return 'drought'; // default fallback
+
+    // If wet area is strictly greater than dry area, show wet stats
+    if (wStats.totalBase > dStats.totalBase) {
+      return 'wet';
+    }
+
+    return 'drought';
+  });
 
   // ===== Chart time-range filter =====
   timeRange = signal<number>(12); // default = last 12 months

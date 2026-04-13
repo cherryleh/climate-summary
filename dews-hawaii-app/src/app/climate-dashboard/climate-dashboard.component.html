@@ -6,7 +6,6 @@
   </header>
 
   <div class="grid">
-    <!-- LEFT COLUMN: Map + Trend stacked to match sidebar height -->
     <div class="left-col">
       <!-- Map Panel -->
       <!-- Climate Snapshot — hero at the top-left -->
@@ -108,13 +107,25 @@
 
 
         <!-- Drought (static for now) -->
-        <div class="stats stats-drought" *ngIf="selectedDataset() === 'Drought'">
-          <app-stat-box value="67%" note="of area <strong>abnormally dry</strong> or worse"></app-stat-box>
-          <app-stat-box value="50%" note="of area in <strong>moderate drought</strong> or worse"></app-stat-box>
-          <app-stat-box value="21%" note="of area in <strong>severe drought</strong> or worse"></app-stat-box>
-          <app-stat-box value="10%" note="of area in <strong>extreme drought</strong> or worse"></app-stat-box>
-          <app-stat-box value="3%" note="of area in <strong>exceptional drought</strong>"></app-stat-box>
-        </div>
+        <ng-container *ngIf="selectedDataset() === 'Drought'">
+
+          <div class="stats stats-drought" *ngIf="dominantCondition() === 'drought' && currentDroughtStats() as dStats">
+            <app-stat-box [value]="dStats.d0 + '%'" note="of area <strong>abnormally dry</strong> or worse"></app-stat-box>
+            <app-stat-box [value]="dStats.d1 + '%'" note="of area in <strong>moderate drought</strong> or worse"></app-stat-box>
+            <app-stat-box [value]="dStats.d2 + '%'" note="of area in <strong>severe drought</strong> or worse"></app-stat-box>
+            <app-stat-box [value]="dStats.d3 + '%'" note="of area in <strong>extreme drought</strong> or worse"></app-stat-box>
+            <app-stat-box [value]="dStats.d4 + '%'" note="of area in <strong>exceptional drought</strong>"></app-stat-box>
+          </div>
+
+          <div class="stats stats-wet" *ngIf="dominantCondition() === 'wet' && currentWetStats() as wStats">
+            <app-stat-box [value]="wStats.w0 + '%'" note="of area <strong>abnormally wet</strong> or wetter"></app-stat-box>
+            <app-stat-box [value]="wStats.w1 + '%'" note="of area in <strong>moderate wetness</strong> or wetter"></app-stat-box>
+            <app-stat-box [value]="wStats.w2 + '%'" note="of area in <strong>severe wetness</strong> or wetter"></app-stat-box>
+            <app-stat-box [value]="wStats.w3 + '%'" note="of area in <strong>extreme wetness</strong> or wetter"></app-stat-box>
+            <app-stat-box [value]="wStats.w4 + '%'" note="of area in <strong>exceptional wetness</strong>"></app-stat-box>
+          </div>
+
+        </ng-container>
 
 
       </section>
