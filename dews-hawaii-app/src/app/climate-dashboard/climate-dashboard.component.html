@@ -72,9 +72,8 @@
           <app-stat-box
             label="Rank"
             [value]="formatRank(stats()?.rank)"
-            [note]="'Driest out of ' + rainfallYears() + ' years'">
+            [note]="(getRankSentiment(stats()?.rank, rainfallYears()) === 'high' ? 'Wettest' : 'Driest') + ' out of ' + rainfallYears() + ' years'">
           </app-stat-box>
-
           <app-stat-box
             *ngIf="dataset() === 'Rainfall'"
             label="YTD % of Normal"
@@ -96,7 +95,7 @@
           <app-stat-box
             label="Rank"
             [value]="formatRank(stats()?.rank)"
-            [note]="'Warmest out of ' + temperatureYears() + ' years'">
+            [note]="(getRankSentiment(stats()?.rank, temperatureYears()) === 'high' ? 'Warmest' : 'Coolest') + ' out of ' + temperatureYears() + ' years'">
           </app-stat-box>
 
           <app-stat-box

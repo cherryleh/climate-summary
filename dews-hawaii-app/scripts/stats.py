@@ -146,7 +146,8 @@ def get_stats(division, dataset, year, month):
     if "division_full" not in df.columns:
         raise ValueError("division_full column missing from records dataframe")
 
-    df["rank"] = df.groupby("division_full")["anomaly"].rank(method="min")
+    #Ranking wettest and warmest
+    df["rank"] = df.groupby("division_full")["anomaly"].rank(method="min", ascending=False)
     latest_df = df[df["date"] == f"{year}-{month:02d}"].reset_index(drop=True)
 
     if dataset == "rainfall":
@@ -212,8 +213,7 @@ def get_statewide_stats(dataset, year, month):
 
     df = pd.DataFrame(all_records)
 
-    ascending = True if dataset == "rainfall" else False
-    df["rank"] = df["anomaly"].rank(method="min")
+    df["rank"] = df["anomaly"].rank(method="min", ascending=False)
     num_rows = len(df)
     latest = df[df["date"] == f"{year}-{month:02d}"].copy()
     if latest.empty:
@@ -270,6 +270,8 @@ def export_metadata(date, stats_dict):
       json.dump(data, f, indent=4)
 
   print(f"Metadata saved to {json_path}")
+
+
 
 def get_statewide_drought_stats(year, month):
     """Compute statewide drought category percentages."""

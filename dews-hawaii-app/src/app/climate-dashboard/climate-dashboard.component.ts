@@ -896,6 +896,12 @@ export class ClimateDashboardComponent implements OnDestroy {
     });
   }
 
+  getRankSentiment(rank: number | undefined, totalYears: number): 'high' | 'low' {
+    if (rank == null || totalYears <= 0) return 'low';
+    // Top half (e.g., 1-15 out of 30)
+    return rank <= (totalYears / 2) ? 'high' : 'low';
+  }
+
   // Helper to draw categorical legends consistently
   private buildLegend(container: HTMLDivElement, colors: string[], labels: string[]) {
     container.innerHTML = '';
