@@ -1,0 +1,248 @@
+<header class="app-header">
+  <a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener">
+  <img src="logos/hcdp_long.png" alt="HCDP Logo" class="logo">
+  </a>
+</header>
+<div class="page">
+  <h1>March 17 to March 23, 2026 Storm Viewer</h1>
+
+  <p class="intro">
+    A second Kona storm hit the Hawaiian Islands from March 17 to 23, pulling additional tropical moisture over the state shortly after the strong first system. Due to deeply saturated grounds from the preceding storm, this second event's heavy downpours triggered severe flooding. significantly compounding the ongoing disaster and complicating relief efforts.The
+    <a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener">Hawaii Climate Data Portal (HCDP)</a> has now finalized updated daily rainfall maps to help the community, researchers,
+    and recovery teams understand the full scale and intensity of the event.
+  </p>
+
+  <section class="viewer-section">
+    <div class="container">
+      <div class="map">
+        <img [src]="imagePath">
+      </div>
+
+      <div class="sidebar">
+        <div class="stats-wrap">
+          <div class="stat-group">
+            <div class="stat-title">
+              Daily Rainfall
+              <span class="stat-county">
+                – {{ formatCountyName(selectedCounty) }}
+              </span>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat-item">
+                <h3>Min</h3>
+                <p>{{ selectedStats.daily.min }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Avg</h3>
+                <p>{{ selectedStats.daily.avg }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Max</h3>
+                <p>{{ selectedStats.daily.max }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-group">
+            <div class="stat-title">Cumulative Rainfall
+              <span class="stat-county">
+                – {{ formatCountyName(selectedCounty) }}
+              </span>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat-item">
+                <h3>Min</h3>
+                <p>{{ selectedStats.cumulative.min }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Avg</h3>
+                <p>{{ selectedStats.cumulative.avg }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Max</h3>
+                <p>{{ selectedStats.cumulative.max }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="controls-bar">
+
+        <div class="control-group">
+          <div class="control-label">Mode</div>
+          <div class="toggle-wrap">
+            <span>Daily</span>
+
+            <label class="switch">
+              <input type="checkbox" (change)="toggleMode()">
+              <span class="slider"></span>
+            </label>
+
+            <span>Cumulative</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">Timeline</div>
+          <div class="buttons">
+            <button type="button" class="play-button" (click)="togglePlay()" [class.playing]="isPlaying">
+              {{ isPlaying ? 'Pause' : 'Play' }}
+            </button>
+
+            <button
+              type="button"
+              *ngFor="let d of days; let i = index"
+              (click)="selectDay(i)"
+              [class.active]="selectedDayIndex === i">
+              {{ d.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">County Filter</div>
+          <div class="buttons">
+            <button
+              type="button"
+              (click)="selectedCounty = 'all'; onCountyChange()"
+              [class.active]="selectedCounty === 'all'">
+              All Counties
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'kauai'; onCountyChange()"
+              [class.active]="selectedCounty === 'kauai'">
+              Kauaʻi
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'honolulu'; onCountyChange()"
+              [class.active]="selectedCounty === 'honolulu'">
+              Honolulu
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'maui'; onCountyChange()"
+              [class.active]="selectedCounty === 'maui'">
+              Maui
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'hawaii'; onCountyChange()"
+              [class.active]="selectedCounty === 'hawaii'">
+              Hawaiʻi
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+    <section class="viewer-section">
+    <h3 class="section-title">Cumulative data from two Kona storms (March 10 to 23, 2026)</h3>
+    <div class="container">
+      <div class="map">
+        <img [src]="allDaysImagePath">
+      </div>
+
+      <div class="sidebar">
+        <div class="stats-wrap">
+          <div class="stat-group">
+            <div class="stat-title">14-Day Cumulative Rainfall
+              <span class="stat-county">
+                – {{ formatCountyName(selectedCounty) }}
+              </span>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat-item">
+                <h3>Min</h3>
+                <p>{{ selectedTwoStormStats.min }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Avg</h3>
+                <p>{{ selectedTwoStormStats.avg }}</p>
+              </div>
+              <div class="stat-item">
+                <h3>Max</h3>
+                <p>{{ selectedTwoStormStats.max }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="controls-bar">
+
+        <div class="control-group">
+          <div class="control-label">County Filter</div>
+          <div class="buttons">
+            <button
+              type="button"
+              (click)="selectedCounty = 'all'; onCountyChange()"
+              [class.active]="selectedCounty === 'all'">
+              All Counties
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'kauai'; onCountyChange()"
+              [class.active]="selectedCounty === 'kauai'">
+              Kauaʻi
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'honolulu'; onCountyChange()"
+              [class.active]="selectedCounty === 'honolulu'">
+              Honolulu
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'maui'; onCountyChange()"
+              [class.active]="selectedCounty === 'maui'">
+              Maui
+            </button>
+            <button
+              type="button"
+              (click)="selectedCounty = 'hawaii'; onCountyChange()"
+              [class.active]="selectedCounty === 'hawaii'">
+              Hawaiʻi
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <section class="storm-highlights">
+    <div class="highlight-card">
+      <div class="highlight-eyebrow">Storm Highlight</div>
+      <h2 class="highlight-title">Mānoa, Palolo Flash Floods</h2>
+
+      <div class="highlight-body">
+        As the two-week rainy period neared its end, an intense, localized atmospheric event struck Mānoa and Palolo valleys on March 23. Honolulu Mayor Rick Blangiardi described it as a “classic rain bomb,” heavy rain caused by a stationary storm cell. This “rain bomb,” over Mānoa and Palolo valleys, dropped 2 to 4 inches of rain per hour.
+
+        Six Hawaiʻi Mesonet stations in the Nuʻuanu-Mānoa area recorded between 3.5 and 6.5 inches of rain, the majority of which fell within a three-hour window. Falling on already saturated ground, this turned streams into raging torrents and triggered significant flash floods.
+        <br><br>For more data and details, see the <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/graphing?id=0501" target="_blank">Lyon Arboretum Mesonet station website</a>.
+      </div>
+
+      <img src="storm_site/lyon.png" style="width: 80%;margin-left: auto; margin-right: auto; display: block; margin-top: 20px;">
+
+    </div>
+  </section>
+
+</div>
+
+<section class="contact-section">
+  <div class="contact-card">
+    Questions? Contact us at
+    <a href="mailto:hcdp@hawaii.edu">hcdp&#64;hawaii.edu</a>
+  </div>
+</section>
