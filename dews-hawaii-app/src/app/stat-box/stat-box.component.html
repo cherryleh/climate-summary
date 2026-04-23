@@ -1,9 +1,10 @@
 <div class="stat" [class.drought]="note?.includes('area')">
   <div class="stat-label">{{ label }}</div>
   <div class="stat-value">
-    <span class="main-value" [innerHTML]="value"></span>
-    <span *ngIf="percent" class="percent-value">{{ percent }}</span>
+    <div class="value-row">
+      <span class="main-value" [innerHTML]="value"></span>
+      <span *ngIf="percent" class="percent-value">{{ percent }}</span>
+    </div>
     <span *ngIf="note" class="stat-note-inline" [innerHTML]="note"></span>
-
   </div>
 </div>

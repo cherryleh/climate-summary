@@ -1,0 +1,286 @@
+<div class="page">
+  <header class="topbar">
+    <div class="brand">
+      <h1>Hawai&#x02BB;i Monthly Climate Summary (Beta)</h1>
+    </div>
+  </header>
+
+  <div class="dashboard-grid">
+    <!-- ── LEFT COLUMN ── -->
+    <div class="left-col">
+
+      <!-- Climate Snapshot -->
+      <section class="panel snapshot-hero" [class.snapshot-hero-drought]="selectedDataset() === 'Drought'">
+        <div class="snapshot-top">
+          <div class="snapshot-meta">
+            <div class="eyebrow">Climate snapshot</div>
+            <div class="title">
+              {{ currentDateLabel() }} {{ selectedDataset() }} –
+              {{ selectedDivisionName() || islandLabel() || 'Statewide' }}
+            </div>
+          </div>
+
+          <div class="snapshot-controls">
+            <div class="control" role="group" aria-labelledby="datasetLabel">
+              <div class="tiny muted control-label" id="datasetLabel">Select a dataset</div>
+              <div class="chips chips-toggle" role="tablist" aria-label="Dataset">
+                <button class="chip chip-option"
+                        [class.chip-selected]="selectedDataset() === 'Rainfall'"
+                        (click)="pickDataset('Rainfall')">Rainfall</button>
+                <button class="chip chip-option"
+                        [class.chip-selected]="selectedDataset() === 'Temperature'"
+                        (click)="pickDataset('Temperature')">Temperature</button>
+                <button class="chip chip-option"
+                        [class.chip-selected]="selectedDataset() === 'Drought'"
+                        (click)="pickDataset('Drought')">Drought</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statement -->
+        <div class="info-box" *ngIf="selectedDataset() === 'Rainfall'">
+          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} received 2.0 inches of rainfall statewide — 3.2 inches (62%) below the August average, marking the driest August in the last 30 years.
+        </div>
+        <div class="info-box" *ngIf="selectedDataset() === 'Temperature'">
+          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} averaged 70°F statewide — 0.5°F above the August average, ranking as the 11th warmest August in the last 30 years.
+        </div>
+        <div class="info-box" *ngIf="selectedDataset() === 'Drought'">
+          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} saw dry conditions with 67% of land area seeing at least abnormally dry conditions, and 21% seeing severe drought or worse conditions.
+        </div>
+
+        <!-- Rainfall stats -->
+        <div class="stats stats-rainfall" *ngIf="selectedDataset() === 'Rainfall' && stats()">
+          <app-stat-box label="Average"
+            [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' in'">
+          </app-stat-box>
+          <app-stat-box label="Anomaly"
+            [value]="formatAnomaly(stats()?.anomaly, selectedDataset())"
+            [percent]="((stats()?.pchange | number:'1.0-0') ?? '') + '%'">
+          </app-stat-box>
+          <app-stat-box label="Rank"
+            [value]="formatRank(stats()?.rank)"
+            [note]="(getRankSentiment(stats()?.rank, rainfallYears()) === 'high' ? 'Wettest' : 'Driest') + ' out of ' + rainfallYears() + ' years'">
+          </app-stat-box>
+          <app-stat-box *ngIf="dataset() === 'Rainfall'"
+            label="YTD % of Normal"
+            [value]="(stats()?.ytd_pnormal | number:'1.1-1') + '%'">
+          </app-stat-box>
+        </div>
+
+        <!-- Temperature stats -->
+        <div class="stats stats-temperature" *ngIf="selectedDataset() === 'Temperature' && stats()">
+          <app-stat-box label="Mean"
+            [value]="((stats()?.mean | number:'1.1-1') ?? '') + '°F'">
+          </app-stat-box>
+          <app-stat-box label="Anomaly"
+            [value]="formatAnomaly(stats()?.anomaly, selectedDataset())">
+          </app-stat-box>
+          <app-stat-box label="Rank"
+            [value]="formatRank(stats()?.rank)"
+            [note]="(getRankSentiment(stats()?.rank, temperatureYears()) === 'high' ? 'Warmest' : 'Coolest') + ' out of ' + temperatureYears() + ' years'">
+          </app-stat-box>
+          <app-stat-box label="Max temp" value="test"></app-stat-box>
+        </div>
+
+        <!-- Drought stats -->
+        <ng-container *ngIf="selectedDataset() === 'Drought'">
+          <div class="stats stats-drought" *ngIf="dominantCondition() === 'drought' && currentDroughtStats() as dStats">
+            <app-stat-box [value]="dStats.d0 + '%'" note="of area <strong>abnormally dry</strong> or worse"></app-stat-box>
+            <app-stat-box [value]="dStats.d1 + '%'" note="of area in <strong>moderate drought</strong> or worse"></app-stat-box>
+            <app-stat-box [value]="dStats.d2 + '%'" note="of area in <strong>severe drought</strong> or worse"></app-stat-box>
+            <app-stat-box [value]="dStats.d3 + '%'" note="of area in <strong>extreme drought</strong> or worse"></app-stat-box>
+            <app-stat-box [value]="dStats.d4 + '%'" note="of area in <strong>exceptional drought</strong>"></app-stat-box>
+          </div>
+          <div class="stats stats-wet" *ngIf="dominantCondition() === 'wet' && currentWetStats() as wStats">
+            <app-stat-box [value]="wStats.w0 + '%'" note="of area <strong>abnormally wet</strong> or wetter"></app-stat-box>
+            <app-stat-box [value]="wStats.w1 + '%'" note="of area in <strong>moderate wetness</strong> or wetter"></app-stat-box>
+            <app-stat-box [value]="wStats.w2 + '%'" note="of area in <strong>severe wetness</strong> or wetter"></app-stat-box>
+            <app-stat-box [value]="wStats.w3 + '%'" note="of area in <strong>extreme wetness</strong> or wetter"></app-stat-box>
+            <app-stat-box [value]="wStats.w4 + '%'" note="of area in <strong>exceptional wetness</strong>"></app-stat-box>
+          </div>
+        </ng-container>
+      </section>
+
+      <!-- Map Panel -->
+      <section class="panel panel-grow map-panel">
+        <div class="panel-head">
+          <div>
+            <div class="eyebrow">Map</div>
+            <div class="title">Select a geography for area-specific climate insights</div>
+            <div class="tiny muted">{{ selectedDataset() }} {{ currentDateLabel() }}</div>
+          </div>
+        </div>
+
+        <div class="selection-bar">
+          <div class="selection-toolbar">
+
+            <!-- Island picker -->
+            <div class="toolbar-group county-anchor">
+              <span class="toolbar-label">Island</span>
+              <button class="chip chip-option chip-selected county-current" type="button">
+                {{ selectedCountyDisplay() }}
+              </button>
+              <button class="chip chip-option county-change" type="button"
+                [class.county-change-active]="countyMenuOpen()"
+                (click)="toggleCountyMenu()">
+                Change
+              </button>
+
+              <div class="county-menu" *ngIf="countyMenuOpen()">
+                <div class="menu-title">Choose an island</div>
+                <button class="menu-item" type="button"
+                  [class.menu-item-active]="!selectedIsland()"
+                  (click)="chooseIsland(null)">Statewide</button>
+                <button class="menu-item" type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Hawaiʻi'"
+                  (click)="chooseIsland('Hawaiʻi')">Hawaiʻi</button>
+                <button class="menu-item" type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Maui'"
+                  (click)="chooseIsland('Maui')">Maui</button>
+                <button class="menu-item" type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Kaho\'olawe'"
+                  (click)="chooseIsland('Kaho\'olawe')">Kaho'olawe</button>
+                <button class="menu-item" type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Lānaʻi'"
+                  (click)="chooseIsland('Lānaʻi')">Lānaʻi</button>
+                <button class="menu-item" type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Molokaʻi'"
+                  (click)="chooseIsland('Molokaʻi')">Molokaʻi</button>
+                <button class="menu-item" type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Oʻahu'"
+                  (click)="chooseIsland('Oʻahu')">Oʻahu</button>
+                <button class="menu-item" type="button"
+                  [class.menu-item-active]="selectedIsland() === 'Kauaʻi'"
+                  (click)="chooseIsland('Kauaʻi')">Kauaʻi</button>
+              </div>
+            </div>
+
+            <!-- Division scope -->
+            <div class="toolbar-group">
+              <span class="toolbar-label">Division</span>
+              <div class="segmented">
+                <button class="seg-btn" type="button"
+                  [class.active]="selectedScope() === 'moku'"
+                  (click)="closeCountyMenu(); setScope('moku')">Moku</button>
+                <button class="seg-btn" type="button"
+                  [class.active]="selectedScope() === 'ahupuaa'"
+                  (click)="closeCountyMenu(); setScope('ahupuaa')">Ahupuaʻa</button>
+                <button class="seg-btn" type="button"
+                  [class.active]="selectedScope() === 'divisions'"
+                  (click)="closeCountyMenu(); setScope('divisions')">Climate</button>
+                <button class="seg-btn" type="button"
+                  [class.active]="selectedScope() === 'watershed'"
+                  (click)="closeCountyMenu(); setScope('watershed')">Watershed</button>
+              </div>
+            </div>
+
+            <!-- Scoped dropdown (watershed / ahupuaa) -->
+            <div class="toolbar-group"
+              *ngIf="(selectedScope() === 'watershed' || selectedScope() === 'ahupuaa') && selectedIsland()">
+              <span class="toolbar-label">
+                {{ selectedScope() === 'watershed' ? 'Watershed' : 'Ahupuaʻa' }}
+              </span>
+              <select class="dropdown"
+                [ngModel]="selectedDivision()"
+                (ngModelChange)="pickDivision($event)">
+                <option [ngValue]="null">Select</option>
+                <option *ngFor="let opt of availableScopedOptions(); trackBy: trackByScopedOption"
+                  [ngValue]="opt.value">{{ opt.label }}</option>
+              </select>
+            </div>
+
+            <button class="btn btn-reset-inline" type="button"
+              *ngIf="selectedIsland() || selectedScope() || selectedDivision()"
+              (click)="closeCountyMenu(); reset()">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="map-wrap">
+          <app-map-panel
+            [selectedDataset]="selectedDataset()"
+            [selectedScope]="selectedScope()"
+            [selectedIsland]="selectedIsland()"
+            [selectedDivision]="selectedDivision()"
+            [viewMode]="viewMode()"
+            [rasterHref]="rasterHref()"
+            [rasterRect]="rasterRect()"
+            [islands]="islands()"
+            [pathById]="pathById()"
+            [centroidById]="centroidById()"
+            (islandSelected)="pickIsland($event)"
+            (divisionSelected)="pickDivision($event)"
+            (resetSelection)="reset()"
+            [selectionLabel]="selectionLabel()">
+          </app-map-panel>
+        </div>
+      </section>
+    </div>
+
+    <!-- ── RIGHT SIDEBAR ── -->
+    <aside class="aside">
+
+      <!-- Chart -->
+      <section class="panel panel-grow chart-section" [class.fullscreen]="chartFullscreen()">
+        <div class="panel-head">
+          <div class="title">{{ selectedDataset() }} graph</div>
+          <div class="actions">
+            <button class="btn" (click)="toggleChartFullscreen()">
+              {{ chartFullscreen() ? 'Close' : 'Expand' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="chart-controls">
+          <button class="btn" [class.active]="timeRange() === 12" (click)="setTimeRange(12)">Last year</button>
+          <button class="btn" [class.active]="timeRange() === 36" (click)="setTimeRange(36)">Last 3 years</button>
+          <button class="btn" [class.active]="timeRange() === 60" (click)="setTimeRange(60)">Last 5 years</button>
+        </div>
+
+        <div class="chart-wrap">
+          <app-data-highchart
+            *ngIf="chartVisible()"
+            [data]="filteredTsData()"
+            [unit]="unit()"
+            [dataset]="selectedDataset()">
+          </app-data-highchart>
+        </div>
+      </section>
+
+      <!-- Email subscription -->
+      <div class="panel email-panel">
+        <div class="eyebrow">Monthly email reports</div>
+        <div class="muted">Get a monthly report for your current selection.</div>
+
+        <div class="mt">
+          <div class="summary">
+            <div class="muted">Selection</div>
+            <div class="strong">{{ fullSelectionLabel }}</div>
+          </div>
+        </div>
+
+        <label class="label" for="email">Email address</label>
+        <input id="email" class="input" type="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          placeholder="you@example.com" />
+
+        <div class="tiny error" *ngIf="email() && !isEmailValid()">
+          Please enter a valid email.
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" [disabled]="!isEmailValid()" (click)="subscribe()">
+            Subscribe
+          </button>
+          <button class="btn" (click)="email.set('')">Clear</button>
+        </div>
+        <div class="tiny muted">We'll send a report around the 1st of each month. You can unsubscribe anytime.</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<app-footer></app-footer>

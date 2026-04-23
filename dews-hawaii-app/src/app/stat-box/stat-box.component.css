@@ -24,45 +24,57 @@
 /* --- Default stat value layout (Rainfall / Temperature) --- */
 .stat-value {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 2px;
   margin-top: 4px;
   font-size: 22px;
   font-weight: 600;
   color: #111827;
 }
 
+.value-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+
 .main-value {
-  font-size: 1.3em; /* base = 22px from parent */
+  font-size: 1.3em;
   font-weight: 600;
   line-height: 1;
 }
 
 .percent-value {
   font-size: 0.7em;
-  color: #dc2626; /* red for negative anomalies */
+  color: #dc2626;
   vertical-align: baseline;
   position: relative;
   top: -2px;
 }
 
-
 :host ::ng-deep .main-value sup {
-  font-size: 0.6em;        /* use 0.6em — 0.2em is usually too tiny to see */
+  font-size: 0.6em;
   vertical-align: super;
   line-height: 0;
-  opacity: 0.8;            /* optional: softens the tone */
+  opacity: 0.8;
 }
 
-
-/* Allow wrapping by default */
 .stat-note-inline {
-  font-size: 14px;
+  font-size: 0.8vw;
   font-weight: 400;
   color: var(--sub);
-  white-space: normal;       /* allow wrapping for most stats */
+  white-space: nowrap;
   line-height: 1.2;
+  text-align: center;
+}
+
+/* Drought/wet notes are long — allow wrapping in narrow cells */
+.stat.drought .stat-note-inline {
+  white-space: normal;
+  font-size: 0.83vw;
 }
 
 .stat.drought .stat-value {

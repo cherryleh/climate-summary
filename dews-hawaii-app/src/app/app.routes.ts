@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { ClimateDashboardComponent } from './climate-dashboard/climate-dashboard.component';
+import { ClimateDashboardV2Component } from './climate-dashboard-v2/climate-dashboard-v2.component';
 import { ClimateSummary2025Component} from './climate-summary-2025/climate-summary-2025.component';
 import { UnsubscribeComponent } from './unsubscribe/unsubscribe.component';
 import { StormViewerComponent } from './storm-viewer/storm-viewer.component';
@@ -7,7 +8,10 @@ import { StormViewerMarch20262Component } from './storm-viewer-march2026-2/storm
 
 export const routes: Routes = [
   {
-    path: '', component: ClimateDashboardComponent
+    path: '', component: ClimateDashboardV2Component
+  },
+  {
+    path: 'v1', component: ClimateDashboardComponent
   },
   {
     path: 'climate-summary-2025', component: ClimateSummary2025Component

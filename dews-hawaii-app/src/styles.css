@@ -28,11 +28,17 @@
               Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
+html {
+  scrollbar-gutter: stable;
+  overflow-x: hidden; /* prevent any content from making the page wider */
+}
+
 html, body {
   font-family: var(--app-font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  margin:0 !important;
+  margin: 0 !important;
+  max-width: 100vw;
 }
 

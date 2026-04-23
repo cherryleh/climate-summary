@@ -85,7 +85,7 @@ export class DataHighchartComponent implements OnChanges {
 
     this.chartOptions = {
       chart: {
-        height: '47%',
+        height: null,
         type: isDistribution ? 'area' : undefined
       },
       title: { text: '' },
@@ -127,15 +127,7 @@ export class DataHighchartComponent implements OnChanges {
         },
         column: { borderWidth: 0 }
       },
-      subtitle: {
-        text: isDistribution ? 'Hover over the chart to see specific area percentages' : '',
-        align: 'center',
-        style: {
-          color: '#666666',
-          fontSize: '12px',
-          fontStyle: 'italic'
-        }
-      },
+      subtitle: { text: '' },
       legend: {
         enabled: false
       },
