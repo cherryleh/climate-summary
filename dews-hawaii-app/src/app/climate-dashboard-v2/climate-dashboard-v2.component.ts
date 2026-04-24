@@ -670,6 +670,16 @@ export class ClimateDashboardV2Component implements OnDestroy {
   rainfallYears = signal<number>(-999);
   temperatureYears = signal<number>(-999);
 
+  selectedMonth = signal<number>(1);
+  selectedYear = signal<number>(2025);
+
+  readonly monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  readonly availableYears = Array.from({ length: 2025 - 1990 + 1 }, (_, i) => 2025 - i);
+
   async ngOnInit(): Promise<void> {
     // Base islands
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
@@ -737,6 +747,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
             timeZone: 'Pacific/Honolulu'
           });
           this.currentDateLabel.set(formattedDate);
+          this.selectedMonth.set(dateObj.getMonth() + 1);
+          this.selectedYear.set(dateObj.getFullYear());
           if (metadata.num_rows_rainfall) {
             this.rainfallYears.set(metadata.num_rows_rainfall);
           }

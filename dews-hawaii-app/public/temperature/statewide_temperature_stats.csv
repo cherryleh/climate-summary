@@ -1,2 +1,2 @@
-division_full,date,mean,anomaly,pchange,rank,max
-Statewide,2026-03,65.0107271724498,1.4650570231903473,1.4650570231903473,5.0,74.66580696105957
+island,division_type,name,date,mean,anomaly,pchange,rank,max
+Statewide,Statewide,Statewide,2026-03,65.0107271724498,1.4650570231903473,1.4650570231903473,5.0,74.66580696105957

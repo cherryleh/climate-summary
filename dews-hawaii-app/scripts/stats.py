@@ -76,18 +76,25 @@ def get_stats(division, dataset, year, month):
     gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.001, preserve_topology=True)
 
     if island_col and name_col:
+        # Standard logic for complex shapefiles (moku, ahupuaa)
         is_same_island_dup = gdf.duplicated(subset=[island_col, name_col], keep=False)
         cum_count = gdf.groupby([island_col, name_col]).cumcount() + 1
         gdf.loc[is_same_island_dup, name_col] = (
             gdf.loc[is_same_island_dup, name_col].astype(str) + " " + cum_count[is_same_island_dup].astype(str)
         )
         gdf = gdf.dissolve(by=[island_col, name_col], as_index=False)
-        gdf["division_full"] = gdf.apply(lambda r: f"{r[island_col]}::{r[name_col]}", axis=1)
+        gdf["island_clean"] = gdf[island_col]
+        gdf["name_clean"] = gdf[name_col]
     elif name_col:
         gdf = gdf.dissolve(by=name_col, as_index=False)
-        gdf["division_full"] = gdf[name_col].astype(str)
-    else:
-        raise ValueError(f"No valid name column found in {division}.shp")
+        gdf["name_clean"] = gdf[name_col]
+
+        if division == "island":
+            gdf["island_clean"] = gdf[name_col]
+        else:
+            gdf["island_clean"] = "Statewide"
+
+    gdf["division_type"] = division
 
     climo_zs = zonal_stats(vectors=gdf, raster=climo_file, stats=["mean"], nodata=None)
     gdf["climo_mean"] = [convert_units(c["mean"], dataset) for c in climo_zs]
@@ -122,26 +129,24 @@ def get_stats(division, dataset, year, month):
                     max_val = convert_units(max_raw, dataset) if max_raw is not None else np.nan
 
             record = {
-                "division_full": row["division_full"],
+                "island": row["island_clean"],
+                "division_type": row["division_type"],
+                "name": row["name_clean"],
                 "date": curr_date,
                 "mean": mean_val,
                 "anomaly": anomaly,
                 "pchange": pchange,
             }
-
             if dataset == "temperature":
                 record["max"] = max_val
-
             all_records.append(record)
 
         del stats
         gc.collect()
 
     df = pd.DataFrame(all_records)
-    if "division_full" not in df.columns:
-        raise ValueError("division_full column missing from records dataframe")
 
-    df["rank"] = df.groupby("division_full")["anomaly"].rank(method="min", ascending=False)
+    df["rank"] = df.groupby(["island", "name"])["anomaly"].rank(method="min", ascending=False)
     latest_df = df[df["date"] == f"{year}-{month:02d}"].reset_index(drop=True)
 
     if dataset == "rainfall":
@@ -165,7 +170,7 @@ def get_stats(division, dataset, year, month):
 
         latest_df["ytd_pnormal"] = ytd_pnormals
 
-    base_cols = ["division_full", "date", "mean", "anomaly", "pchange", "rank"]
+    base_cols = ["island", "division_type", "name", "date", "mean", "anomaly", "pchange", "rank"]
 
     if dataset == "rainfall":
         base_cols.append("ytd_pnormal")
@@ -249,9 +254,11 @@ def get_statewide_stats(dataset, year, month):
 
         latest["ytd_pnormal"] = pnormal
 
-    latest["division_full"] = "Statewide"
+    latest["island"] = "Statewide"
+    latest["division_type"] = "Statewide"
+    latest["name"] = "Statewide"
 
-    base_cols = ["division_full", "date", "mean", "anomaly", "pchange", "rank"]
+    base_cols = ["island", "division_type", "name", "date", "mean", "anomaly", "pchange", "rank"]
 
     if dataset == "rainfall":
         base_cols.append("ytd_pnormal")
@@ -306,8 +313,10 @@ def get_statewide_drought_stats(year, month):
     total_pixels = valid_data.size
 
     record = {
-        "date": f"{year}-{month:02d}",
-        "division_full": "Statewide"
+        "island": "Statewide",
+        "division_type": "Statewide",
+        "name": "Statewide",
+        "date": f"{year}-{month:02d}"
     }
 
     if total_pixels > 0:
@@ -323,7 +332,7 @@ def get_statewide_drought_stats(year, month):
 
     df = pd.DataFrame([record])
     drought_cols = [
-        "division_full", "date",
+        "island", "division_type", "name", "date",
         "D4", "D3", "D2", "D1", "D0",
         "Near Normal",
         "W0", "W1", "W2", "W3", "W4"
@@ -331,7 +340,7 @@ def get_statewide_drought_stats(year, month):
 
     df = df[drought_cols]
 
-    # Fixed: Changed {division} to "statewide"
+
     out_csv = os.path.join(output_dir, "spi", "statewide_drought_stats.csv")
     df.to_csv(out_csv, index=False)
     print(f"Saved {out_csv}")
@@ -368,12 +377,16 @@ def get_drought_stats(division, year, month):
             gdf.loc[is_same_island_dup, name_col].astype(str) + " " + cum_count[is_same_island_dup].astype(str)
         )
         gdf = gdf.dissolve(by=[island_col, name_col], as_index=False)
-        gdf["division_full"] = gdf.apply(lambda r: f"{r[island_col]}::{r[name_col]}", axis=1)
+        gdf["island_clean"] = gdf[island_col]
+        gdf["name_clean"] = gdf[name_col]
     elif name_col:
         gdf = gdf.dissolve(by=name_col, as_index=False)
-        gdf["division_full"] = gdf[name_col].astype(str)
-    else:
-        raise ValueError(f"No valid name column found in {division}.shp")
+        gdf["name_clean"] = gdf[name_col]
+
+        if division == "island":
+            gdf["island_clean"] = gdf[name_col]
+        else:
+            gdf["island_clean"] = "Statewide"
 
     with rasterio.open(tif_path) as src:
         nodata = src.nodata
@@ -382,12 +395,14 @@ def get_drought_stats(division, year, month):
 
     all_records = []
     for i, stats in enumerate(zs):
-        division_name = gdf.iloc[i]["division_full"]
+        row = gdf.iloc[i]
         total = sum(stats.values()) if stats else 0
 
         record = {
+            "island": row["island_clean"],
+            "division_type": division,
+            "name": row["name_clean"],
             "date": f"{year}-{month:02d}",
-            "division_full": division_name,
         }
 
         for val, code in cat_map.items():
@@ -399,12 +414,8 @@ def get_drought_stats(division, year, month):
 
     df = pd.DataFrame(all_records)
 
-    drought_cols = [
-        "division_full", "date",
-        "D4", "D3", "D2", "D1", "D0",
-        "Near Normal",
-        "W0", "W1", "W2", "W3", "W4"
-    ]
+    drought_cols = ["island", "division_type", "name", "date", "D4", "D3", "D2", "D1", "D0",
+    "Near Normal", "W0", "W1", "W2", "W3", "W4"]
 
     df = df[drought_cols]
 

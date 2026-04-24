@@ -3,6 +3,21 @@
     <div class="brand">
       <h1>Hawai&#x02BB;i Monthly Climate Summary (Beta)</h1>
     </div>
+    <div class="topbar-date">
+      <span class="tiny muted">Month &amp; year</span>
+      <div class="date-selectors">
+        <select class="dropdown"
+                [ngModel]="selectedMonth()"
+                (ngModelChange)="selectedMonth.set(+$event)">
+          <option *ngFor="let name of monthNames; let i = index" [value]="i + 1">{{ name }}</option>
+        </select>
+        <select class="dropdown"
+                [ngModel]="selectedYear()"
+                (ngModelChange)="selectedYear.set(+$event)">
+          <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+        </select>
+      </div>
+    </div>
   </header>
 
   <div class="dashboard-grid">
