@@ -54,6 +54,8 @@
   position: relative;
   top: -2px;
 }
+.percent-value.positive { color: #16a34a; }
+.percent-value.negative { color: #dc2626; }
 
 :host ::ng-deep .main-value sup {
   font-size: 0.6em;

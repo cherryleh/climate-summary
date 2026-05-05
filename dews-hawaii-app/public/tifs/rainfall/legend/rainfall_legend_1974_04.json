@@ -1,0 +1,71 @@
+{
+    "dataset": "rainfall",
+    "year": 1974,
+    "month": 4,
+    "is_wet_heavy": true,
+    "items": [
+        {
+            "category_value": 8,
+            "color": "#001933",
+            "label": "> 175%",
+            "min": 174.64052438735962,
+            "max": null
+        },
+        {
+            "category_value": 7,
+            "color": "#0066CC",
+            "label": "+125% to +175%",
+            "min": 125.01286268234253,
+            "max": 174.64052438735962
+        },
+        {
+            "category_value": 6,
+            "color": "#99CCFF",
+            "label": "+89% to +125%",
+            "min": 89.26576375961304,
+            "max": 125.01286268234253
+        },
+        {
+            "category_value": 5,
+            "color": "#CCE5FF",
+            "label": "+10% to +89%",
+            "min": 10.0,
+            "max": 89.26576375961304
+        },
+        {
+            "category_value": 4,
+            "color": "#FFFFFF",
+            "label": "-10% to +10%",
+            "min": -10.0,
+            "max": 10.0
+        },
+        {
+            "category_value": 3,
+            "color": "#FFCC66",
+            "label": "-30% to -10%",
+            "min": -30.0,
+            "max": -10.0
+        },
+        {
+            "category_value": 2,
+            "color": "#FF6600",
+            "label": "-50% to -30%",
+            "min": -50.0,
+            "max": -30.0
+        },
+        {
+            "category_value": 1,
+            "color": "#FF0000",
+            "label": "-70% to -50%",
+            "min": -70.0,
+            "max": -50.0
+        },
+        {
+            "category_value": 0,
+            "color": "#730000",
+            "label": "< -70%",
+            "min": null,
+            "max": -70.0
+        }
+    ]
+}

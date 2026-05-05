@@ -12,6 +12,7 @@ export class StatBoxComponent {
   @Input() label!: string;
   @Input() value!: string;
   @Input() percent?: string;
+  @Input() percentClass?: string;
   @Input() note?: string;
   @Input() droughtNote = false;
 }

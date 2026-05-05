@@ -12,6 +12,7 @@ from datetime import datetime
 
 # Ensure these paths match your environment
 LOCAL_DEP_DIR = os.environ.get('DEPENDENCY_DIR', "./data/dependencies")
+TIF_DIR = "/Users/cherryleheu/Documents/HCDP/Data/"
 OUTPUT_DIR = os.environ.get('OUTPUT_DIR', "./public/tifs")
 
 # Ensure output directory exists
@@ -27,7 +28,7 @@ def save_raster(path, data, profile):
 def process_rainfall(year, month):
   print(f"Processing Rainfall for {year}-{month:02d}...")
   climo_file = os.path.join(LOCAL_DEP_DIR, f"climo/rainfall/rainfall_1991-2020_{month:02d}.tif")
-  raster_file = os.path.join(LOCAL_DEP_DIR, f"rainfall/rainfall_{year}_{month:02d}.tif")
+  raster_file = os.path.join(TIF_DIR, f"rf_all/monthly/rainfall_{year}_{month:02d}.tif")
 
   with rasterio.open(climo_file) as c_src, rasterio.open(raster_file) as r_src:
       rf_climo = np.ma.masked_equal(c_src.read(1), c_src.nodata)
@@ -77,7 +78,7 @@ def process_rainfall(year, month):
           "max": None if np.isinf(high) else float(high)
       })
 
-  save_raster(os.path.join(OUTPUT_DIR, "tifs", "rainfall_pdiff_cat.tif"), categorical, profile)
+  save_raster(os.path.join(OUTPUT_DIR, "tifs", "rainfall", f"rainfall_pdiff_cat_{year}_{month:02}.tif"), categorical, profile)
 
   # JSON Legend Metadata
   is_wet_heavy = np.median(valid_data) > 0
@@ -92,14 +93,14 @@ def process_rainfall(year, month):
       "items": legend_items
   }
 
-  json_path = os.path.join(OUTPUT_DIR, "tifs","rainfall_legend.json")
+  json_path = os.path.join(OUTPUT_DIR, "tifs","rainfall", "legend",f"rainfall_legend_{year}_{month:02d}.json")
   with open(json_path, 'w') as f:
       json.dump(legend_data, f, indent=4)
   print(f"Saved Legend: {json_path}")
+
 def process_temperature(year, month):
-    print(f"Processing Temperature for {year}-{month:02d}...")
     climo_file = os.path.join(LOCAL_DEP_DIR, f"climo/temperature/temperature_1991-2020_{month:02d}.tif")
-    raster_file = os.path.join(LOCAL_DEP_DIR, f"temperature/temperature_{year}_{month:02d}.tif")
+    raster_file = os.path.join(TIF_DIR, f"monthly/tmean/tmean_{year}_{month:02d}.tif")
 
     with rasterio.open(climo_file) as c_src, rasterio.open(raster_file) as r_src:
         t_climo = c_src.read(1).astype(float)
@@ -117,7 +118,7 @@ def process_temperature(year, month):
         cond = (~mask) & (diff > low) & (diff <= high)
         categorical[cond] = i
 
-    save_raster(os.path.join(OUTPUT_DIR, "tifs", "temperature_diff_cat.tif"), categorical, profile)
+    save_raster(os.path.join(OUTPUT_DIR, "tifs", "temperature", f"temperature_diff_cat_{year}_{month:02d}.tif"), categorical, profile)
 
 def process_drought(year, month):
     print(f"Processing Drought (SPI3) for {year}-{month:02d}...")
@@ -137,7 +138,7 @@ def process_drought(year, month):
         cond = valid & (data > bins[i]) & (data <= bins[i+1])
         categorical[cond] = i
 
-    save_raster(os.path.join(LOCAL_DEP_DIR, "spi3", "cat",f"spi3_cat_{year}_{month:02d}.tif"), categorical, profile)
+    save_raster(os.path.join(LOCAL_DEP_DIR, "tifs", "drought",f"spi3_cat_{year}_{month:02d}.tif"), categorical, profile)
 
 
 if __name__ == "__main__":
@@ -152,22 +153,20 @@ if __name__ == "__main__":
         today = today.replace(hour=0, minute=0, second=0, microsecond=0)
         date = today - relativedelta(months=1)
 
-    month_value = date.month
-    year_value = date.year
+    # month_value = date.month
+    # year_value = date.year
 
-    process_rainfall(year_value, month_value)
-    process_temperature(year_value, month_value)
-    process_drought(year_value, month_value)
+    # process_rainfall(year_value, month_value)
+    # process_temperature(year_value, month_value)
+    # process_drought(year_value, month_value)
 
-    # current_month_limit = 3
-    # end_year = 2026
-    # for year in range(1990,2026+1):
-    #   last_month = current_month_limit if year == end_year else 12
-    #   for month in range(1, last_month + 1):
-    #     try:
-    #         # process_rainfall(year_value, month_value)
-    #         # process_temperature(year_value, month_value)
-    #         process_drought(year, month)
-    #         print(f"{year}-{month} made successfully.")
-    #     except Exception as e:
-    #         print(f"{year}-{month} An error occurred: {e}")
+    current_month_limit=4
+    for year in range(1990,2026+1):
+      last_month = current_month_limit if year == 2026 else 12
+      for month in range(1, last_month + 1):
+        try:
+            # process_rainfall(year, month)
+            process_temperature(year, month)
+            # process_drought(year, month)
+        except Exception as e:
+            print(f"{year}-{month} An error occurred: {e}")

@@ -576,10 +576,12 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
   private async loadRasterOnce(dataset: Dataset) {
     try {
+      const year = this.selectedYear();
+      const mm = String(this.selectedMonth()).padStart(2, '0');
       let file = '';
-      if (dataset === 'Rainfall') file = 'tifs/rainfall_pdiff_cat.tif';
-      else if (dataset === 'Temperature') file = 'tifs/temperature_diff_cat.tif';
-      else if (dataset === 'Drought') file = 'tifs/spi3_cat.tif';
+      if (dataset === 'Rainfall') file = `tifs/rainfall/rainfall_pdiff_cat_${year}_${mm}.tif`;
+      else if (dataset === 'Temperature') file = `tifs/temperature/temperature_diff_cat_${year}_${mm}.tif`;
+      else if (dataset === 'Drought') file = `tifs/drought/spi3_cat_${year}_${mm}.tif`;
 
       // --- Open the GeoTIFF ---
       const tiff = await GeoTIFF.fromUrl(file);
@@ -715,7 +717,10 @@ export class ClimateDashboardV2Component implements OnDestroy {
   rainfallConfig = signal<any>(null);
 
   private async loadRainfallDataConfig() {
-    const config = await firstValueFrom(this.http.get<any>('tifs/rainfall_legend.json'));
+    const year = this.selectedYear();
+    const mm = String(this.selectedMonth()).padStart(2, '0');
+    const file = `tifs/rainfall/legend/rainfall_legend_${year}_${mm}.json`;
+    const config = await firstValueFrom(this.http.get<any>(file));
     this.rainfallConfig.set(config);
     return config;
   }
@@ -740,16 +745,60 @@ export class ClimateDashboardV2Component implements OnDestroy {
   selectedMonth = signal<number>(new Date().getMonth() === 0 ? 12 : new Date().getMonth());
   selectedYear = signal<number>(new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear());
 
+  private latestMonth(): { month: number; year: number } {
+    const now = new Date();
+    return now.getMonth() === 0
+      ? { month: 12, year: now.getFullYear() - 1 }
+      : { month: now.getMonth(), year: now.getFullYear() };
+  }
+
+  private clampToLatest(month: number, year: number): { month: number; year: number } {
+    const latest = this.latestMonth();
+    if (year > latest.year || (year === latest.year && month >= latest.month + 1)) {
+      return latest;
+    }
+    return { month, year };
+  }
+
+  goToLatest() {
+    const { month, year } = this.latestMonth();
+    this.selectedYear.set(year);
+    this.applyDate(month, year);
+  }
+
+  stepMonth(delta: number) {
+    let month = this.selectedMonth() + delta;
+    let year = this.selectedYear();
+    if (month < 1) { month = 12; year--; }
+    else if (month > 12) { month = 1; year++; }
+    const clamped = this.clampToLatest(month, year);
+    this.selectedYear.set(clamped.year);
+    this.applyDate(clamped.month, clamped.year);
+  }
+
   setMonth(month: number) {
-    this.selectedMonth.set(month);
-    this.loadStats();
-    if (this.dataset() === 'Rainfall') this.loadRainfallData();
+    const clamped = this.clampToLatest(month, this.selectedYear());
+    this.selectedMonth.set(clamped.month);
+    this.selectedYear.set(clamped.year);
+    this.applyDate(clamped.month, clamped.year);
   }
 
   setYear(year: number) {
+    const clamped = this.clampToLatest(this.selectedMonth(), year);
+    this.selectedMonth.set(clamped.month);
+    this.selectedYear.set(clamped.year);
+    this.applyDate(clamped.month, clamped.year);
+  }
+
+  private applyDate(month: number, year: number) {
+    this.selectedMonth.set(month);
     this.selectedYear.set(year);
     this.loadStats();
-    if (this.dataset() === 'Rainfall') this.loadRainfallData();
+    this.loadRasterOnce(this.dataset());
+    if (this.dataset() === 'Rainfall') {
+      this.loadRainfallData();
+      this.loadRainfallDataConfig();
+    }
   }
 
   readonly monthNames = [

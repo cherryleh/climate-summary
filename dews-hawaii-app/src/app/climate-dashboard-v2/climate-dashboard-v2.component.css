@@ -421,6 +421,29 @@
 }
 .seg-btn.active { background: #e0f2fe; color: #075985; }
 
+.date-arrow {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 7px;
+  cursor: pointer;
+  color: #555;
+}
+.date-arrow:hover { background: #f0f0f0; }
+
+.date-latest {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 3px 8px;
+  cursor: pointer;
+  color: #555;
+}
+.date-latest:hover { background: #f0f0f0; }
+
 .dropdown {
   padding: 4px 7px;
   font-size: 12px;

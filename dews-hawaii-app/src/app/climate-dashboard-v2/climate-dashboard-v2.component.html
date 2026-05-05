@@ -6,6 +6,7 @@
     <div class="topbar-date">
       <span class="tiny muted">Month &amp; year</span>
       <div class="date-selectors">
+        <button class="date-arrow" (click)="stepMonth(-1)" title="Previous month">&#8249;</button>
         <select class="dropdown"
                 [ngModel]="selectedMonth()"
                 (ngModelChange)="setMonth(+$event)">
@@ -16,6 +17,8 @@
                 (ngModelChange)="setYear(+$event)">
           <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
         </select>
+        <button class="date-arrow" (click)="stepMonth(1)" title="Next month">&#8250;</button>
+        <button class="date-latest" (click)="goToLatest()">Latest</button>
       </div>
     </div>
   </header>
@@ -71,7 +74,8 @@
           </app-stat-box>
           <app-stat-box label="Anomaly"
             [value]="formatAnomaly(stats()?.anomaly, selectedDataset())"
-            [percent]="((stats()?.pchange | number:'1.0-0') ?? '') + '%'">
+            [percent]="((stats()?.pchange ?? 0) >= 0 ? '+' : '') + ((stats()?.pchange | number:'1.0-0') ?? '') + '%'"
+            [percentClass]="(stats()?.pchange ?? 0) >= 0 ? 'positive' : 'negative'">
           </app-stat-box>
           <app-stat-box label="Rank"
             [value]="formatRank(stats()?.rank)"
