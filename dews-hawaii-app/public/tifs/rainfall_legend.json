@@ -1,36 +1,36 @@
 {
     "dataset": "rainfall",
     "year": 2026,
-    "month": 3,
+    "month": 4,
     "is_wet_heavy": true,
     "items": [
         {
             "category_value": 8,
             "color": "#001933",
-            "label": "> 528%",
-            "min": 527.501368522644,
+            "label": "> 116%",
+            "min": 115.8569723367691,
             "max": null
         },
         {
             "category_value": 7,
             "color": "#0066CC",
-            "label": "+373% to +528%",
-            "min": 373.4722852706909,
-            "max": 527.501368522644
+            "label": "+69% to +116%",
+            "min": 68.6753123998642,
+            "max": 115.8569723367691
         },
         {
             "category_value": 6,
             "color": "#99CCFF",
-            "label": "+173% to +373%",
-            "min": 172.5451946258545,
-            "max": 373.4722852706909
+            "label": "+47% to +69%",
+            "min": 46.86214700341225,
+            "max": 68.6753123998642
         },
         {
             "category_value": 5,
             "color": "#CCE5FF",
-            "label": "+10% to +173%",
+            "label": "+10% to +47%",
             "min": 10.0,
-            "max": 172.5451946258545
+            "max": 46.86214700341225
         },
         {
             "category_value": 4,

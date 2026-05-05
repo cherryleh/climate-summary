@@ -1,7 +1,8 @@
 import { Component, computed, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HttpHeaders, HttpParams } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { geoIdentity, geoPath } from 'd3-geo';
 import type { FeatureCollection } from 'geojson';
 import * as d3 from 'd3';
@@ -36,13 +37,7 @@ interface Island {
 }
 
 
-// County → list of islands
-const COUNTY_GROUPS: Record<string, string[]> = {
-  'Kauaʻi': ['Kauaʻi'],
-  'Honolulu': ['Oʻahu'],
-  'Maui': ['Maui', 'Molokaʻi', 'Lānaʻi', 'Kahoʻolawe'],
-  'Hawaiʻi': ['Hawaiʻi']
-};
+
 
 function canonIsland(name: string): string {
   if (!name) return '';
@@ -291,19 +286,19 @@ export class ClimateDashboardV2Component implements OnDestroy {
           let prefixCanon = islandCanon;
           let displayIsland = island;
 
-          if (scope === 'divisions') {
-            const isMauiNui = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(islandCanon);
+          // if (scope === 'divisions') {
+          //   const isMauiNui = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(islandCanon);
 
-            if (isMauiNui) {
-              if (canonIsland(name) === 'hilo') {
-                prefixCanon = 'hawaii';
-                displayIsland = 'Hawaiʻi';
-              } else {
-                prefixCanon = 'maui';
-                displayIsland = 'Maui';
-              }
-            }
-          }
+          //   if (isMauiNui) {
+          //     if (canonIsland(name) === 'hilo') {
+          //       prefixCanon = 'hawaii';
+          //       displayIsland = 'Hawaiʻi';
+          //     } else {
+          //       prefixCanon = 'maui';
+          //       displayIsland = 'Maui';
+          //     }
+          //   }
+          // }
 
           const key = `${prefixCanon}::${name}`;
           const id = `${prefixCanon}-${name}`.toLowerCase().replace(/\s+/g, '-');
@@ -437,8 +432,22 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
 
+  private rainfallStatsUrl = 'https://api.hcdp.ikewai.org/mesonet/climate_report/rainfall_stats';
+
+  private apiHeaders(): HttpHeaders {
+    return new HttpHeaders({ 'Authorization': `Bearer ${environment.apiToken}` });
+  }
+
+
   private async loadStats(divisionArg?: string | null) {
     const dataset = this.selectedDataset();
+
+    if (dataset === 'Rainfall') {
+      await this.loadRainfallStats(divisionArg);
+      return;
+    }
+
+    // Temperature / Drought: continue reading from CSV
     const island = this.selectedIsland();
     const division = divisionArg || this.selectedDivision();
     const scope = this.selectedScope();
@@ -453,7 +462,6 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const folder = dataset === 'Drought' ? 'spi' : dataset.toLowerCase();
     const suffix = dataset.toLowerCase();
 
-    // This forces the path to 'spi/statewide_drought_stats.csv'
     const file = `${folder}/${prefix}_${suffix}_stats.csv`;
 
     const csv = await firstValueFrom(this.http.get(file, { responseType: 'text' }));
@@ -467,7 +475,6 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
       record = rows.find(r => {
         const csvLabel = this.normalizeKey(r['division_full'] || r['Division'] || r['name'] || '');
-        // Check if the CSV matches either the full key OR the base division name
         return csvLabel === this.normalizeKey(division) || csvLabel === this.normalizeKey(baseDiv);
       });
     }
@@ -504,6 +511,66 @@ export class ClimateDashboardV2Component implements OnDestroy {
       w4: +record.W4, w3: +record.W3, w2: +record.W2, w1: +record.W1, w0: +record.W0,
       near_normal: +record['Near Normal']
     } : null);
+  }
+
+  private async loadRainfallStats(divisionArg?: string | null) {
+    const island = this.selectedIsland();
+    const division = divisionArg || this.selectedDivision();
+    const scope = this.selectedScope();
+    const year = this.selectedYear();
+    const month = this.selectedMonth();
+    const date = `${year}-${String(month).padStart(2, '0')}`;
+
+    let divisionType: string;
+    let apiIsland: string;
+    let name: string;
+
+    if (!scope && !island && !division) {
+      divisionType = 'Statewide';
+      apiIsland = 'Statewide';
+      name = 'Statewide';
+    } else if (!scope && island && !division) {
+      divisionType = 'island';
+      apiIsland = island;
+      name = island;
+    } else {
+      divisionType =
+        scope === 'ahupuaa' ? 'ahupuaa' :
+        scope === 'moku' ? 'moku' :
+        scope === 'watershed' ? 'watershed' :
+        scope === 'divisions' ? 'climate_division' : 'island';
+
+      const divisionStr = division ?? '';
+      const parts = divisionStr.split('::');
+      name = parts.length === 2 ? parts[1].trim() : divisionStr.trim();
+      apiIsland = island ?? (parts.length === 2 ? parts[0].trim() : '');
+    }
+
+    const params = new HttpParams()
+      .set('division_type', divisionType)
+      .set('island', apiIsland)
+      .set('name', name)
+      .set('date', date);
+
+    console.log('[loadRainfallStats] params:', { division_type: divisionType, island: apiIsland, name, date });
+
+    try {
+      const results = await firstValueFrom(
+        this.http.get<any[]>(this.rainfallStatsUrl, { params, headers: this.apiHeaders() })
+      );
+      console.log('[loadRainfallStats] API response:', results);
+      const record = results?.[0] ?? null;
+      this.stats.set(record ? {
+        mean: +record.mean,
+        anomaly: +record.anomaly,
+        pchange: +record.pchange,
+        rank: +record.rank,
+        ytd_pnormal: +record.ytd_pnormal,
+      } : null);
+    } catch (err) {
+      console.error('[loadRainfallStats] Failed:', err);
+      this.stats.set(null);
+    }
   }
 
 
@@ -670,15 +737,31 @@ export class ClimateDashboardV2Component implements OnDestroy {
   rainfallYears = signal<number>(-999);
   temperatureYears = signal<number>(-999);
 
-  selectedMonth = signal<number>(1);
-  selectedYear = signal<number>(2025);
+  selectedMonth = signal<number>(new Date().getMonth() === 0 ? 12 : new Date().getMonth());
+  selectedYear = signal<number>(new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear());
+
+  setMonth(month: number) {
+    this.selectedMonth.set(month);
+    this.loadStats();
+    if (this.dataset() === 'Rainfall') this.loadRainfallData();
+  }
+
+  setYear(year: number) {
+    this.selectedYear.set(year);
+    this.loadStats();
+    if (this.dataset() === 'Rainfall') this.loadRainfallData();
+  }
 
   readonly monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  readonly availableYears = Array.from({ length: 2025 - 1990 + 1 }, (_, i) => 2025 - i);
+  readonly availableYears = Array.from({ length: new Date().getFullYear() - 1990 + 1 }, (_, i) => new Date().getFullYear() - i);
+
+  selectedDateLabel = computed(() =>
+    `${this.monthNames[this.selectedMonth() - 1]} ${this.selectedYear()}`
+  );
 
   async ngOnInit(): Promise<void> {
     // Base islands
@@ -747,8 +830,6 @@ export class ClimateDashboardV2Component implements OnDestroy {
             timeZone: 'Pacific/Honolulu'
           });
           this.currentDateLabel.set(formattedDate);
-          this.selectedMonth.set(dateObj.getMonth() + 1);
-          this.selectedYear.set(dateObj.getFullYear());
           if (metadata.num_rows_rainfall) {
             this.rainfallYears.set(metadata.num_rows_rainfall);
           }
@@ -977,25 +1058,68 @@ export class ClimateDashboardV2Component implements OnDestroy {
     return data;
   }
 
-  private loadRainfallData() {
+  private rainfallHistoricalUrl = 'https://api.hcdp.ikewai.org/mesonet/climate_report/rainfall_historical';
+
+  private rainfallApiParams(startDate: string, endDate: string): HttpParams {
     const island = this.selectedIsland();
-    const file = island ? 'rainfall/island_rainfall.csv' : 'rainfall/statewide_rainfall.csv';
+    const division = this.selectedDivision();
+    const scope = this.selectedScope();
 
-    this.http.get(file, { responseType: 'text' }).subscribe(csv => {
-      const data = this.parseCsv(csv, island ? 'island' : 'state');
+    let divisionType: string, apiIsland: string, name: string;
 
-      if (island) {
-        const filtered = data
-          .filter(r => this.normalizeKey(r.island || '') === this.normalizeKey(island))
-          .map(r => ({ month: r.month, value: r.value }));
-        this.tsData.set(filtered);
-      } else {
-        const statewide = data
-          .filter(r => r.state?.toLowerCase() === 'statewide')
-          .map(r => ({ month: r.month, value: r.value }));
-        this.tsData.set(statewide);
-      }
-    });
+    if (!scope && !island && !division) {
+      divisionType = 'Statewide'; apiIsland = 'Statewide'; name = 'Statewide';
+    } else if (!scope && island && !division) {
+      divisionType = 'island'; apiIsland = island; name = island;
+    } else {
+      divisionType =
+        scope === 'ahupuaa' ? 'ahupuaa' :
+        scope === 'moku' ? 'moku' :
+        scope === 'watershed' ? 'watershed' :
+        scope === 'divisions' ? 'climate_division' : 'island';
+      const divStr = division ?? '';
+      const parts = divStr.split('::');
+      name = parts.length === 2 ? parts[1].trim() : divStr.trim();
+      apiIsland = island ?? (parts.length === 2 ? parts[0].trim() : '');
+    }
+
+    return new HttpParams()
+      .set('division_type', divisionType)
+      .set('island', apiIsland)
+      .set('name', name)
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+  }
+
+  private loadRainfallData() {
+    const endYear = this.selectedYear();
+    const endMonth = this.selectedMonth();
+    const endDate = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+
+    // fetch 60 months back so all time-range options work client-side
+    const totalMonths0 = endYear * 12 + (endMonth - 1) - 59;
+    const startYear = Math.floor(totalMonths0 / 12);
+    const startMonth = (totalMonths0 % 12) + 1;
+    const startDate = `${startYear}-${String(startMonth).padStart(2, '0')}`;
+
+    const params = this.rainfallApiParams(startDate, endDate);
+    console.log('[loadRainfallData] params:', params.toString());
+
+    this.http.get<any[]>(this.rainfallHistoricalUrl, { params, headers: this.apiHeaders() })
+      .subscribe({
+        next: (results) => {
+          console.log('[loadRainfallData] API response:', results);
+          const mapped = (results ?? []).map(r => ({
+            month: (r.date as string).slice(0, 7),
+            value: +r.value
+          }));
+          this.tsData.set(mapped);
+        },
+        error: (err) => {
+          console.error('[loadRainfallData] Failed:', err);
+          this.tsData.set([]);
+        }
+      });
   }
 
   private loadTemperatureData() {

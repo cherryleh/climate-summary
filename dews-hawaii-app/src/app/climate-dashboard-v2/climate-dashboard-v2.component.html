@@ -8,12 +8,12 @@
       <div class="date-selectors">
         <select class="dropdown"
                 [ngModel]="selectedMonth()"
-                (ngModelChange)="selectedMonth.set(+$event)">
+                (ngModelChange)="setMonth(+$event)">
           <option *ngFor="let name of monthNames; let i = index" [value]="i + 1">{{ name }}</option>
         </select>
         <select class="dropdown"
                 [ngModel]="selectedYear()"
-                (ngModelChange)="selectedYear.set(+$event)">
+                (ngModelChange)="setYear(+$event)">
           <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
         </select>
       </div>
@@ -30,7 +30,7 @@
           <div class="snapshot-meta">
             <div class="eyebrow">Climate snapshot</div>
             <div class="title">
-              {{ currentDateLabel() }} {{ selectedDataset() }} –
+              {{ selectedDateLabel() }} {{ selectedDataset() }} –
               {{ selectedDivisionName() || islandLabel() || 'Statewide' }}
             </div>
           </div>
@@ -78,7 +78,7 @@
             [note]="(getRankSentiment(stats()?.rank, rainfallYears()) === 'high' ? 'Wettest' : 'Driest') + ' out of ' + rainfallYears() + ' years'">
           </app-stat-box>
           <app-stat-box *ngIf="dataset() === 'Rainfall'"
-            label="YTD % of Normal"
+            label="Year-to-date % of Normal"
             [value]="(stats()?.ytd_pnormal | number:'1.1-1') + '%'">
           </app-stat-box>
         </div>
@@ -123,7 +123,7 @@
           <div>
             <div class="eyebrow">Map</div>
             <div class="title">Select a geography for area-specific climate insights</div>
-            <div class="tiny muted">{{ selectedDataset() }} {{ currentDateLabel() }}</div>
+            <div class="tiny muted">{{ selectedDataset() }} {{ selectedDateLabel() }}</div>
           </div>
         </div>
 

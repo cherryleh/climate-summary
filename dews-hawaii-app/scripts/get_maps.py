@@ -144,26 +144,30 @@ if __name__ == "__main__":
     hst = pytz.timezone('HST')
     date = None
 
-    # if len(sys.argv) > 1:
-    #     input_date = sys.argv[1]
-    #     date = parser.parse(input_date).astimezone(hst)
-    # else:
-    #     today = datetime.now(hst)
-    #     today = today.replace(hour=0, minute=0, second=0, microsecond=0)
-    #     date = today - relativedelta(months=1)
+    if len(sys.argv) > 1:
+        input_date = sys.argv[1]
+        date = parser.parse(input_date).astimezone(hst)
+    else:
+        today = datetime.now(hst)
+        today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        date = today - relativedelta(months=1)
 
-    # month_value = date.month
-    # year_value = date.year
+    month_value = date.month
+    year_value = date.year
 
-    current_month_limit = 3
-    end_year = 2026
-    for year in range(1990,2026+1):
-      last_month = current_month_limit if year == end_year else 12
-      for month in range(1, last_month + 1):
-        try:
-            # process_rainfall(year_value, month_value)
-            # process_temperature(year_value, month_value)
-            process_drought(year, month)
-            print(f"{year}-{month} made successfully.")
-        except Exception as e:
-            print(f"{year}-{month} An error occurred: {e}")
+    process_rainfall(year_value, month_value)
+    process_temperature(year_value, month_value)
+    process_drought(year_value, month_value)
+
+    # current_month_limit = 3
+    # end_year = 2026
+    # for year in range(1990,2026+1):
+    #   last_month = current_month_limit if year == end_year else 12
+    #   for month in range(1, last_month + 1):
+    #     try:
+    #         # process_rainfall(year_value, month_value)
+    #         # process_temperature(year_value, month_value)
+    #         process_drought(year, month)
+    #         print(f"{year}-{month} made successfully.")
+    #     except Exception as e:
+    #         print(f"{year}-{month} An error occurred: {e}")

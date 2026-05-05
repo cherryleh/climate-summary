@@ -86,13 +86,23 @@ export class DataHighchartComponent implements OnChanges {
     this.chartOptions = {
       chart: {
         height: null,
-        type: isDistribution ? 'area' : undefined
+        type: isDistribution ? 'area' : undefined,
+        marginBottom: 80,
+        spacingBottom: 10,
+        events: {
+          render() { this.reflow(); }
+        }
       },
       title: { text: '' },
       xAxis: {
         categories,
         title: { text: undefined },
-        tickmarkPlacement: 'on'
+        tickmarkPlacement: 'on',
+        labels: {
+          rotation: -45,
+          style: { fontSize: '11px' },
+          overflow: 'allow'
+        }
       },
       yAxis: {
         title: { text: isDistribution ? 'Area (%)' : (isSPI ? 'SPI' : this.unit) },
