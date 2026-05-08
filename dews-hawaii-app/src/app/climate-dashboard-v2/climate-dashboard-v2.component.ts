@@ -76,6 +76,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
     pchange?: number;
     rank?: number;
     ytd_pnormal?: number;
+    max?: number;
     d0?: number; d1?: number; d2?: number; d3?: number; d4?: number;
     w0?: number; w1?: number; w2?: number; w3?: number; w4?: number;
     near_normal?: number;
@@ -280,7 +281,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
               : scope === 'moku'
               ? this.getProp(p, ['moku', 'Moku', 'MOKU'])
               : scope === 'watershed'
-              ? this.getProp(p, ['wuname', 'name_hwn', 'watershed', 'Watershed', 'WATERSHED', 'name'])
+              ? this.getProp(p, ['name_hwn'])
               : this.getProp(p, ['division', 'Division', 'name', 'NAME']);
 
           let prefixCanon = islandCanon;
@@ -330,11 +331,14 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
     // reload data
     this.loadStats();
-    this.loadRainfallData();
+    const d = this.dataset();
+    if (d === 'Rainfall') this.loadRainfallData();
+    else if (d === 'Temperature') this.loadTemperatureData();
+    else if (d === 'Drought') this.loadDroughtDistribution();
   }
 
 
-  tsData = signal<{ month: string; value: number }[]>([]);
+  tsData = signal<{ month: string; value?: number; [key: string]: any }[]>([]);
 
   email = signal<string>('');
   private emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -447,70 +451,63 @@ export class ClimateDashboardV2Component implements OnDestroy {
       return;
     }
 
-    // Temperature / Drought: continue reading from CSV
+    if (dataset === 'Temperature') {
+      await this.loadTemperatureStats(divisionArg);
+      return;
+    }
+
+    await this.loadDroughtStats(divisionArg);
+  }
+
+  private async loadDroughtStats(divisionArg?: string | null) {
     const island = this.selectedIsland();
     const division = divisionArg || this.selectedDivision();
     const scope = this.selectedScope();
+    const date = `${this.selectedYear()}-${String(this.selectedMonth()).padStart(2, '0')}`;
 
-    let prefix = 'statewide';
-    if (scope === 'ahupuaa') prefix = 'ahupuaa';
-    else if (scope === 'moku') prefix = 'moku';
-    else if (scope === 'watershed') prefix = 'watershed';
-    else if (scope === 'divisions') prefix = 'climate';
-    else if (island) prefix = 'island';
+    let divisionType: string, apiIsland: string, name: string;
 
-    const folder = dataset === 'Drought' ? 'spi' : dataset.toLowerCase();
-    const suffix = dataset.toLowerCase();
-
-    const file = `${folder}/${prefix}_${suffix}_stats.csv`;
-
-    const csv = await firstValueFrom(this.http.get(file, { responseType: 'text' }));
-    const rows = d3.csvParse(csv);
-
-    let record: any = null;
-
-    if (division) {
-      const parts = division.split('::');
-      const baseDiv = parts.length === 2 ? parts[1].trim() : division.trim();
-
-      record = rows.find(r => {
-        const csvLabel = this.normalizeKey(r['division_full'] || r['Division'] || r['name'] || '');
-        return csvLabel === this.normalizeKey(division) || csvLabel === this.normalizeKey(baseDiv);
-      });
+    if (!scope && !island && !division) {
+      divisionType = 'Statewide'; apiIsland = 'Statewide'; name = 'Statewide';
+    } else if (!scope && island && !division) {
+      divisionType = 'island';
+      apiIsland = this.canonicalIslandName(island);
+      name = this.canonicalIslandName(island);
+    } else {
+      divisionType =
+        scope === 'ahupuaa' ? 'ahupuaa' :
+        scope === 'moku' ? 'moku' :
+        scope === 'watershed' ? 'watershed' :
+        scope === 'divisions' ? 'climate_division' : 'island';
+      const divStr = division ?? '';
+      const parts = divStr.split('::');
+      name = parts.length === 2 ? parts[1].trim() : divStr.trim();
+      apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
     }
 
-    if (!record && island) {
-      const iso = this.normalizeKey(island);
+    const params = new HttpParams()
+      .set('division_type', divisionType)
+      .set('island', apiIsland)
+      .set('name', name)
+      .set('date', date);
 
-      record = rows.find(r => {
-        const fullValue = r['division_full'] || r['Division'] || '';
-        const normalizedCSV = this.normalizeKey(fullValue);
+    console.log('[loadDroughtStats] params:', { division_type: divisionType, island: apiIsland, name, date });
 
-        if (fullValue.includes('::')) {
-          const parts = fullValue.split('::').map(p => this.normalizeKey(p));
-          return parts.includes(iso);
-        }
-
-        return normalizedCSV === iso;
-      });
-    }
-
-    if (!record) {
-      record = rows.find(r =>
-        this.normalizeKey(r['division_full'] || '') === 'statewide'
+    try {
+      const results = await firstValueFrom(
+        this.http.get<any[]>(this.droughtStatsUrl, { params, headers: this.apiHeaders() })
       );
+      console.log('[loadDroughtStats] API response:', results);
+      const r = results?.[0] ?? null;
+      this.stats.set(r ? {
+        d0: +r.d0, d1: +r.d1, d2: +r.d2, d3: +r.d3, d4: +r.d4,
+        w0: +r.w0, w1: +r.w1, w2: +r.w2, w3: +r.w3, w4: +r.w4,
+        near_normal: +r.near_normal,
+      } : null);
+    } catch (err) {
+      console.error('[loadDroughtStats] Failed:', err);
+      this.stats.set(null);
     }
-
-    this.stats.set(record ? {
-      mean: +record.mean,
-      anomaly: +record.anomaly,
-      pchange: +record.pchange,
-      rank: +record.rank,
-      ytd_pnormal: +record.ytd_pnormal,
-      d4: +record.D4, d3: +record.D3, d2: +record.D2, d1: +record.D1, d0: +record.D0,
-      w4: +record.W4, w3: +record.W3, w2: +record.W2, w1: +record.W1, w0: +record.W0,
-      near_normal: +record['Near Normal']
-    } : null);
   }
 
   private async loadRainfallStats(divisionArg?: string | null) {
@@ -531,8 +528,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
       name = 'Statewide';
     } else if (!scope && island && !division) {
       divisionType = 'island';
-      apiIsland = island;
-      name = island;
+      apiIsland = this.canonicalIslandName(island);
+      name = this.canonicalIslandName(island);
     } else {
       divisionType =
         scope === 'ahupuaa' ? 'ahupuaa' :
@@ -543,7 +540,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
       const divisionStr = division ?? '';
       const parts = divisionStr.split('::');
       name = parts.length === 2 ? parts[1].trim() : divisionStr.trim();
-      apiIsland = island ?? (parts.length === 2 ? parts[0].trim() : '');
+      apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
     }
 
     const params = new HttpParams()
@@ -573,15 +570,71 @@ export class ClimateDashboardV2Component implements OnDestroy {
     }
   }
 
+  private temperatureStatsUrl = 'https://api.hcdp.ikewai.org/mesonet/climate_report/temperature_stats';
+
+  private async loadTemperatureStats(divisionArg?: string | null) {
+    const island = this.selectedIsland();
+    const division = divisionArg || this.selectedDivision();
+    const scope = this.selectedScope();
+    const date = `${this.selectedYear()}-${String(this.selectedMonth()).padStart(2, '0')}`;
+
+    let divisionType: string, apiIsland: string, name: string;
+
+    if (!scope && !island && !division) {
+      divisionType = 'Statewide'; apiIsland = 'Statewide'; name = 'Statewide';
+    } else if (!scope && island && !division) {
+      divisionType = 'island';
+      apiIsland = this.canonicalIslandName(island);
+      name = this.canonicalIslandName(island);
+    } else {
+      divisionType =
+        scope === 'ahupuaa' ? 'ahupuaa' :
+        scope === 'moku' ? 'moku' :
+        scope === 'watershed' ? 'watershed' :
+        scope === 'divisions' ? 'climate_division' : 'island';
+      const divStr = division ?? '';
+      const parts = divStr.split('::');
+      name = parts.length === 2 ? parts[1].trim() : divStr.trim();
+      apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
+    }
+
+    const params = new HttpParams()
+      .set('division_type', divisionType)
+      .set('island', apiIsland)
+      .set('name', name)
+      .set('date', date);
+
+    console.log('[loadTemperatureStats] params:', { division_type: divisionType, island: apiIsland, name, date });
+
+    try {
+      const results = await firstValueFrom(
+        this.http.get<any[]>(this.temperatureStatsUrl, { params, headers: this.apiHeaders() })
+      );
+      console.log('[loadTemperatureStats] API response:', results);
+      const record = results?.[0] ?? null;
+      this.stats.set(record ? {
+        mean: +record.mean,
+        anomaly: +record.anomaly,
+        pchange: +record.pchange,
+        rank: +record.rank,
+        max: +record.max,
+      } : null);
+    } catch (err) {
+      console.error('[loadTemperatureStats] Failed:', err);
+      this.stats.set(null);
+    }
+  }
+
 
   private async loadRasterOnce(dataset: Dataset) {
     try {
       const year = this.selectedYear();
       const mm = String(this.selectedMonth()).padStart(2, '0');
+      const tifBase = 'https://api.hcdp.ikewai.org/files/download/climate_report_data/climate_summary_tifs';
       let file = '';
-      if (dataset === 'Rainfall') file = `tifs/rainfall/rainfall_pdiff_cat_${year}_${mm}.tif`;
-      else if (dataset === 'Temperature') file = `tifs/temperature/temperature_diff_cat_${year}_${mm}.tif`;
-      else if (dataset === 'Drought') file = `tifs/drought/spi3_cat_${year}_${mm}.tif`;
+      if (dataset === 'Rainfall') file = `${tifBase}/rainfall/rainfall_pdiff_cat_${year}_${mm}.tif`;
+      else if (dataset === 'Temperature') file = `${tifBase}/temperature/temperature_diff_cat_${year}_${mm}.tif`;
+      else if (dataset === 'Drought') file = `${tifBase}/spi3/spi3_cat_${year}_${mm}.tif`;
 
       // --- Open the GeoTIFF ---
       const tiff = await GeoTIFF.fromUrl(file);
@@ -719,7 +772,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   private async loadRainfallDataConfig() {
     const year = this.selectedYear();
     const mm = String(this.selectedMonth()).padStart(2, '0');
-    const file = `tifs/rainfall/legend/rainfall_legend_${year}_${mm}.json`;
+    const file = `https://api.hcdp.ikewai.org/files/download/climate_report_data/climate_summary_tifs/rainfall/legend/rainfall_legend_${year}_${mm}.json`;
     const config = await firstValueFrom(this.http.get<any>(file));
     this.rainfallConfig.set(config);
     return config;
@@ -798,6 +851,10 @@ export class ClimateDashboardV2Component implements OnDestroy {
     if (this.dataset() === 'Rainfall') {
       this.loadRainfallData();
       this.loadRainfallDataConfig();
+    } else if (this.dataset() === 'Temperature') {
+      this.loadTemperatureData();
+    } else if (this.dataset() === 'Drought') {
+      this.loadDroughtDistribution();
     }
   }
 
@@ -917,7 +974,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
       d2: Math.round(d2 + d3 + d4),
       d1: Math.round(d1 + d2 + d3 + d4),
       d0: Math.round(totalDry),
-      totalBase: totalDry // Raw unrounded sum for precise comparison
+      near_normal: Math.round(Number(data.near_normal) || 0),
+      totalBase: totalDry
     };
   });
 
@@ -940,7 +998,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
       w2: Math.round(w2 + w3 + w4),
       w1: Math.round(w1 + w2 + w3 + w4),
       w0: Math.round(totalWet),
-      totalBase: totalWet // Raw unrounded sum for precise comparison
+      near_normal: Math.round(Number(data.near_normal) || 0),
+      totalBase: totalWet
     };
   });
 
@@ -1109,19 +1168,21 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
   private rainfallHistoricalUrl = 'https://api.hcdp.ikewai.org/mesonet/climate_report/rainfall_historical';
 
-  private rainfallApiParams(startDate: string, endDate: string): HttpParams {
+  private buildRainfallQueryArgs(extraDates: Record<string, string>): Record<string, string> {
     const island = this.selectedIsland();
     const division = this.selectedDivision();
     const scope = this.selectedScope();
 
-    let divisionType: string, apiIsland: string, name: string;
+    let division_type: string, apiIsland: string, name: string;
 
     if (!scope && !island && !division) {
-      divisionType = 'Statewide'; apiIsland = 'Statewide'; name = 'Statewide';
+      division_type = 'Statewide'; apiIsland = 'Statewide'; name = 'Statewide';
     } else if (!scope && island && !division) {
-      divisionType = 'island'; apiIsland = island; name = island;
+      division_type = 'island';
+      apiIsland = this.canonicalIslandName(island);
+      name = this.canonicalIslandName(island);
     } else {
-      divisionType =
+      division_type =
         scope === 'ahupuaa' ? 'ahupuaa' :
         scope === 'moku' ? 'moku' :
         scope === 'watershed' ? 'watershed' :
@@ -1129,15 +1190,15 @@ export class ClimateDashboardV2Component implements OnDestroy {
       const divStr = division ?? '';
       const parts = divStr.split('::');
       name = parts.length === 2 ? parts[1].trim() : divStr.trim();
-      apiIsland = island ?? (parts.length === 2 ? parts[0].trim() : '');
+      apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
     }
 
-    return new HttpParams()
-      .set('division_type', divisionType)
-      .set('island', apiIsland)
-      .set('name', name)
-      .set('startDate', startDate)
-      .set('endDate', endDate);
+    return { division_type, island: apiIsland, name, ...extraDates };
+  }
+
+  private rainfallApiParams(startDate: string, endDate: string): HttpParams {
+    const args = this.buildRainfallQueryArgs({ startDate, endDate });
+    return Object.entries(args).reduce((p, [k, v]) => p.set(k, v), new HttpParams());
   }
 
   private loadRainfallData() {
@@ -1151,8 +1212,9 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const startMonth = (totalMonths0 % 12) + 1;
     const startDate = `${startYear}-${String(startMonth).padStart(2, '0')}`;
 
-    const params = this.rainfallApiParams(startDate, endDate);
-    console.log('[loadRainfallData] params:', params.toString());
+    const args = this.buildRainfallQueryArgs({ startDate, endDate });
+    const params = Object.entries(args).reduce((p, [k, v]) => p.set(k, v), new HttpParams());
+    console.log('[loadRainfallData] params:', args);
 
     this.http.get<any[]>(this.rainfallHistoricalUrl, { params, headers: this.apiHeaders() })
       .subscribe({
@@ -1171,25 +1233,37 @@ export class ClimateDashboardV2Component implements OnDestroy {
       });
   }
 
+  private temperatureHistoricalUrl = 'https://api.hcdp.ikewai.org/mesonet/climate_report/temperature_historical';
+
   private loadTemperatureData() {
-    const island = this.selectedIsland();
-    const file = island ? 'temperature/island_temperature.csv' : 'temperature/statewide_temperature.csv';
+    const endYear = this.selectedYear();
+    const endMonth = this.selectedMonth();
+    const endDate = `${endYear}-${String(endMonth).padStart(2, '0')}`;
 
-    this.http.get(file, { responseType: 'text' }).subscribe(csv => {
-      const data = this.parseCsv(csv, island ? 'island' : 'state');
+    const totalMonths0 = endYear * 12 + (endMonth - 1) - 59;
+    const startYear = Math.floor(totalMonths0 / 12);
+    const startMonth = (totalMonths0 % 12) + 1;
+    const startDate = `${startYear}-${String(startMonth).padStart(2, '0')}`;
 
-      if (island) {
-        const filtered = data
-          .filter(r => r.island?.trim().toLowerCase() === island.trim().toLowerCase())
-          .map(r => ({ month: r.month, value: r.value }));
-        this.tsData.set(filtered);
-      } else {
-        const statewide = data
-          .filter(r => r.state?.toLowerCase() === 'statewide')
-          .map(r => ({ month: r.month, value: r.value }));
-        this.tsData.set(statewide);
-      }
-    });
+    const args = this.buildRainfallQueryArgs({ startDate, endDate });
+    const params = Object.entries(args).reduce((p, [k, v]) => p.set(k, v), new HttpParams());
+    console.log('[loadTemperatureData] params:', args);
+
+    this.http.get<any[]>(this.temperatureHistoricalUrl, { params, headers: this.apiHeaders() })
+      .subscribe({
+        next: (results) => {
+          console.log('[loadTemperatureData] API response:', results);
+          const mapped = (results ?? []).map(r => ({
+            month: (r.date as string).slice(0, 7),
+            value: +r.value
+          }));
+          this.tsData.set(mapped);
+        },
+        error: (err) => {
+          console.error('[loadTemperatureData] Failed:', err);
+          this.tsData.set([]);
+        }
+      });
   }
 
 
@@ -1276,26 +1350,46 @@ export class ClimateDashboardV2Component implements OnDestroy {
       data: s.data.slice(-months)   // last N months per scale
     }));
   });
+  private droughtStatsUrl = 'https://api.hcdp.ikewai.org/mesonet/climate_report/drought_stats';
+
   private async loadDroughtDistribution() {
-    // Path to the CSV generated by your Python script
-    const file = 'spi/statewide_spi3_distribution.csv';
+    const endYear = this.selectedYear();
+    const endMonth = this.selectedMonth();
+    const endDate = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+
+    const totalMonths0 = endYear * 12 + (endMonth - 1) - 59;
+    const startYear = Math.floor(totalMonths0 / 12);
+    const startMonth = (totalMonths0 % 12) + 1;
+    const startDate = `${startYear}-${String(startMonth).padStart(2, '0')}`;
+
+    const args = this.buildRainfallQueryArgs({ startDate, endDate });
+    const params = Object.entries(args).reduce((p, [k, v]) => p.set(k, v), new HttpParams());
+    console.log('[loadDroughtDistribution] params:', args);
 
     try {
-      const csv = await firstValueFrom(this.http.get(file, { responseType: 'text' }));
-      const rows = d3.csvParse(csv);
+      const results = await firstValueFrom(
+        this.http.get<any[]>(this.droughtStatsUrl, { params, headers: this.apiHeaders() })
+      );
+      console.log('[loadDroughtDistribution] API response:', results);
 
-      // Convert string values from CSV to numbers
-      const formattedData = rows.map(row => {
-        const obj: any = { month: row['month'] };
-        Object.keys(row).forEach(key => {
-          if (key !== 'month') obj[key] = parseFloat(row[key] || '0');
-        });
-        return obj;
-      });
+      const mapped = (results ?? []).map(r => ({
+        month: (r.date as string).slice(0, 7),
+        'D0 Abnormally Dry':      parseFloat(r.d0 || '0'),
+        'D1 Moderate Drought':    parseFloat(r.d1 || '0'),
+        'D2 Severe Drought':      parseFloat(r.d2 || '0'),
+        'D3 Extreme Drought':     parseFloat(r.d3 || '0'),
+        'D4 Exceptional Drought': parseFloat(r.d4 || '0'),
+        'W0 Abnormally Wet':      parseFloat(r.w0 || '0'),
+        'W1 Moderately Wet':      parseFloat(r.w1 || '0'),
+        'W2 Severely Wet':        parseFloat(r.w2 || '0'),
+        'W3 Extremely Wet':       parseFloat(r.w3 || '0'),
+        'W4 Exceptionally Wet':   parseFloat(r.w4 || '0'),
+      }));
 
-      this.tsData.set(formattedData);
+      this.tsData.set(mapped);
     } catch (err) {
-      console.error('Could not load drought distribution CSV', err);
+      console.error('[loadDroughtDistribution] Failed:', err);
+      this.tsData.set([]);
     }
   }
 
@@ -1359,90 +1453,30 @@ export class ClimateDashboardV2Component implements OnDestroy {
     this.selectedDivision.set(d);
     this.loadStats(d);
 
-    if (!d) {
-      // If no division was chosen, fallback to island/statewide
-      const island = this.selectedIsland();
-      if (island && this.selectedDataset() === 'Drought') {
-        const newSeries = this.spiSeries().map(s => {
-          const parsed = this.divisionSPIByScale[s.scale] || [];
-          return {
-            scale: s.scale,
-            data: parsed
-              .filter((r: any) => r['island']?.trim().toLowerCase() === island.trim().toLowerCase())
-              .map((r: any) => ({ month: r.month, value: r.value }))
-          };
-        });
-        this.spiSeries.set(newSeries);
-      }
-      return;
-    }
-
-    this.selectedDivision.set(d);
-    const divKey = d.trim().toLowerCase();
-    const scope = this.selectedScope();
     const dataset = this.selectedDataset();
+    if (dataset === 'Rainfall') this.loadRainfallData();
+    else if (dataset === 'Temperature') this.loadTemperatureData();
+    else if (dataset === 'Drought') this.loadDroughtDistribution();
 
-    // Map to label key
-    let labelKey: 'division' | 'moku' | 'ahupuaa' | 'watershed' = 'division';
-    if (scope === 'moku') labelKey = 'moku';
-    else if (scope === 'ahupuaa') labelKey = 'ahupuaa';
-    else if (scope === 'watershed') labelKey = 'watershed';
-
-    if (dataset === 'Drought') {
-      // Drought — load all SPI scales
-      const scales = [1, 6, 12];
-      const parts = d.split('::');
-      const baseDiv = parts.length === 2 ? parts[1].trim() : d.trim();
-
-      const promises = scales.map(scale =>
-        firstValueFrom(this.http.get(`spi/${scope}_spi${scale}.csv`, { responseType: 'text' }))
-          .then(csv => {
-            const parsed = this.parseCsv(csv, labelKey);
-            this.divisionSPIByScale[scale] = parsed;
-            const data = parsed
-              .filter(r => {
-                const csvLabel = this.normalizeKey(r[labelKey] || '');
-                return csvLabel === this.normalizeKey(d) || csvLabel === this.normalizeKey(baseDiv);
-              })
-              .map(r => ({ month: r.month, value: r.value }));
-            return { scale, data };
-          })
-      );
-
-      Promise.all(promises).then(results => this.spiSeries.set(results));
-      return;
-    }
-
-    // Rainfall / Temperature
-    const datasetFolder = dataset.toLowerCase(); // rainfall | temperature
-    const prefix = scope === 'divisions' ? 'climate' : scope;
-    const file = `${datasetFolder}/${prefix}_${datasetFolder}.csv`;
-
-    const parts = d.split('::');
-    const baseDiv = parts.length === 2 ? parts[1].trim() : d.trim();
-
-    this.http.get(file, { responseType: 'text' }).subscribe(csv => {
-      const parsed = this.parseCsv(csv, labelKey);
-
-      const filtered = parsed
-        .filter(r => {
-          const csvLabel = this.normalizeKey(r[labelKey] || '');
-          return (
-            csvLabel === this.normalizeKey(d) ||
-            csvLabel === this.normalizeKey(baseDiv)
-          );
-        })
-        .map(r => ({ month: r.month, value: r.value }));
-
-      this.tsData.set(filtered);
-    });
   }
 
   reset() {
+    this.selectedScope.set(null);
     this.selectedIsland.set(null);
     this.selectedDivision.set(null);
     this.viewMode.set('islands');
+
     this.loadStats();
+
+    const dataset = this.selectedDataset();
+    if (dataset === 'Drought') {
+      this.loadDroughtDistribution();
+    } else if (dataset === 'Rainfall') {
+      this.loadRainfallData();
+    } else if (dataset === 'Temperature') {
+      this.loadTemperatureData();
+    }
+
     // reload map outlines
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
       const projection = geoIdentity().reflectY(true).fitExtent([[-130, 10], [560, 310]], fc);
@@ -1467,62 +1501,6 @@ export class ClimateDashboardV2Component implements OnDestroy {
       this.pathById.set(pathById);
       this.centroidById.set(centroidById);
     });
-
-    const dataset = this.selectedDataset();
-
-    // Reload data normally
-    if (dataset === 'Drought') {
-      this.loadDroughtDistribution();
-    } else if (dataset === 'Rainfall') {
-      this.loadRainfallData();
-    } else if (dataset === 'Temperature') {
-      this.loadTemperatureData();
-    }
-
-    // --- Force statewide stats reload ---
-    setTimeout(() => this.loadStats(null), 0);
-
-
-    // === smooth transition ===
-    // small helper to animate once data is ready
-    const applyStatewide = () => {
-      const stateData = this.statewideSPI
-        .filter((r: any) => r.state?.toLowerCase() === 'statewide')
-        .map((r: any) => ({ month: r.month, value: r.value }));
-
-      if (!stateData.length) return false; // still not ready
-      const old = this.tsData();
-
-      if (!old || !old.length) {
-        this.tsData.set(stateData);
-        return true;
-      }
-
-      // trigger animation
-      const intermediate = stateData.map((d, i) => ({
-        month: d.month,
-        value: old[i] ? old[i].value : 0
-      }));
-      this.tsData.set(intermediate);
-      setTimeout(() => this.tsData.set(stateData), 50);
-      return true;
-    };
-
-    // try immediately; if data not ready yet, retry shortly
-    if (!applyStatewide()) {
-      const check = setInterval(() => {
-        if (applyStatewide()) clearInterval(check);
-      }, 100);
-    }
-    // --- Force statewide stats reload explicitly ---
-    setTimeout(() => {
-      this.selectedScope.set(null);
-      this.selectedIsland.set(null);
-      this.selectedDivision.set(null);
-      console.log('Reset: fetching statewide stats');
-      this.loadStats(null);
-    }, 50);
-
   }
 
   formatRank(rank: number | undefined): string {
@@ -1540,6 +1518,87 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
 
+
+  rainfallInfoBox = computed(() => {
+    const s = this.stats();
+    const location = this.selectedDivisionName() || this.islandLabel() || 'Statewide';
+    const month = this.monthNames[this.selectedMonth() - 1];
+    const years = this.rainfallYears();
+
+    if (!s || s.mean == null) return `${location} rainfall data is not yet available for this period.`;
+
+    const mean = s.mean?.toFixed(1) ?? '—';
+    const anomaly = s.anomaly ?? 0;
+    const pchange = s.pchange ?? 0;
+    const rank = s.rank;
+
+    const direction = anomaly >= 0 ? 'above' : 'below';
+    const absPchange = Math.abs(Math.round(pchange));
+    const absAnomaly = Math.abs(anomaly).toFixed(1);
+
+    let rankStr = '';
+    if (rank != null && years > 0) {
+      const sentiment = this.getRankSentiment(rank, years) === 'high' ? 'wettest' : 'driest';
+      const suffix = this.formatRankSuffix(rank);
+      rankStr = `, ranking as the ${rank}${suffix} ${sentiment} ${month} in the last ${years} years`;
+    }
+
+    return `${location} received ${mean} inches of rainfall — ${absAnomaly} inches (${absPchange}%) ${direction} the ${month} average${rankStr}.`;
+  });
+
+  temperatureInfoBox = computed(() => {
+    const s = this.stats();
+    const location = this.selectedDivisionName() || this.islandLabel() || 'Statewide';
+    const month = this.monthNames[this.selectedMonth() - 1];
+    const years = this.temperatureYears();
+
+    if (!s || s.mean == null) return `${location} temperature data is not yet available for this period.`;
+
+    const mean = s.mean?.toFixed(1) ?? '—';
+    const anomaly = s.anomaly ?? 0;
+    const rank = s.rank;
+
+    const direction = anomaly >= 0 ? 'above' : 'below';
+    const absAnomaly = Math.abs(anomaly).toFixed(1);
+
+    let rankStr = '';
+    if (rank != null && years > 0) {
+      const sentiment = this.getRankSentiment(rank, years) === 'high' ? 'warmest' : 'coolest';
+      const suffix = this.formatRankSuffix(rank);
+      rankStr = `, ranking as the ${rank}${suffix} ${sentiment} ${month} in the last ${years} years`;
+    }
+
+    return `${location} averaged ${mean}°F — ${absAnomaly}°F ${direction} the ${month} average${rankStr}.`;
+  });
+
+  droughtInfoBox = computed(() => {
+    const location = this.selectedDivisionName() || this.islandLabel() || 'Statewide';
+    const condition = this.dominantCondition();
+
+    if (condition === 'wet') {
+      const w = this.currentWetStats();
+      if (!w) return `${location} drought/wetness data is not yet available for this period.`;
+      return `${location} experienced wet conditions with ${w.w0}% of land area seeing at least abnormally wet conditions, and ${w.w3}% seeing extreme wetness or worse.`;
+    }
+
+    const d = this.currentDroughtStats();
+    if (!d) return `${location} drought data is not yet available for this period.`;
+
+    if (d.totalBase === 0) {
+      return `${location} experienced near-normal conditions with no drought recorded this month.`;
+    }
+
+    return `${location} experienced dry conditions with ${d.d0}% of land area seeing at least abnormally dry conditions, and ${d.d3}% seeing extreme drought or worse.`;
+  });
+
+  private formatRankSuffix(rank: number): string {
+    const j = rank % 10;
+    const k = rank % 100;
+    if (j === 1 && k !== 11) return 'st';
+    if (j === 2 && k !== 12) return 'nd';
+    if (j === 3 && k !== 13) return 'rd';
+    return 'th';
+  }
 
   formatAnomaly(value?: number | null, dataset?: 'Rainfall' | 'Temperature' | 'Drought'): string {
     if (value == null || isNaN(value)) return '';
@@ -1564,9 +1623,23 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
   private islandToApi(island: string): string {
-    // Your island labels might be "Honolulu", "Hawaiʻi", etc.
-    // API examples use lowercase: hawaii, honolulu
     return this.slugifySelection(island).replace('_island', '');
+  }
+
+  private readonly ISLAND_CANONICAL: Record<string, string> = {
+    hawaii:     'Hawaiʻi',
+    oahu:       'Oʻahu',
+    kauai:      'Kauaʻi',
+    lanai:      'Lānaʻi',
+    molokai:    'Molokaʻi',
+    kahoolawe:  'Kahoʻolawe',
+    maui:       'Maui',
+    niihau:     'Niʻihau',
+  };
+
+  private canonicalIslandName(island: string): string {
+    const key = this.normalizeKey(island);
+    return this.ISLAND_CANONICAL[key] ?? island;
   }
 
   private extractScopedName(key: string): string {

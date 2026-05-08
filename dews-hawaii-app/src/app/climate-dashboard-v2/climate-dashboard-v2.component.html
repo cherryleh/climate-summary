@@ -57,15 +57,9 @@
         </div>
 
         <!-- Statement -->
-        <div class="info-box" *ngIf="selectedDataset() === 'Rainfall'">
-          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} received 2.0 inches of rainfall statewide — 3.2 inches (62%) below the August average, marking the driest August in the last 30 years.
-        </div>
-        <div class="info-box" *ngIf="selectedDataset() === 'Temperature'">
-          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} averaged 70°F statewide — 0.5°F above the August average, ranking as the 11th warmest August in the last 30 years.
-        </div>
-        <div class="info-box" *ngIf="selectedDataset() === 'Drought'">
-          {{ selectedDivisionName() || islandLabel() || 'Statewide' }} saw dry conditions with 67% of land area seeing at least abnormally dry conditions, and 21% seeing severe drought or worse conditions.
-        </div>
+        <div class="info-box" *ngIf="selectedDataset() === 'Rainfall'">{{ rainfallInfoBox() }}</div>
+        <div class="info-box" *ngIf="selectedDataset() === 'Temperature'">{{ temperatureInfoBox() }}</div>
+        <div class="info-box" *ngIf="selectedDataset() === 'Drought'">{{ droughtInfoBox() }}</div>
 
         <!-- Rainfall stats -->
         <div class="stats stats-rainfall" *ngIf="selectedDataset() === 'Rainfall' && stats()">
@@ -99,22 +93,24 @@
             [value]="formatRank(stats()?.rank)"
             [note]="(getRankSentiment(stats()?.rank, temperatureYears()) === 'high' ? 'Warmest' : 'Coolest') + ' out of ' + temperatureYears() + ' years'">
           </app-stat-box>
-          <app-stat-box label="Max temp" value="test"></app-stat-box>
+          <app-stat-box label="Max temp"
+            [value]="((stats()?.max | number:'1.1-1') ?? '') + '°F'">
+          </app-stat-box>
         </div>
 
         <!-- Drought stats -->
         <ng-container *ngIf="selectedDataset() === 'Drought'">
           <div class="stats stats-drought" *ngIf="dominantCondition() === 'drought' && currentDroughtStats() as dStats">
+            <app-stat-box [value]="dStats.near_normal + '%'" note="of area under <strong>normal conditions</strong>"></app-stat-box>
             <app-stat-box [value]="dStats.d0 + '%'" note="of area <strong>abnormally dry</strong> or worse"></app-stat-box>
             <app-stat-box [value]="dStats.d1 + '%'" note="of area in <strong>moderate drought</strong> or worse"></app-stat-box>
-            <app-stat-box [value]="dStats.d2 + '%'" note="of area in <strong>severe drought</strong> or worse"></app-stat-box>
             <app-stat-box [value]="dStats.d3 + '%'" note="of area in <strong>extreme drought</strong> or worse"></app-stat-box>
             <app-stat-box [value]="dStats.d4 + '%'" note="of area in <strong>exceptional drought</strong>"></app-stat-box>
           </div>
           <div class="stats stats-wet" *ngIf="dominantCondition() === 'wet' && currentWetStats() as wStats">
+            <app-stat-box [value]="wStats.near_normal + '%'" note="of area under <strong>normal conditions</strong>"></app-stat-box>
             <app-stat-box [value]="wStats.w0 + '%'" note="of area <strong>abnormally wet</strong> or wetter"></app-stat-box>
             <app-stat-box [value]="wStats.w1 + '%'" note="of area in <strong>moderate wetness</strong> or wetter"></app-stat-box>
-            <app-stat-box [value]="wStats.w2 + '%'" note="of area in <strong>severe wetness</strong> or wetter"></app-stat-box>
             <app-stat-box [value]="wStats.w3 + '%'" note="of area in <strong>extreme wetness</strong> or wetter"></app-stat-box>
             <app-stat-box [value]="wStats.w4 + '%'" note="of area in <strong>exceptional wetness</strong>"></app-stat-box>
           </div>

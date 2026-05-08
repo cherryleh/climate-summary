@@ -23,7 +23,7 @@ jobs:
 
       - name: Generate environment.ts
         run: |
-          echo "export const environment = { production: false, apiToken: '' };" > dews-hawaii-app/src/environments/environment.ts
+          echo "export const environment = { production: false, apiToken: '$(echo '${{ secrets.API_CONFIG_JSON }}' };" > dews-hawaii-app/src/environments/environment.ts
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
