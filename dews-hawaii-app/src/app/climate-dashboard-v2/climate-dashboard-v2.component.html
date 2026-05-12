@@ -63,7 +63,7 @@
 
         <!-- Rainfall stats -->
         <div class="stats stats-rainfall" *ngIf="selectedDataset() === 'Rainfall' && stats()">
-          <app-stat-box label="Average"
+          <app-stat-box label="Observed Average"
             [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' in'">
           </app-stat-box>
           <app-stat-box label="Anomaly"
@@ -83,7 +83,7 @@
 
         <!-- Temperature stats -->
         <div class="stats stats-temperature" *ngIf="selectedDataset() === 'Temperature' && stats()">
-          <app-stat-box label="Mean"
+          <app-stat-box label="Observed Average"
             [value]="((stats()?.mean | number:'1.1-1') ?? '') + '°F'">
           </app-stat-box>
           <app-stat-box label="Anomaly"
@@ -291,6 +291,7 @@
             Subscribe
           </button>
           <button class="btn" (click)="email.set('')">Clear</button>
+          <a class="btn" routerLink="/manage-subscriptions">Manage preferences</a>
         </div>
         <div class="tiny muted">We'll send a report around the 1st of each month. You can unsubscribe anytime.</div>
       </div>

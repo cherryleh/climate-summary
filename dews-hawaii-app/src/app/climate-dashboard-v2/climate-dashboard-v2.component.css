@@ -171,6 +171,7 @@
   white-space: nowrap;
 }
 .btn:hover           { background: #f9fafb; }
+a.btn                { color: inherit; text-decoration: none; }
 .btn-primary         { background: #e0f2fe; border-color: #bae6fd; }
 .btn-primary:hover   { background: #bae6fd; }
 .btn[disabled]       { opacity: 0.6; cursor: not-allowed; }

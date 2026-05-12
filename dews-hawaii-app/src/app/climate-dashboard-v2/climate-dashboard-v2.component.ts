@@ -15,7 +15,7 @@ import * as GeoTIFF from 'geotiff';
 import { Pool } from 'geotiff';
 import { NgZone } from '@angular/core';
 import { MapPanelComponent } from '../map-panel/map-panel.component';
-
+import { RouterModule } from '@angular/router';
 import { EmailSubscriptionService } from '../services/email-subscription.service';
 
 import { catchError, map, switchMap } from 'rxjs/operators';
@@ -52,7 +52,7 @@ function canonIsland(name: string): string {
 @Component({
   selector: 'app-climate-dashboard-v2',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, DataHighchartComponent, FooterComponent, MapPanelComponent],
+  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, DataHighchartComponent, FooterComponent, MapPanelComponent, RouterModule],
   templateUrl: './climate-dashboard-v2.component.html',
   styleUrls: ['./climate-dashboard-v2.component.css']
 })
