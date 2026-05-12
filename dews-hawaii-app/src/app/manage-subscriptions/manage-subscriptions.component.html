@@ -1,0 +1,107 @@
+<div class="wrap">
+
+  <!-- Step 1: Email lookup -->
+  <ng-container *ngIf="view === 'email'">
+    <h2>Manage Subscriptions</h2>
+    <p class="subtext">Enter your email address to view and manage your report preferences.</p>
+
+    <form #f="ngForm" (ngSubmit)="lookup(f)" novalidate>
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        required
+        email
+        autocomplete="email"
+        placeholder="name@hawaii.edu"
+        [disabled]="loading"
+      />
+
+      <button type="submit" [disabled]="loading || f.invalid">
+        {{ loading ? 'Looking up…' : 'Look up' }}
+      </button>
+
+      <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+      <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+    </form>
+  </ng-container>
+
+  <!-- Step 2: Preferences -->
+  <ng-container *ngIf="view === 'prefs'">
+    <div class="prefs-header">
+      <button class="back-btn" (click)="back()" [disabled]="loading">← Back</button>
+      <div>
+        <h2>Your Subscriptions</h2>
+        <p class="subtext">{{ email }}</p>
+      </div>
+    </div>
+
+    <ng-container *ngIf="hasAnySubscription; else noPrefs">
+      <p class="hint">Uncheck items you want to remove, then save.</p>
+
+      <div
+        class="category"
+        *ngFor="let cat of categories"
+      >
+        <ng-container *ngIf="(items[cat]?.length ?? 0) > 0">
+          <div class="cat-header">
+            <span class="cat-label">{{ categoryLabels[cat] }}</span>
+            <label class="toggle-all">
+              <input
+                type="checkbox"
+                [checked]="allChecked(cat)"
+                (change)="toggleAll(cat, $any($event.target).checked)"
+                [disabled]="loading"
+              />
+              All
+            </label>
+          </div>
+          <div class="chip-grid">
+            <label
+              class="chip"
+              [class.unchecked]="!checked[cat]?.[item]"
+              *ngFor="let item of items[cat]"
+            >
+              <input
+                type="checkbox"
+                [(ngModel)]="checked[cat]![item]"
+                [disabled]="loading"
+              />
+              {{ item }}
+            </label>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="actions">
+        <button
+          class="save-btn"
+          (click)="saveChanges()"
+          [disabled]="loading || checkedCount === 0"
+        >
+          {{ loading ? 'Saving…' : 'Save changes' }}
+        </button>
+        <button
+          class="unsub-btn"
+          (click)="unsubscribeAll()"
+          [disabled]="loading"
+        >
+          {{ loading ? 'Removing…' : 'Unsubscribe from all' }}
+        </button>
+      </div>
+    </ng-container>
+
+    <ng-template #noPrefs>
+      <p class="subtext">No active subscriptions found for this email.</p>
+      <button class="unsub-btn" (click)="unsubscribeAll()" [disabled]="loading">
+        {{ loading ? 'Removing…' : 'Unsubscribe from all' }}
+      </button>
+    </ng-template>
+
+    <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+  </ng-container>
+
+</div>

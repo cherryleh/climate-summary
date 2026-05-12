@@ -7,6 +7,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
   selector: 'app-data-highchart',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
+  styleUrls: ['./data-highchart.component.css'],
   template: `
   <highcharts-chart
     [Highcharts]="Highcharts"
@@ -33,6 +34,12 @@ export class DataHighchartComponent implements OnChanges {
     }
   }
 
+  private formatMonth(ym: string): string {
+    const [year, month] = ym.split('-');
+    const abbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${abbr[parseInt(month, 10) - 1]} '${year.slice(2)}`;
+  }
+
   private updateChart() {
     const isSPI = this.dataset === 'Drought';
     let categories: string[] = [];
@@ -41,7 +48,7 @@ export class DataHighchartComponent implements OnChanges {
     const isDistribution = isSPI && this.data.length > 0 && ('D4 Exceptional Drought' in this.data[0]);
 
     if (isDistribution) {
-      categories = this.data.map(d => d.month);
+      categories = this.data.map(d => this.formatMonth(d.month));
       const config = [
         // Drought categories (Factor 1 = Above the line)
         { name: 'D0 Abnormally Dry', color: '#FFFF00', factor: 1 },
@@ -70,7 +77,7 @@ export class DataHighchartComponent implements OnChanges {
       }));
 
     } else {
-      categories = this.data.map(d => d.month);
+      categories = this.data.map(d => this.formatMonth(d.month));
 
       const seriesColor = this.dataset === 'Rainfall' ? '#7cb5ec' : '#ff4d4d';
 
@@ -88,9 +95,21 @@ export class DataHighchartComponent implements OnChanges {
         height: null,
         type: isDistribution ? 'area' : undefined,
         marginBottom: 80,
+        marginRight: 20,
         spacingBottom: 10,
         events: {
-          render() { this.reflow(); }
+          render() {
+            this.reflow();
+            if (this.container) {
+              this.container.style.overflow = 'visible';
+              if (this.container.parentElement) {
+                this.container.parentElement.style.overflow = 'visible';
+              }
+            }
+            if (this.renderer?.box) {
+              this.renderer.box.style.overflow = 'visible';
+            }
+          }
         }
       },
       title: { text: '' },
@@ -100,6 +119,7 @@ export class DataHighchartComponent implements OnChanges {
         tickmarkPlacement: 'on',
         labels: {
           rotation: -45,
+          y: 14,
           style: { fontSize: '11px' },
           overflow: 'allow'
         }

@@ -33,6 +33,14 @@ html {
   overflow-x: hidden; /* prevent any content from making the page wider */
 }
 
+/* Highcharts sets overflow:hidden on both the renderTo element and its inner
+   container, clipping rotated x-axis labels that extend past the SVG boundary. */
+highcharts-chart,
+.highcharts-container,
+.highcharts-container svg {
+  overflow: visible !important;
+}
+
 html, body {
   font-family: var(--app-font);
   -webkit-font-smoothing: antialiased;

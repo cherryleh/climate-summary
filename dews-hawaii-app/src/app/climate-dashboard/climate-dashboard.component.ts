@@ -364,6 +364,10 @@ export class ClimateDashboardComponent implements OnDestroy {
       else if (scope === 'ahupuaa') newBody.ahupuaa = [name];
       else if (scope === 'watershed') newBody.watershed = [name];
 
+      if (islandSel) {
+        const islandKey = this.slugifySelection(islandSel);
+        newBody.county = [this.ISLAND_CANONICAL[islandKey] ?? islandSel];
+      }
     }
 
     this.emailSvc.emailLookup(email).pipe(
@@ -1379,34 +1383,55 @@ export class ClimateDashboardComponent implements OnDestroy {
   }
 
   private islandToApi(island: string): string {
-    // Your island labels might be "Honolulu", "Hawaiʻi", etc.
-    // API examples use lowercase: hawaii, honolulu
     return this.slugifySelection(island).replace('_island', '');
   }
 
+  private readonly ISLAND_CANONICAL: Record<string, string> = {
+    hawaii:    'Hawaiʻi',
+    oahu:      'Oʻahu',
+    kauai:     'Kauaʻi',
+    lanai:     'Lānaʻi',
+    molokai:   'Molokaʻi',
+    kahoolawe: 'Kahoʻolawe',
+    maui:      'Maui',
+    niihau:    'Niʻihau',
+  };
+
   private extractScopedName(key: string): string {
-    // key looks like "molokai::Kona" (in your code)
-    // We want the right-hand name
     const parts = key.split('::');
-    const name = (parts.length === 2 ? parts[1] : key).trim();
-    return this.slugifySelection(name);
+    if (parts.length === 2) {
+      const islandKey = this.slugifySelection(parts[0]);
+      const islandName = this.ISLAND_CANONICAL[islandKey] ?? parts[0].trim();
+      return `${islandName}::${parts[1].trim()}`;
+    }
+    return key.trim();
   }
 
   private readonly LIST_FIELDS: Array<'county'|'moku'|'ahupuaa'|'watershed'> =
     ['county', 'moku', 'ahupuaa', 'watershed'];
 
   private mergeDedup(oldVals: string[] = [], newVals: string[] = []): string[] {
+    const normalize = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[ʻ''`]/gu, '').toLowerCase();
+    const baseName = (v: string) => normalize(v.includes('::') ? v.split('::')[1] : v);
+
+    // Base names from incoming values supersede old bare-name entries for the same location
+    const newBaseNames = new Set(newVals.map(v => baseName(v)));
+
     const out: string[] = [];
     const seen = new Set<string>();
 
-    for (const v of [...oldVals, ...newVals]) {
+    for (const v of oldVals) {
+      const s = (v ?? '').trim();
+      if (!s || newBaseNames.has(baseName(s))) continue; // superseded by new prefixed entry
+      if (!seen.has(s)) { seen.add(s); out.push(s); }
+    }
+
+    for (const v of newVals) {
       const s = (v ?? '').trim();
       if (!s) continue;
-      if (!seen.has(s)) {
-        seen.add(s);
-        out.push(s);
-      }
+      if (!seen.has(s)) { seen.add(s); out.push(s); }
     }
+
     return out;
   }
 

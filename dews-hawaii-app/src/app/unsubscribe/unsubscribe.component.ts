@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import {
@@ -8,6 +8,7 @@ import {
   HttpHeaders,
   HttpParams,
 } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 type EmailLookupResponse = {
@@ -21,15 +22,25 @@ type EmailLookupResponse = {
   templateUrl: './unsubscribe.component.html',
   styleUrls: ['./unsubscribe.component.css'],
 })
-export class UnsubscribeComponent {
+export class UnsubscribeComponent implements OnInit {
   private baseUrl = 'https://api.hcdp.ikewai.org/mesonet/climate_report';
 
   email = '';
   loading = false;
   successMsg = '';
   errorMsg = '';
+  autoMode = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    const id = this.route.snapshot.queryParamMap.get('id');
+    if (id) {
+      this.autoMode = true;
+      this.loading = true;
+      this.unsubscribe(id);
+    }
+  }
 
   private headers(): HttpHeaders {
     const token = environment.apiToken;

@@ -7,11 +7,12 @@ export type ListField = 'county' | 'moku' | 'ahupuaa' | 'watershed';
 
 export interface SubscriptionRecord {
   email: string;
+  island?: string[];
   county?: string[];
   moku?: string[];
   ahupuaa?: string[];
   watershed?: string[];
-  division?: string[]; 
+  division?: string[];
 }
 
 export interface EmailLookupResponse {
@@ -57,6 +58,14 @@ export class EmailSubscriptionService {
     return this.http.patch(
       `${this.baseUrl}/subscription/${userID}`,
       body,
+      { headers: this.headers() }
+    );
+  }
+
+  unsubscribeAll(userID: string): Observable<any> {
+    return this.http.patch(
+      `${this.baseUrl}/subscription/${encodeURIComponent(userID)}/unsubscribe`,
+      null,
       { headers: this.headers() }
     );
   }

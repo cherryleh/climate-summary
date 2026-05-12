@@ -1,26 +1,37 @@
 <div class="wrap">
   <h2>Unsubscribe</h2>
-  <p class="subtext">Enter the email address you used to subscribe.</p>
 
-  <form #f="ngForm" (ngSubmit)="submit(f)" novalidate>
-    <label for="email">Email</label>
-    <input
-      id="email"
-      type="email"
-      name="email"
-      [(ngModel)]="email"
-      required
-      email
-      autocomplete="email"
-      placeholder="name@hawaii.edu"
-      [disabled]="loading"
-    />
-
-    <button type="submit" [disabled]="loading || f.invalid">
-      {{ loading ? 'Unsubscribing…' : 'Unsubscribe' }}
-    </button>
-
+  <!-- Auto-unsubscribe via ?id= query param -->
+  <ng-container *ngIf="autoMode">
+    <p class="subtext" *ngIf="loading">Unsubscribing…</p>
     <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
     <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
-  </form>
+  </ng-container>
+
+  <!-- Manual email form -->
+  <ng-container *ngIf="!autoMode">
+    <p class="subtext">Enter the email address you used to subscribe.</p>
+
+    <form #f="ngForm" (ngSubmit)="submit(f)" novalidate>
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        required
+        email
+        autocomplete="email"
+        placeholder="name@hawaii.edu"
+        [disabled]="loading"
+      />
+
+      <button type="submit" [disabled]="loading || f.invalid">
+        {{ loading ? 'Unsubscribing…' : 'Unsubscribe' }}
+      </button>
+
+      <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+      <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+    </form>
+  </ng-container>
 </div>

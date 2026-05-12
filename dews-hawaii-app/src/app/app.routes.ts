@@ -3,6 +3,7 @@ import { ClimateDashboardComponent } from './climate-dashboard/climate-dashboard
 import { ClimateDashboardV2Component } from './climate-dashboard-v2/climate-dashboard-v2.component';
 import { ClimateSummary2025Component} from './climate-summary-2025/climate-summary-2025.component';
 import { UnsubscribeComponent } from './unsubscribe/unsubscribe.component';
+import { ManageSubscriptionsComponent } from './manage-subscriptions/manage-subscriptions.component';
 import { StormViewerComponent } from './storm-viewer/storm-viewer.component';
 import { StormViewerMarch20262Component } from './storm-viewer-march2026-2/storm-viewer-march2026-2.component';
 
@@ -18,6 +19,9 @@ export const routes: Routes = [
   },
   {
     path: 'unsubscribe', component: UnsubscribeComponent
+  },
+  {
+    path: 'manage-subscriptions', component: ManageSubscriptionsComponent
   },
   { path: 'storm-viewer', component: StormViewerComponent},
   { path: 'storm-viewer-march2026-2', component: StormViewerMarch20262Component}
