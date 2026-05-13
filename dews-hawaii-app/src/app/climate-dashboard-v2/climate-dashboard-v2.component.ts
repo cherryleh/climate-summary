@@ -15,7 +15,7 @@ import * as GeoTIFF from 'geotiff';
 import { Pool } from 'geotiff';
 import { NgZone } from '@angular/core';
 import { MapPanelComponent } from '../map-panel/map-panel.component';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { EmailSubscriptionService } from '../services/email-subscription.service';
 
 import { catchError, map, switchMap } from 'rxjs/operators';
@@ -57,7 +57,13 @@ function canonIsland(name: string): string {
   styleUrls: ['./climate-dashboard-v2.component.css']
 })
 export class ClimateDashboardV2Component implements OnDestroy {
-  constructor(private http: HttpClient, private ngZone: NgZone,private emailSvc: EmailSubscriptionService) { }
+  constructor(
+    private http: HttpClient,
+    private ngZone: NgZone,
+    private emailSvc: EmailSubscriptionService,
+    private router: Router,
+    private route: ActivatedRoute,
+  ) { }
 
   islands = signal<Island[]>([]);
   pathById = signal<Record<string, string>>({});
@@ -821,6 +827,11 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const { month, year } = this.latestMonth();
     this.selectedYear.set(year);
     this.applyDate(month, year);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {},
+      replaceUrl: true,
+    });
   }
 
   stepMonth(delta: number) {
@@ -847,9 +858,19 @@ export class ClimateDashboardV2Component implements OnDestroy {
     this.applyDate(clamped.month, clamped.year);
   }
 
+  private updateUrlParams(month: number, year: number) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { year, month },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
   private applyDate(month: number, year: number) {
     this.selectedMonth.set(month);
     this.selectedYear.set(year);
+    this.updateUrlParams(month, year);
     this.loadStats();
     this.loadRasterOnce(this.dataset());
     if (this.dataset() === 'Rainfall') {
@@ -874,6 +895,16 @@ export class ClimateDashboardV2Component implements OnDestroy {
   );
 
   async ngOnInit(): Promise<void> {
+    // Apply month/year from URL query params before any loads
+    const qp = this.route.snapshot.queryParamMap;
+    const qYear = qp.get('year');
+    const qMonth = qp.get('month');
+    if (qYear && qMonth) {
+      const clamped = this.clampToLatest(+qMonth, +qYear);
+      this.selectedMonth.set(clamped.month);
+      this.selectedYear.set(clamped.year);
+    }
+
     // Base islands
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
       const projection = geoIdentity().reflectY(true).fitExtent(
@@ -1694,6 +1725,62 @@ export class ClimateDashboardV2Component implements OnDestroy {
     return updated;
   }
 
+
+  // ===== Rank history modal =====
+  rankTableVisible = signal(false);
+  rankTableLoading = signal(false);
+  rankTableTitle = signal('');
+  rankTableRows = signal<{ year: number; value: number; anomaly: number; pchange: number; rank: number }[]>([]);
+
+  openRankTable() {
+    const dataset = this.selectedDataset();
+    if (dataset === 'Drought') return;
+
+    const month = this.selectedMonth();
+    const year = this.selectedYear();
+    const location = this.selectedDivisionName() || this.islandLabel() || 'Statewide';
+    this.rankTableTitle.set(`${this.monthNames[month - 1]} ${dataset} Rankings — ${location}`);
+    this.rankTableVisible.set(true);
+    this.rankTableLoading.set(true);
+    this.rankTableRows.set([]);
+
+    const startDate = dataset === 'Rainfall' ? '1920-01' : '1990-01';
+    const endDate = `${year}-${String(month).padStart(2, '0')}`;
+    const statsUrl = dataset === 'Rainfall' ? this.rainfallStatsUrl : this.temperatureStatsUrl;
+    const args = this.buildRainfallQueryArgs({ startDate, endDate });
+    const params = Object.entries(args).reduce((p, [k, v]) => p.set(k, v), new HttpParams());
+
+    this.http.get<any[]>(statsUrl, { params, headers: this.apiHeaders() }).subscribe({
+      next: (results) => {
+        const rows = (results ?? [])
+          .filter(r => parseInt((r.date as string).slice(5, 7), 10) === month)
+          .map(r => ({
+            year: parseInt((r.date as string).slice(0, 4), 10),
+            value: +r.mean,
+            anomaly: +r.anomaly,
+            pchange: +r.pchange,
+            rank: +r.rank
+          }))
+          .filter(r => !isNaN(r.rank))
+          .sort((a, b) => a.rank - b.rank);
+        this.rankTableRows.set(rows);
+        this.rankTableLoading.set(false);
+        setTimeout(() => {
+          document.querySelector('.rank-current')?.scrollIntoView({ block: 'center', behavior: 'instant' });
+        });
+      },
+      error: () => this.rankTableLoading.set(false)
+    });
+  }
+
+  closeRankTable() {
+    this.rankTableVisible.set(false);
+  }
+
+  goToYear(year: number) {
+    this.closeRankTable();
+    this.applyDate(this.selectedMonth(), year);
+  }
 
   countyMenuOpen = signal(false);
 

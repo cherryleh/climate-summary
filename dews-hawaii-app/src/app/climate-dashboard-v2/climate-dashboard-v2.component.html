@@ -63,40 +63,50 @@
 
         <!-- Rainfall stats -->
         <div class="stats stats-rainfall" *ngIf="selectedDataset() === 'Rainfall' && stats()">
-          <app-stat-box label="Observed Average"
-            [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' in'">
+          <app-stat-box class="clickable-stat" label="Observed Average"
+            [value]="((stats()?.mean | number:'1.1-1') ?? '') + ' in'"
+            (click)="openRankTable()">
           </app-stat-box>
-          <app-stat-box label="Anomaly"
+          <app-stat-box class="clickable-stat" label="Anomaly"
             [value]="formatAnomaly(stats()?.anomaly, selectedDataset())"
             [percent]="((stats()?.pchange ?? 0) >= 0 ? '+' : '') + ((stats()?.pchange | number:'1.0-0') ?? '') + '%'"
-            [percentClass]="(stats()?.pchange ?? 0) >= 0 ? 'positive' : 'negative'">
+            [percentClass]="(stats()?.pchange ?? 0) >= 0 ? 'positive' : 'negative'"
+            (click)="openRankTable()">
           </app-stat-box>
-          <app-stat-box label="Rank"
+          <app-stat-box class="clickable-stat" label="Rank"
             [value]="formatRank(stats()?.rank)"
-            [note]="(getRankSentiment(stats()?.rank, rainfallYears()) === 'high' ? 'Wettest' : 'Driest') + ' out of ' + rainfallYears() + ' years'">
+            [note]="(getRankSentiment(stats()?.rank, rainfallYears()) === 'high' ? 'Wettest' : 'Driest') + ' out of ' + rainfallYears() + ' years'"
+            (click)="openRankTable()">
           </app-stat-box>
-          <app-stat-box *ngIf="dataset() === 'Rainfall'"
+          <app-stat-box *ngIf="dataset() === 'Rainfall'" class="clickable-stat"
             label="Year-to-date % of Normal"
-            [value]="(stats()?.ytd_pnormal | number:'1.1-1') + '%'">
+            [value]="(stats()?.ytd_pnormal | number:'1.1-1') + '%'"
+            (click)="openRankTable()">
           </app-stat-box>
         </div>
+        <div class="stats-hint" *ngIf="selectedDataset() === 'Rainfall'">Click any stat to view full year rankings</div>
 
         <!-- Temperature stats -->
         <div class="stats stats-temperature" *ngIf="selectedDataset() === 'Temperature' && stats()">
-          <app-stat-box label="Observed Average"
-            [value]="((stats()?.mean | number:'1.1-1') ?? '') + '°F'">
+          <app-stat-box class="clickable-stat" label="Observed Average"
+            [value]="((stats()?.mean | number:'1.1-1') ?? '') + '°F'"
+            (click)="openRankTable()">
           </app-stat-box>
-          <app-stat-box label="Anomaly"
-            [value]="formatAnomaly(stats()?.anomaly, selectedDataset())">
+          <app-stat-box class="clickable-stat" label="Anomaly"
+            [value]="formatAnomaly(stats()?.anomaly, selectedDataset())"
+            (click)="openRankTable()">
           </app-stat-box>
-          <app-stat-box label="Rank"
+          <app-stat-box class="clickable-stat" label="Rank"
             [value]="formatRank(stats()?.rank)"
-            [note]="(getRankSentiment(stats()?.rank, temperatureYears()) === 'high' ? 'Warmest' : 'Coolest') + ' out of ' + temperatureYears() + ' years'">
+            [note]="(getRankSentiment(stats()?.rank, temperatureYears()) === 'high' ? 'Warmest' : 'Coolest') + ' out of ' + temperatureYears() + ' years'"
+            (click)="openRankTable()">
           </app-stat-box>
-          <app-stat-box label="Max temp"
-            [value]="((stats()?.max | number:'1.1-1') ?? '') + '°F'">
+          <app-stat-box class="clickable-stat" label="Max temp"
+            [value]="((stats()?.max | number:'1.1-1') ?? '') + '°F'"
+            (click)="openRankTable()">
           </app-stat-box>
         </div>
+        <div class="stats-hint" *ngIf="selectedDataset() === 'Temperature'">Click any stat to view full year rankings</div>
 
         <!-- Drought stats -->
         <ng-container *ngIf="selectedDataset() === 'Drought'">
@@ -296,6 +306,49 @@
         <div class="tiny muted">We'll send a report around the 1st of each month. You can unsubscribe anytime.</div>
       </div>
     </aside>
+  </div>
+  <!-- Rank History Modal -->
+  <div class="rank-modal-overlay" *ngIf="rankTableVisible()" (click)="closeRankTable()">
+    <div class="rank-modal" (click)="$event.stopPropagation()">
+      <div class="rank-modal-head">
+        <div class="rank-modal-title">{{ rankTableTitle() }}</div>
+        <button class="btn" (click)="closeRankTable()">✕ Close</button>
+      </div>
+      <div class="rank-modal-body">
+        <div *ngIf="rankTableLoading()" class="rank-empty">Loading…</div>
+        <table *ngIf="!rankTableLoading() && rankTableRows().length" class="rank-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Year</th>
+              <th class="col-num">Value</th>
+              <th class="col-num">Anomaly</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of rankTableRows()"
+                [class.rank-current]="row.year === selectedYear()"
+                (click)="goToYear(row.year)"
+                title="View {{ monthNames[selectedMonth() - 1] }} {{ row.year }}">
+              <td><span [innerHTML]="formatRank(row.rank)"></span></td>
+              <td>{{ row.year }}{{ row.year === selectedYear() ? ' ★' : '' }}</td>
+              <td class="col-num">{{ row.value | number:'1.2-2' }} {{ unit() }}</td>
+              <td class="col-num">
+                {{ formatAnomaly(row.anomaly, selectedDataset()) }}
+                <span *ngIf="selectedDataset() === 'Rainfall'" class="pchange"
+                      [class.pchange-pos]="row.pchange >= 0"
+                      [class.pchange-neg]="row.pchange < 0">
+                  ({{ row.pchange >= 0 ? '+' : '' }}{{ row.pchange | number:'1.0-0' }}%)
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="!rankTableLoading() && !rankTableRows().length" class="rank-empty">
+          No data available.
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

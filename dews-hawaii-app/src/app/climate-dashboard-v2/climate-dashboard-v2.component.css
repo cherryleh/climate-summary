@@ -574,6 +574,116 @@ app-data-highchart {
   .county-menu        { left: 0; width: 100%; }
 }
 
+/* ── Stats click hint ───────────────────────────── */
+.stats-hint {
+  text-align: right;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+/* ── Clickable stat boxes ───────────────────────── */
+.clickable-stat { cursor: pointer; }
+.clickable-stat:hover ::ng-deep .stat {
+  background: #f0f9ff;
+  outline: 1px solid #bae6fd;
+  border-radius: 8px;
+}
+
+/* ── Rank history modal ─────────────────────────── */
+.rank-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rank-modal {
+  background: #fff;
+  border-radius: 14px;
+  width: min(520px, 95vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+}
+
+.rank-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.rank-modal-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.rank-modal-body {
+  overflow-y: auto;
+}
+
+.rank-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rank-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  padding: 6px 16px;
+  border-bottom: 2px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  background: #fff;
+}
+
+.rank-table td {
+  padding: 7px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+.rank-table tr:last-child td { border-bottom: none; }
+
+.rank-table tbody tr {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.rank-table tbody tr:hover td { background: #f1f5f9; }
+.rank-table tbody tr.rank-current:hover td { background: #bae6fd; }
+
+.rank-table tr.rank-current td {
+  background: #e0f2fe;
+  font-weight: 700;
+  color: #0369a1;
+}
+
+.col-num { text-align: right; }
+
+.pchange { font-size: 11px; margin-left: 4px; }
+.pchange-pos { color: #16a34a; }
+.pchange-neg { color: #dc2626; }
+
+.rank-empty {
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+  padding: 28px;
+}
+
 /* ── Very wide (1600px+) ────────────────────────── */
 @media (min-width: 1600px) {
   .dashboard-grid {
