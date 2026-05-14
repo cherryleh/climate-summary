@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, OnDestroy, SimpleChanges, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -18,8 +18,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
   ></highcharts-chart>
   `
 })
-export class DataHighchartComponent implements OnChanges {
-  @Input() data: any[] = []; // Changed to any to support distribution keys
+export class DataHighchartComponent implements OnChanges, OnInit, OnDestroy {
+  @Input() data: any[] = [];
   @Input() dataset: string = '';
   @Input() multiSeries: { scale: number; data: { month: string; value: number }[] }[] = [];
   @Input() unit: string = '';
@@ -27,6 +27,26 @@ export class DataHighchartComponent implements OnChanges {
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = {};
   updateFlag = false;
+
+  private containerHeight = 340;
+  private resizeObserver: ResizeObserver | null = null;
+
+  constructor(private el: ElementRef) {}
+
+  ngOnInit() {
+    this.resizeObserver = new ResizeObserver(entries => {
+      const h = entries[0]?.contentRect.height;
+      if (h && h > 0 && h !== this.containerHeight) {
+        this.containerHeight = h;
+        this.updateChart();
+      }
+    });
+    this.resizeObserver.observe(this.el.nativeElement);
+  }
+
+  ngOnDestroy() {
+    this.resizeObserver?.disconnect();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] || changes['unit'] || changes['dataset']) {
@@ -92,11 +112,11 @@ export class DataHighchartComponent implements OnChanges {
 
     this.chartOptions = {
       chart: {
-        height: null,
+        height: this.containerHeight,
         type: isDistribution ? 'area' : undefined,
-        marginBottom: 80,
+        marginBottom: 60,
         marginRight: 20,
-        spacingBottom: 10,
+        spacingBottom: 5,
         events: {
           render() {
             this.reflow();

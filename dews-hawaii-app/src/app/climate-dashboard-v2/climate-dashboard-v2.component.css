@@ -533,7 +533,15 @@ app-data-highchart {
 
 /* ── Email panel ────────────────────────────────── */
 .email-panel {
-  flex-shrink: 0; /* stays compact at the bottom of the aside */
+  flex-shrink: 0;
+}
+
+.email-steps {
+  margin: 8px 0 0 0;
+  padding-left: 18px;
+  font-size: 11px;
+  color: var(--sub);
+  line-height: 1.7;
 }
 
 .email-panel .summary {
