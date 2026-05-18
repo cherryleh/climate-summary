@@ -259,9 +259,10 @@
         </div>
 
         <div class="chart-controls">
-          <button class="btn" [class.active]="timeRange() === 12" (click)="setTimeRange(12)">Last year</button>
-          <button class="btn" [class.active]="timeRange() === 36" (click)="setTimeRange(36)">Last 3 years</button>
-          <button class="btn" [class.active]="timeRange() === 60" (click)="setTimeRange(60)">Last 5 years</button>
+          <button class="btn" [class.active]="!aprilMode() && timeRange() === 12" (click)="setTimeRange(12)">Last year</button>
+          <button class="btn" [class.active]="!aprilMode() && timeRange() === 36" (click)="setTimeRange(36)">Last 3 years</button>
+          <button class="btn" [class.active]="!aprilMode() && timeRange() === 60" (click)="setTimeRange(60)">Last 5 years</button>
+          <button *ngIf="selectedDataset() !== 'Drought'" class="btn" [class.active]="aprilMode()" (click)="toggleAprilMode()">{{ monthNames[selectedMonth() - 1] }} (10 yr)</button>
         </div>
 
         <div class="chart-wrap">

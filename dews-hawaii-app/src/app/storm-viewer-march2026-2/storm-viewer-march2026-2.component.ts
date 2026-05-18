@@ -219,7 +219,7 @@ export class StormViewerMarch20262Component {
       date: '2026_03_18',
       statsByCounty: {
         all: {
-          daily: {date: 'March 18, 2026', min: '0.0 in', avg: '0.8 in', max: '5.7 in'},
+          daily: {date: 'March 18, 2026', min: '0.0 in', avg: '0.1 in', max: '1.0 in'},
           cumulative: {date: 'March 18, 2026', min: '0.0 in', avg: '1.0 in', max: '5.8 in'}
         },
         maui: {
@@ -245,24 +245,24 @@ export class StormViewerMarch20262Component {
       date: '2026_03_19',
       statsByCounty: {
         all: {
-          daily: {date: 'March 19, 2026', min: '0.0 in', avg: '0.6 in', max: '60.2 in'},
-          cumulative: {date: 'March 19, 2026', min: '0.0 in', avg: '1.6 in', max: '60.2 in'}
+          daily: {date: 'March 19, 2026', min: '0.0 in', avg: '0.5 in', max: '8.9 in'},
+          cumulative: {date: 'March 19, 2026', min: '0.0 in', avg: '1.5 in', max: '9.1 in'}
         },
         maui: {
-          daily: { date: 'March 19, 2026', min: '0.0 in', avg: '0.6 in', max: '4.4 in'},
-          cumulative: { date: 'March 19, 2026', min: '0.2 in', avg: '1.3 in', max: '5.1 in'}
+          daily: { date: 'March 19, 2026', min: '0.0 in', avg: '0.5 in', max: '2.1 in'},
+          cumulative: { date: 'March 19, 2026', min: '0.2 in', avg: '1.2 in', max: '5.1 in'}
         },
         hawaii: {
-          daily: { date: 'March 19, 2026', min: '0.0 in', avg: '0.1 in', max: '0.7 in'},
-          cumulative: { date: 'March 19, 2026', min: '0.1 in', avg: '1.4 in', max: '6.0 in'}
+          daily: { date: 'March 19, 2026', min: '0.0 in', avg: '0.1 in', max: '0.6 in'},
+          cumulative: { date: 'March 19, 2026', min: '0.1 in', avg: '1.4 in', max: '5.8 in'}
         },
         honolulu: {
-          daily: { date: 'March 19, 2026', min: '0.3 in', avg: '2.1 in', max: '8.6 in'},
-          cumulative: { date: 'March 19, 2026', min: '0.4 in', avg: '2.4 in', max: '8.9 in'}
+          daily: { date: 'March 19, 2026', min: '0.3 in', avg: '2.1 in', max: '8.9 in'},
+          cumulative: { date: 'March 19, 2026', min: '0.4 in', avg: '2.3 in', max: '9.1 in'}
         },
         kauai: {
-          daily: { date: 'March 19, 2026', min: '0.0 in', avg: '2.1 in', max: '56.0 in'},
-          cumulative: { date: 'March 19, 2026', min: '0.0 in', avg: '2.1 in', max: '56.1 in'}
+          daily: { date: 'March 19, 2026', min: '0.1 in', avg: '1.6 in', max: '3.4 in'},
+          cumulative: { date: 'March 19, 2026', min: '0.0 in', avg: '1.6 in', max: '3.7 in'}
         }
       }
     },
@@ -272,23 +272,23 @@ export class StormViewerMarch20262Component {
       statsByCounty: {
         all: {
           daily: {date: 'March 20, 2026', min: '0.0 in', avg: '1.0 in', max: '13.1 in'},
-          cumulative: {date: 'March 20, 2026', min: '0.1 in', avg: '2.5 in', max: '60.4 in'}
+          cumulative: {date: 'March 20, 2026', min: '0.1 in', avg: '2.4 in', max: '22.1 in'}
         },
         maui: {
           daily: { date: 'March 20, 2026', min: '0.1 in', avg: '1.4 in', max: '8.1 in'},
-          cumulative: { date: 'March 20, 2026', min: '0.5 in', avg: '2.7 in', max: '10.9 in'}
+          cumulative: { date: 'March 20, 2026', min: '0.5 in', avg: '2.6 in', max: '10.9 in'}
         },
         hawaii: {
           daily: { date: 'March 20, 2026', min: '0.0 in', avg: '0.1 in', max: '0.3 in'},
-          cumulative: { date: 'March 20, 2026', min: '0.1 in', avg: '1.5 in', max: '6.0 in'}
+          cumulative: { date: 'March 20, 2026', min: '0.1 in', avg: '1.5 in', max: '5.8 in'}
         },
         honolulu: {
           daily: { date: 'March 20, 2026', min: '2.3 in', avg: '6.5 in', max: '13.1 in'},
-          cumulative: { date: 'March 20, 2026', min: '3.0 in', avg: '8.8 in', max: '21.9 in'}
+          cumulative: { date: 'March 20, 2026', min: '3.0 in', avg: '8.7 in', max: '22.1 in'}
         },
         kauai: {
           daily: { date: 'March 20, 2026', min: '0.0 in', avg: '0.2 in', max: '0.6 in'},
-          cumulative: { date: 'March 20, 2026', min: '0.2 in', avg: '2.4 in', max: '56.2 in'}
+          cumulative: { date: 'March 20, 2026', min: '0.2 in', avg: '1.9 in', max: '4.2 in'}
         }
       }
     },
@@ -298,23 +298,23 @@ export class StormViewerMarch20262Component {
       statsByCounty: {
         all: {
           daily: {date: 'March 21, 2026', min: '0.0 in', avg: '0.8 in', max: '9.6 in'},
-          cumulative: {date: 'March 21, 2026', min: '0.2 in', avg: '3.4 in', max: '60.4 in'}
+          cumulative: {date: 'March 21, 2026', min: '0.2 in', avg: '3.3 in', max: '23.7 in'}
         },
         maui: {
           daily: { date: 'March 21, 2026', min: '0.4 in', avg: '3.2 in', max: '9.6 in'},
-          cumulative: { date: 'March 21, 2026', min: '1.3 in', avg: '5.9 in', max: '20.5 in'}
+          cumulative: { date: 'March 21, 2026', min: '1.3 in', avg: '5.8 in', max: '20.5 in'}
         },
         hawaii: {
           daily: { date: 'March 21, 2026', min: '0.0 in', avg: '0.2 in', max: '2.0 in'},
-          cumulative: { date: 'March 21, 2026', min: '0.2 in', avg: '1.7 in', max: '6.3 in'}
+          cumulative: { date: 'March 21, 2026', min: '0.2 in', avg: '1.7 in', max: '6.1 in'}
         },
         honolulu: {
           daily: { date: 'March 21, 2026', min: '0.1 in', avg: '1.0 in', max: '3.0 in'},
-          cumulative: { date: 'March 21, 2026', min: '3.7 in', avg: '9.8 in', max: '23.4 in'}
+          cumulative: { date: 'March 21, 2026', min: '3.5 in', avg: '9.7 in', max: '23.7 in'}
         },
         kauai: {
           daily: { date: 'March 21, 2026', min: '0.0 in', avg: '0.0 in', max: '0.0 in'},
-          cumulative: { date: 'March 21, 2026', min: '0.2 in', avg: '2.4 in', max: '56.2 in'}
+          cumulative: { date: 'March 21, 2026', min: '0.2 in', avg: '1.9 in', max: '4.2 in'}
         }
       }
     },
@@ -324,7 +324,7 @@ export class StormViewerMarch20262Component {
       statsByCounty: {
         all: {
           daily: {date: 'March 22, 2026', min: '0.0 in', avg: '0.6 in', max: '8.9 in'},
-          cumulative: {date: 'March 22, 2026', min: '0.3 in', avg: '4.0 in', max: '60.4 in'}
+          cumulative: {date: 'March 22, 2026', min: '0.3 in', avg: '3.9 in', max: '23.8 in'}
         },
         maui: {
           daily: { date: 'March 22, 2026', min: '0.0 in', avg: '1.3 in', max: '8.9 in'},
@@ -332,15 +332,15 @@ export class StormViewerMarch20262Component {
         },
         hawaii: {
           daily: { date: 'March 22, 2026', min: '0.0 in', avg: '0.5 in', max: '1.5 in'},
-          cumulative: { date: 'March 22, 2026', min: '0.3 in', avg: '2.2 in', max: '6.8 in'}
+          cumulative: { date: 'March 22, 2026', min: '0.3 in', avg: '2.2 in', max: '6.6 in'}
         },
         honolulu: {
           daily: { date: 'March 22, 2026', min: '0.0 in', avg: '0.3 in', max: '1.6 in'},
-          cumulative: { date: 'March 22, 2026', min: '4.1 in', avg: '10.1 in', max: '23.5 in'}
+          cumulative: { date: 'March 22, 2026', min: '3.6 in', avg: '10.0 in', max: '23.8 in'}
         },
         kauai: {
           daily: { date: 'March 22, 2026', min: '0.0 in', avg: '0.1 in', max: '0.5 in'},
-          cumulative: { date: 'March 22, 2026', min: '0.3 in', avg: '2.5 in', max: '56.3 in'}
+          cumulative: { date: 'March 22, 2026', min: '0.3 in', avg: '2.0 in', max: '4.4 in'}
         }
       }
     },
@@ -350,7 +350,7 @@ export class StormViewerMarch20262Component {
       statsByCounty: {
         all: {
           daily: {date: 'March 23, 2026', min: '0.0 in', avg: '0.7 in', max: '7.3 in'},
-          cumulative: {date: 'March 23, 2026', min: '0.3 in', avg: '4.7 in', max: '60.6 in'}
+          cumulative: {date: 'March 23, 2026', min: '0.3 in', avg: '4.6 in', max: '28.0 in'}
         },
         maui: {
           daily: { date: 'March 23, 2026', min: '0.0 in', avg: '1.0 in', max: '6.7 in'},
@@ -362,11 +362,11 @@ export class StormViewerMarch20262Component {
         },
         honolulu: {
           daily: { date: 'March 23, 2026', min: '0.0 in', avg: '1.3 in', max: '7.0 in'},
-          cumulative: { date: 'March 23, 2026', min: '4.1 in', avg: '11.4 in', max: '27.1 in'}
+          cumulative: { date: 'March 23, 2026', min: '3.6 in', avg: '11.3 in', max: '27.4 in'}
         },
         kauai: {
           daily: { date: 'March 23, 2026', min: '0.0 in', avg: '0.1 in', max: '2.3 in'},
-          cumulative: { date: 'March 23, 2026', min: '0.3 in', avg: '2.6 in', max: '56.5 in'}
+          cumulative: { date: 'March 23, 2026', min: '0.3 in', avg: '2.1 in', max: '4.5 in'}
         }
       }
     }
@@ -506,121 +506,6 @@ export class StormViewerMarch20262Component {
     }
   }
 
-  // async loadStormChart() {
-  //   try {
-  //     this.isChartLoading = true;
-  //     this.updateFlag = false;
-
-
-
-  //     const response = await fetch('storm_site/merged_storm_data.csv');
-  //     if (!response.ok) {
-  //       throw new Error(`Failed to fetch CSV: ${response.status}`);
-  //     }
-
-  //     const csvText = await response.text();
-  //     const lines = csvText.trim().split(/\r?\n/);
-
-  //     if (lines.length < 2) {
-  //       this.isChartLoading = false;
-  //       return;
-  //     }
-
-  //     const headers = lines[0].split(',').map(h => h.trim());
-  //     const allStationIds = headers.slice(1);
-  //     const stationIds = this.filterStationIdsByCounty(allStationIds);
-
-  //     const seriesMap: Record<string, [number, number | null][]> = {};
-  //     const runningTotals: Record<string, number> = {};
-
-  //     stationIds.forEach(id => {
-  //       seriesMap[id] = [];
-  //       runningTotals[id] = 0;
-  //     });
-
-  //     for (let i = 1; i < lines.length; i++) {
-  //       const cols = lines[i].split(',');
-  //       if (cols.length < headers.length) continue;
-
-  //       const timestampStr = cols[0]?.trim();
-  //       if (!timestampStr) continue;
-
-  //       const [datePart, timePart] = timestampStr.split(' ');
-  //       if (!datePart || !timePart) continue;
-
-  //       const [year, month, day] = datePart.split('-').map(Number);
-  //       const [hour, minute, second] = timePart.split(':').map(Number);
-  //       const time = new Date(year, month - 1, day, hour, minute, second).getTime();
-
-  //       for (let j = 0; j < stationIds.length; j++) {
-  //         const stationId = stationIds[j];
-  //         const colIndex = headers.indexOf(stationId);
-  //         const raw = cols[colIndex]?.trim();
-
-  //         if (this.mode === 'cumulative') {
-  //           const numericValue = raw === '' ? 0 : Number(raw);
-  //           runningTotals[stationId] += Number.isFinite(numericValue) ? numericValue : 0;
-  //           seriesMap[stationId].push([time, runningTotals[stationId]]);
-  //         } else {
-  //           const value = raw === '' ? null : Number(raw);
-  //           seriesMap[stationId].push([
-  //             time,
-  //             Number.isFinite(value) ? value : null
-  //           ]);
-  //         }
-  //       }
-  //     }
-
-  //     const colors = [
-  //       '#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e',
-  //       '#17becf', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22'
-  //     ];
-
-  //     const series: Highcharts.SeriesOptionsType[] = stationIds.map((id, idx) => ({
-  //       name: id,
-  //       type: 'line',
-  //       data: seriesMap[id],
-  //       color: colors[idx % colors.length],
-  //       lineWidth: 1,
-  //       marker: { enabled: false },
-  //       stickyTracking: false
-  //     }));
-
-  //     this.chartOptions.series = [];
-  //     this.updateFlag = true;
-
-  //     setTimeout(() => {
-  //       this.chartOptions = {
-  //         ...this.chartOptions,
-  //         title: {
-  //           text: this.selectedCounty === 'all'
-  //                 ? 'Storm Station Rainfall Time Series'
-  //                 : `Storm Station Rainfall Time Series – ${this.selectedCounty}`
-  //         },
-  //         series: series
-  //       };
-  //       this.updateFlag = true;
-  //       this.isChartLoading = false;
-  //     }, 10);
-
-  //     setTimeout(() => {
-  //       this.updateFlag = true;
-  //       this.isChartLoading = false;
-  //     }, 0);
-
-  //   } catch (err) {
-  //     console.error('Chart load error:', err);
-  //     this.isChartLoading = false;
-  //   }
-  // }
-
-  // async loadStormChart() {
-  //   await this.loadCsvChart('storm_site/merged_storm_data.csv', 'rain');
-  // }
-
-  // async loadWindChart() {
-  //   await this.loadCsvChart('storm_site/WG_merged_storm_data.csv', 'wind');
-  // }
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     this.chartRef = chart;
@@ -631,38 +516,15 @@ export class StormViewerMarch20262Component {
     }, 0);
   };
 
-  windChartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    this.windChartRef = chart;
+  // windChartCallback: Highcharts.ChartCallbackFunction = (chart) => {
+  //   this.windChartRef = chart;
 
-    setTimeout(() => {
-      chart.reflow();
-      chart.redraw(false);
-    }, 0);
-  };
+  //   setTimeout(() => {
+  //     chart.reflow();
+  //     chart.redraw(false);
+  //   }, 0);
+  // };
 
-  // private syncExtremes(
-  //   sourceChart: Highcharts.Chart,
-  //   targetChart: Highcharts.Chart,
-  //   e: Highcharts.AxisSetExtremesEventObject
-  // ): void {
-  //   if (!targetChart?.xAxis?.[0]) return;
-
-  //   // prevent recursive loop
-  //   if ((e as any).trigger === 'syncExtremes') return;
-
-  //   targetChart.xAxis[0].setExtremes(
-  //     e.min,
-  //     e.max,
-  //     true,
-  //     false,
-  //     { trigger: 'syncExtremes' } as any
-  //   );
-  // }
-
-  // private extractStationCode(header: string): string | null {
-  //   const match = header.trim().match(/(\d{4})$/);
-  //   return match ? match[1] : null;
-  // }
 
 
   getSelectedSeriesCode(): string {
@@ -673,11 +535,11 @@ export class StormViewerMarch20262Component {
   }
 
   twoStormStats: Record<CountyFilter, RainStats> = {
-    all: { date: 'March 10 - 23, 2026', min: '2.2 in', avg: '16.7 in', max: '73.0 in' },
-    maui: { date: 'March 10 - 23, 2026', min: '11.6 in', avg: '24.8 in', max: '73.0 in' },
-    hawaii: { date: 'March 10 - 23, 2026', min: '5.0 in', avg: '13.8 in', max: '32.4 in' },
-    honolulu: { date: 'March 10 - 23, 2026', min: '13.3 in', avg: '24.0 in', max: '54.0 in' },
-    kauai: { date: 'March 10 - 23, 2026', min: '2.2 in', avg: '12.5 in', max: '65.8 in' }
+    all: { date: 'March 10 - 23, 2026', min: '2.2 in', avg: '17.6 in', max: '76.0 in' },
+    maui: { date: 'March 10 - 23, 2026', min: '12.1 in', avg: '25.4 in', max: '76.0 in' },
+    hawaii: { date: 'March 10 - 23, 2026', min: '5.6 in', avg: '15.1 in', max: '34.8 in' },
+    honolulu: { date: 'March 10 - 23, 2026', min: '13.4 in', avg: '24.2 in', max: '54.5 in' },
+    kauai: { date: 'March 10 - 23, 2026', min: '2.2 in', avg: '12.1 in', max: '26.2 in' }
   };
 
   get selectedTwoStormStats() {

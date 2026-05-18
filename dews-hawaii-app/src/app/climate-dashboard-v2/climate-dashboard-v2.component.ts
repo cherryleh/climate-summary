@@ -1054,19 +1054,30 @@ export class ClimateDashboardV2Component implements OnDestroy {
   });
 
   // ===== Chart time-range filter =====
-  timeRange = signal<number>(12); // default = last 12 months
+  timeRange = signal<number>(12);
+  aprilMode = signal<boolean>(false);
 
   setTimeRange(months: number) {
+    this.aprilMode.set(false);
     this.timeRange.set(months);
   }
 
-  // Filtered time series based on selected range
+  toggleAprilMode() {
+    this.aprilMode.set(!this.aprilMode());
+  }
+
   filteredTsData = computed(() => {
     const data = this.tsData();
-    const months = this.timeRange();
     if (!data || data.length === 0) return [];
 
-    return data.slice(-months); // take last N entries
+    if (this.aprilMode()) {
+      const monthSuffix = `-${String(this.selectedMonth()).padStart(2, '0')}`;
+      return data
+        .filter(d => d.month?.endsWith(monthSuffix))
+        .slice(-10);
+    }
+
+    return data.slice(-this.timeRange());
   });
 
   private drawColorbar(dataset: Dataset) {
@@ -1241,8 +1252,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const endMonth = this.selectedMonth();
     const endDate = `${endYear}-${String(endMonth).padStart(2, '0')}`;
 
-    // fetch 60 months back so all time-range options work client-side
-    const totalMonths0 = endYear * 12 + (endMonth - 1) - 59;
+    // fetch 120 months back so Aprils (10 yr) mode has enough data
+    const totalMonths0 = endYear * 12 + (endMonth - 1) - 119;
     const startYear = Math.floor(totalMonths0 / 12);
     const startMonth = (totalMonths0 % 12) + 1;
     const startDate = `${startYear}-${String(startMonth).padStart(2, '0')}`;
@@ -1275,7 +1286,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const endMonth = this.selectedMonth();
     const endDate = `${endYear}-${String(endMonth).padStart(2, '0')}`;
 
-    const totalMonths0 = endYear * 12 + (endMonth - 1) - 59;
+    const totalMonths0 = endYear * 12 + (endMonth - 1) - 119;
     const startYear = Math.floor(totalMonths0 / 12);
     const startMonth = (totalMonths0 % 12) + 1;
     const startDate = `${startYear}-${String(startMonth).padStart(2, '0')}`;
