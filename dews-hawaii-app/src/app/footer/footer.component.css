@@ -23,9 +23,16 @@
 }
 
 .powered-footer .logos img {
-  height: 100px;  /* control logo size */
+  height: 100px;
   width: auto;
+  max-width: 100%;
   transition: transform 0.2s ease-in-out;
+}
+
+@media (max-width: 639px) {
+  .powered-footer .logos img {
+    height: 60px;
+  }
 }
 
 .powered-footer .logos img:hover {

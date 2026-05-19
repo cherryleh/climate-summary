@@ -184,3 +184,53 @@ select.input option {
   font-size: 13px;
   color: var(--sub);
 }
+
+@media (max-width: 639px) {
+  /* Stack: SVG → selection row → legend row */
+  .map {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .map-svg {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 560 / 320;
+    flex-shrink: 0;
+    display: block;
+  }
+
+  /* Selection box: flow below SVG as a plain bar */
+  .selection-overlay {
+    position: static;
+    width: auto;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid var(--border);
+    box-shadow: none;
+    background: #f8fafc;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .selection-overlay .eyebrow { margin-bottom: 0; }
+  .selection-overlay .main    { font-size: 13px; }
+
+  /* Legend: flow below selection bar, visible again */
+  .colorbar.legend {
+    position: static;
+    border-radius: 0 0 12px 12px;
+    border: none;
+    border-top: 1px solid var(--border);
+    box-shadow: none;
+    background: #f8fafc;
+    padding: 6px 10px;
+    display: flex;
+    align-items: flex-start;
+  }
+}

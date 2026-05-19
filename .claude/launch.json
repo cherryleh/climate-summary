@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dews-hawaii",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "port": 4200,
+      "cwd": "/Users/cherryleheu/Documents/dews-hawaii/dews-hawaii-app"
+    }
+  ]
+}

@@ -360,8 +360,10 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const scope = this.selectedScope();
     const divisionKey = this.selectedDivision();
 
-    if (islandSel) newBody.island = [this.islandToApi(islandSel)];
-    else newBody.island = ['hawaii', 'honolulu', 'kauai', 'maui'];
+    if (islandSel) {
+      const islandKey = this.slugifySelection(islandSel);
+      newBody.island = [this.ISLAND_CANONICAL[islandKey] ?? islandSel];
+    } else newBody.island = ['hawaii', 'honolulu', 'kauai', 'maui'];
 
     if (scope && divisionKey) {
       const name = this.extractScopedName(divisionKey);

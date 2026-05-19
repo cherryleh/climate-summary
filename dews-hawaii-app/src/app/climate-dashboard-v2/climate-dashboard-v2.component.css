@@ -575,10 +575,35 @@ app-data-highchart {
 
 /* ── Small screen overrides (<640px) ────────────── */
 @media (max-width: 639px) {
-  .snapshot-top     { flex-direction: column; }
-  .snapshot-controls { width: 100%; }
-  .chips-toggle     { flex-wrap: nowrap; overflow-x: auto; }
+  /* Header */
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 12px;
+  }
+  .brand h1    { font-size: 14px; }
+  .topbar-date { flex-direction: column; align-items: flex-start; gap: 4px; width: 100%; }
+  .date-selectors { flex-wrap: wrap; gap: 4px; }
 
+  /* Snapshot */
+  .snapshot-top      { flex-direction: column; }
+  .snapshot-controls { width: 100%; }
+  .chips-toggle      { flex-wrap: nowrap; overflow-x: auto; }
+
+  /* Info box — let it wrap fully, no clamp */
+  .info-box {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+
+  /* Map panel — override flex-grow collapse; size to content on mobile */
+  .map-panel    { flex: 0 0 auto; height: auto; min-height: 0; }
+  .map-wrap     { flex: 0 0 auto; height: auto; overflow: visible; min-height: 0; }
+  app-map-panel { height: auto; min-height: 0; }
+
+  /* Selection toolbar */
   .selection-toolbar  { flex-direction: column; align-items: flex-start; }
   .toolbar-group      { width: 100%; }
   .segmented          { width: 100%; justify-content: space-between; }
