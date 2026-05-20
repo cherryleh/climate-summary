@@ -187,7 +187,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
         };
 
         const projection = geoIdentity().reflectY(true).fitExtent(
-          [[-130, 10], [560, 320]],
+          [[-130, 5], [560, 305]],
           fcIsland
         );
 
@@ -244,7 +244,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
         };
 
         const projection = geoIdentity().reflectY(true).fitExtent(
-          [[-130, 10], [560, 320]],
+          [[-130, 5], [560, 305]],
           fcIslandBase
         );
 
@@ -349,6 +349,13 @@ export class ClimateDashboardV2Component implements OnDestroy {
   email = signal<string>('');
   private emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   isEmailValid = computed(() => this.emailRegex.test(this.email().trim()));
+  subscribeNotice = signal<{ type: 'success' | 'error'; message: string } | null>(null);
+  private noticeTimer: any = null;
+  private showNotice(type: 'success' | 'error', message: string) {
+    clearTimeout(this.noticeTimer);
+    this.subscribeNotice.set({ type, message });
+    this.noticeTimer = setTimeout(() => this.subscribeNotice.set(null), 6000);
+  }
   subscribe() {
     const email = this.email().trim();
     if (!this.isEmailValid()) return;
@@ -403,12 +410,13 @@ export class ClimateDashboardV2Component implements OnDestroy {
           typeof err?.error === 'string'
             ? err.error
             : JSON.stringify(err?.error ?? err, null, 2);
-        alert(msg);
+        this.showNotice('error', msg);
         return throwError(() => err);
       })
     ).subscribe(({ mode }) => {
       const label = this.selectedDivisionName() || this.islandLabel() || 'Statewide';
-      alert(`${mode === 'created' ? 'Subscribed' : 'Updated subscription'} for ${this.selectedDataset()} — ${label}.`);
+      const verb = mode === 'created' ? "You're subscribed!" : 'Subscription updated!';
+      this.showNotice('success', `${verb} You'll receive monthly climate reports for ${label}.`);
     });
   }
 
@@ -910,7 +918,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
     // Base islands
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
       const projection = geoIdentity().reflectY(true).fitExtent(
-        [[-130, 10], [560, 310]],
+        [[-130, 5], [560, 305]],
         fc
       );
       const path = geoPath(projection as any);
@@ -1527,7 +1535,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
     // reload map outlines
     this.http.get<any>('hawaii_islands_simplified.geojson').subscribe(fc => {
-      const projection = geoIdentity().reflectY(true).fitExtent([[-130, 10], [560, 310]], fc);
+      const projection = geoIdentity().reflectY(true).fitExtent([[-130, 5], [560, 305]], fc);
       const path = geoPath(projection as any);
       this.project = projection as any;
       this.updateRasterRect();

@@ -283,7 +283,9 @@
         <ol class="email-steps">
           <li>Choose an <strong>area</strong> using the map or dropdown</li>
           <li>Enter your email below and subscribe</li>
+          <li>To select multiple areas, submit this form again</li>
         </ol>
+        <div class="tiny muted">All subscriptions will automatically subscribe to Statewide reports</div>
 
         <div class="mt">
           <div class="summary">
@@ -307,7 +309,7 @@
             Subscribe
           </button>
           <button class="btn" (click)="email.set('')">Clear</button>
-          <a class="btn" routerLink="/manage-subscriptions">Manage preferences</a>
+          <a class="btn" routerLink="/manage-subscriptions" target="_blank">Manage preferences</a>
         </div>
         <div class="tiny muted">We'll send a report around the 1st of each month. You can unsubscribe anytime.</div>
       </div>
@@ -355,6 +357,12 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="subscribeNotice()" class="toast-bottom" [class.toast-bottom-error]="subscribeNotice()?.type === 'error'">
+    <span class="toast-bottom-icon">{{ subscribeNotice()?.type === 'error' ? '❌' : '✅' }}</span>
+    {{ subscribeNotice()?.message }}
+    <button class="toast-bottom-close" (click)="subscribeNotice.set(null)">✕</button>
   </div>
 </div>
 

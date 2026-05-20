@@ -573,6 +573,42 @@ app-data-highchart {
 }
 .input:focus { outline: 2px solid #06b6d4; border-color: #06b6d4; }
 
+.toast-bottom {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #065f46;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toast-up 0.2s ease;
+}
+.toast-bottom-error { background: #991b1b; }
+.toast-bottom-icon { font-size: 16px; }
+.toast-bottom-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.7;
+  padding: 0 0 0 8px;
+  line-height: 1;
+}
+.toast-bottom-close:hover { opacity: 1; }
+@keyframes toast-up {
+  from { transform: translateX(-50%) translateY(16px); opacity: 0; }
+  to   { transform: translateX(-50%) translateY(0);   opacity: 1; }
+}
+
 /* ── Small screen overrides (<640px) ────────────── */
 @media (max-width: 639px) {
   /* Header */
