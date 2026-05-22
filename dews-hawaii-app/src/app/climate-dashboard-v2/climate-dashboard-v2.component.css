@@ -538,12 +538,38 @@ app-data-highchart {
 /* ── Email panel ────────────────────────────────── */
 .email-panel {
   flex-shrink: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.email-header {
+  background: #0ea5e9;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.email-header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.email-header-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.8);
+}
+
+.email-body {
+  padding: 10px 12px;
 }
 
 .email-steps {
-  margin: 8px 0 0 0;
+  margin: 0 0 8px 0;
   padding-left: 18px;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--sub);
   line-height: 1.7;
 }
@@ -555,11 +581,24 @@ app-data-highchart {
   padding: 6px 10px;
 }
 
+.email-panel .summary .sel-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--sub);
+}
+
+.email-panel .summary .strong { color: var(--text); font-size: 13px; }
+
 .label {
   display: block;
   margin-top: 10px;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #374151;
 }
 
 .input {
@@ -567,11 +606,43 @@ app-data-highchart {
   width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 7px;
-  padding: 6px 10px;
-  font-size: 13px;
+  padding: 7px 10px;
+  font-size: 14px;
   box-sizing: border-box;
 }
 .input:focus { outline: 2px solid #06b6d4; border-color: #06b6d4; }
+
+.btn-subscribe-primary {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: #fff;
+  border-color: transparent;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(14,165,233,.35);
+}
+.btn-subscribe-primary:hover:not([disabled]) {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  border-color: transparent;
+}
+.btn-subscribe-primary[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+.manage-link {
+  font-size: 11px;
+  color: #0369a1;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  align-self: center;
+}
+.manage-link:hover { text-decoration: underline; }
+
+.email-footer-note {
+  margin-top: 6px;
+}
+
+.division-note {
+  font-size: 12px;
+  margin-top: 5px;
+}
 
 .toast-bottom {
   position: fixed;
@@ -755,6 +826,27 @@ app-data-highchart {
   color: #64748b;
   font-size: 13px;
   padding: 28px;
+}
+
+/* ── Compact layout on short viewport heights ────── */
+@media (min-width: 1024px) and (max-height: 800px) {
+  .chart-section {
+    min-height: 240px;
+  }
+  .email-header {
+    padding: 7px 12px;
+  }
+  .email-body {
+    padding: 8px 12px;
+  }
+  .email-steps {
+    line-height: 1.4;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+  .email-panel .summary {
+    padding: 4px 10px;
+  }
 }
 
 /* ── Very wide (1600px+) ────────────────────────── */

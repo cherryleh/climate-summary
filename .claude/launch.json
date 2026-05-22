@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "dews-hawaii",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["start"],
+      "runtimeExecutable": "/Users/cherryleheu/.nvm/versions/node/v18.20.5/bin/node",
+      "runtimeArgs": ["node_modules/@angular/cli/bin/ng.js", "serve"],
       "port": 4200,
       "cwd": "/Users/cherryleheu/Documents/dews-hawaii/dews-hawaii-app"
     }

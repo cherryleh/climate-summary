@@ -277,41 +277,50 @@
 
       <!-- Email subscription -->
       <div class="panel email-panel">
-        <div class="eyebrow">Monthly email reports</div>
-        <div class="muted">Get a monthly report for your current selection.</div>
-
-        <ol class="email-steps">
-          <li>Choose an <strong>area</strong> using the map or dropdown</li>
-          <li>Enter your email below and subscribe</li>
-          <li>To select multiple areas, submit this form again</li>
-        </ol>
-        <div class="tiny muted">All subscriptions will automatically subscribe to Statewide reports</div>
-
-        <div class="mt">
-          <div class="summary">
-            <div class="muted">Selection</div>
-            <div class="strong">{{ fullSelectionLabel }}</div>
+        <div class="email-header">
+          <div>
+            <div class="email-header-title">Monthly Email Reports</div>
+            <div class="email-header-sub">Climate updates for your selection</div>
           </div>
         </div>
 
-        <label class="label" for="email">Email address</label>
-        <input id="email" class="input" type="email"
-          [ngModel]="email()"
-          (ngModelChange)="email.set($event)"
-          placeholder="you@example.com" />
+        <div class="email-body">
+          <ol class="email-steps">
+            <li>Select an area on the map (or leave as Statewide)</li>
+            <li>Enter your email and click <strong>Subscribe</strong></li>
+            <li>Resubmit to add more areas</li>
+          </ol>
 
-        <div class="tiny error" *ngIf="email() && !isEmailValid()">
-          Please enter a valid email.
-        </div>
+          <div class="mt">
+            <div class="summary">
+              <div class="sel-label">Current selection</div>
+              <div class="strong">{{ fullSelectionLabel }}</div>
+            </div>
+            <div class="tiny muted division-note" >
+              Subscribing to a division also includes reports for its island and for statewide.
+            </div>
+          </div>
 
-        <div class="actions">
-          <button class="btn btn-primary" [disabled]="!isEmailValid()" (click)="subscribe()">
-            Subscribe
-          </button>
-          <button class="btn" (click)="email.set('')">Clear</button>
-          <a class="btn" routerLink="/manage-subscriptions" target="_blank">Manage preferences</a>
+          <label class="label" for="email">Email address</label>
+          <input id="email" class="input" type="email"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            placeholder="you@example.com" />
+
+          <div class="tiny error" *ngIf="email() && !isEmailValid()">
+            Please enter a valid email.
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" [disabled]="!isEmailValid()" (click)="subscribe()">
+              Subscribe
+            </button>
+            <button class="btn" (click)="email.set('')">Clear</button>
+            <a class="manage-link" routerLink="/manage-subscriptions" target="_blank">Manage preferences</a>
+          </div>
+
+          <div class="tiny muted email-footer-note">Reports arrive around the 1st of each month. Unsubscribe anytime.</div>
         </div>
-        <div class="tiny muted">We'll send a report around the 1st of each month. You can unsubscribe anytime.</div>
       </div>
     </aside>
   </div>
