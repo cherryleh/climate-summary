@@ -24,6 +24,9 @@
       </button>
 
       <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+      <p class="error" *ngIf="noSubscriptionError">
+        No subscription found for that email. To subscribe, submit your email on the <a routerLink="/">main page</a>.
+      </p>
       <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
     </form>
   </ng-container>

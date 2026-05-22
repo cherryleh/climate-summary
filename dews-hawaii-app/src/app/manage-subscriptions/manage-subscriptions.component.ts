@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 import {
   EmailSubscriptionService,
   SubscriptionRecord,
@@ -19,17 +20,18 @@ const CATEGORY_LABELS: Record<Category, string> = {
 };
 
 @Component({
-  selector: 'app-manage-subscriptions',
+  selector: 'app-manage-preferences',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule],
   templateUrl: './manage-subscriptions.component.html',
   styleUrls: ['./manage-subscriptions.component.css'],
 })
-export class ManageSubscriptionsComponent {
+export class ManagePreferencesComponent {
   email = '';
   loading = false;
   successMsg = '';
   errorMsg = '';
+  noSubscriptionError = false;
 
   view: 'email' | 'prefs' = 'email';
 
@@ -60,6 +62,7 @@ export class ManageSubscriptionsComponent {
   lookup(form: NgForm) {
     this.successMsg = '';
     this.errorMsg = '';
+    this.noSubscriptionError = false;
 
     if (form.invalid) {
       this.errorMsg = 'Please enter a valid email address.';
@@ -74,7 +77,7 @@ export class ManageSubscriptionsComponent {
         const id = res?.userID;
         if (!id) {
           this.loading = false;
-          this.errorMsg = 'No subscription found for that email.';
+          this.noSubscriptionError = true;
           return;
         }
         this.userID = id;

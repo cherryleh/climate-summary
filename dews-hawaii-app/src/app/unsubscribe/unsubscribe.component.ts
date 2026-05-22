@@ -1,116 +1,64 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import {
-  HttpClient,
-  HttpClientModule,
-  HttpErrorResponse,
-  HttpHeaders,
-  HttpParams,
-} from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpClientModule, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { environment } from '../../environments/environment';
-
-type EmailLookupResponse = {
-  userID: string | null;
-};
 
 @Component({
   selector: 'app-unsubscribe',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, RouterModule],
   templateUrl: './unsubscribe.component.html',
   styleUrls: ['./unsubscribe.component.css'],
 })
 export class UnsubscribeComponent implements OnInit {
   private baseUrl = 'https://api.hcdp.ikewai.org/mesonet/climate_report';
 
-  email = '';
   loading = false;
-  successMsg = '';
+  success = false;
   errorMsg = '';
-  autoMode = false;
+  hasId = false;
 
   constructor(private http: HttpClient, private route: ActivatedRoute) {}
 
   ngOnInit() {
     const id = this.route.snapshot.queryParamMap.get('id');
     if (id) {
-      this.autoMode = true;
+      this.hasId = true;
       this.loading = true;
       this.unsubscribe(id);
     }
   }
 
   private headers(): HttpHeaders {
-    const token = environment.apiToken;
-    let h = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return h.set('Authorization', `Bearer ${token}`);
-  }
-
-  submit(form: NgForm) {
-    this.successMsg = '';
-    this.errorMsg = '';
-
-    if (form.invalid) {
-      this.errorMsg = 'Please enter a valid email address.';
-      return;
-    }
-
-    const emailTrimmed = this.email.trim().toLowerCase();
-    this.loading = true;
-
-    const params = new HttpParams().set('email', emailTrimmed);
-
-    this.http
-      .get<EmailLookupResponse>(`${this.baseUrl}/email_lookup`, {
-        params,
-        headers: this.headers(),
-      })
-      .subscribe({
-        next: (data) => {
-          const userID = data?.userID;
-          if (!userID) {
-            this.loading = false;
-            this.errorMsg = 'No subscription found for that email.';
-            return;
-          }
-          this.unsubscribe(userID);
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorMsg = this.humanizeHttpError(err, 'Lookup failed.');
-        },
-      });
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${environment.apiToken}`,
+    });
   }
 
   private unsubscribe(userID: string) {
     const url = `${this.baseUrl}/subscription/${encodeURIComponent(userID)}/unsubscribe`;
-
     this.http.patch(url, null, { headers: this.headers() }).subscribe({
       next: () => {
         this.loading = false;
-        this.successMsg = 'You have been unsubscribed.';
+        this.success = true;
       },
       error: (err) => {
         this.loading = false;
-        this.errorMsg = this.humanizeHttpError(err, 'Unsubscribe failed.');
+        this.errorMsg = this.humanizeError(err);
       },
     });
   }
 
-  private humanizeHttpError(err: unknown, fallback: string): string {
+  private humanizeError(err: unknown): string {
     if (err instanceof HttpErrorResponse) {
-      const apiMsg =
+      const msg =
         (typeof err.error === 'string' && err.error) ||
-        (err.error &&
-          typeof err.error === 'object' &&
-          (err.error.message || err.error.detail)) ||
+        (err.error && typeof err.error === 'object' && (err.error.message || err.error.detail)) ||
         '';
-      return apiMsg
-        ? `${fallback} ${apiMsg}`
-        : `${fallback} (HTTP ${err.status}${err.statusText ? `: ${err.statusText}` : ''})`;
+      return msg || `Unsubscribe failed (HTTP ${err.status}).`;
     }
-    return fallback;
+    return 'Unsubscribe failed.';
   }
 }

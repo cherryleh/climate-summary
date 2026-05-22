@@ -1,37 +1,26 @@
 <div class="wrap">
-  <h2>Unsubscribe</h2>
-
-  <!-- Auto-unsubscribe via ?id= query param -->
-  <ng-container *ngIf="autoMode">
-    <p class="subtext" *ngIf="loading">Unsubscribing…</p>
-    <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
-    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+  <!-- ?id= provided: auto-unsubscribe -->
+  <ng-container *ngIf="hasId">
+    <ng-container *ngIf="loading">
+      <p class="subtext">Unsubscribing…</p>
+    </ng-container>
+    <ng-container *ngIf="success">
+      <div class="check">✓</div>
+      <h2>You are unsubscribed</h2>
+      <p class="subtext">You will no longer receive monthly climate reports.</p>
+      <a class="manage-link" routerLink="/manage-preferences">Manage preferences</a>
+    </ng-container>
+    <ng-container *ngIf="errorMsg">
+      <h2>Something went wrong</h2>
+      <p class="error">{{ errorMsg }}</p>
+      <a class="manage-link" routerLink="/manage-preferences">Manage preferences</a>
+    </ng-container>
   </ng-container>
 
-  <!-- Manual email form -->
-  <ng-container *ngIf="!autoMode">
-    <p class="subtext">Enter the email address you used to subscribe.</p>
-
-    <form #f="ngForm" (ngSubmit)="submit(f)" novalidate>
-      <label for="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        name="email"
-        [(ngModel)]="email"
-        required
-        email
-        autocomplete="email"
-        placeholder="name@hawaii.edu"
-        [disabled]="loading"
-      />
-
-      <button type="submit" [disabled]="loading || f.invalid">
-        {{ loading ? 'Unsubscribing…' : 'Unsubscribe' }}
-      </button>
-
-      <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
-      <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
-    </form>
+  <!-- No ?id=: nothing to do here -->
+  <ng-container *ngIf="!hasId">
+    <h2>Unsubscribe</h2>
+    <p class="subtext">To manage your subscriptions, use the link below.</p>
+    <a class="manage-link" routerLink="/manage-preferences">Manage preferences</a>
   </ng-container>
 </div>
