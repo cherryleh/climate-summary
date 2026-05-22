@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import {
   EmailSubscriptionService,
   SubscriptionRecord,
 } from '../services/email-subscription.service';
 
-type Category = 'island' | 'county' | 'moku' | 'ahupuaa' | 'watershed' | 'division';
+type Category = 'island' | 'county' | 'moku' | 'ahupuaa' | 'watershed' | 'division' | 'climate';
 
 const CATEGORY_LABELS: Record<Category, string> = {
   island: 'Island',
@@ -17,6 +17,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
   ahupuaa: "Ahupuaʻa",
   watershed: 'Watershed',
   division: 'Division',
+  climate: 'Climate',
 };
 
 @Component({
@@ -26,7 +27,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
   templateUrl: './manage-subscriptions.component.html',
   styleUrls: ['./manage-subscriptions.component.css'],
 })
-export class ManagePreferencesComponent {
+export class ManagePreferencesComponent implements OnInit {
   email = '';
   loading = false;
   successMsg = '';
@@ -37,14 +38,21 @@ export class ManagePreferencesComponent {
 
   userID = '';
   categoryLabels = CATEGORY_LABELS;
-  categories: Category[] = ['island', 'county', 'moku', 'ahupuaa', 'watershed', 'division'];
+  categories: Category[] = ['island', 'county', 'moku', 'ahupuaa', 'watershed', 'division', 'climate'];
 
-  // checked[category][item] = true/false
   checked: Partial<Record<Category, Record<string, boolean>>> = {};
-  // original list per category (for display ordering)
   items: Partial<Record<Category, string[]>> = {};
 
-  constructor(private svc: EmailSubscriptionService) {}
+  constructor(private svc: EmailSubscriptionService, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    const id = this.route.snapshot.queryParamMap.get('id');
+    if (id) {
+      this.userID = id;
+      this.loading = true;
+      this.fetchPrefs();
+    }
+  }
 
   get hasAnySubscription(): boolean {
     return this.categories.some(
@@ -94,6 +102,7 @@ export class ManagePreferencesComponent {
     this.svc.getSubscription(this.userID).subscribe({
       next: (sub) => {
         this.loading = false;
+        if (sub.email) this.email = sub.email;
         this.buildChecked(sub);
         this.view = 'prefs';
       },

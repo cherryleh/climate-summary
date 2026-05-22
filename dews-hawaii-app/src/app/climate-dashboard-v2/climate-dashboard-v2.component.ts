@@ -379,7 +379,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
       if (scope === 'moku') newBody.moku = [name];
       else if (scope === 'ahupuaa') newBody.ahupuaa = [name];
       else if (scope === 'watershed') newBody.watershed = [name];
-      else if (scope === 'divisions') newBody.division = [name];
+      else if (scope === 'divisions') newBody.climate = [name];
 
       if (islandSel) {
         const islandKey = this.slugifySelection(islandSel);
@@ -1711,8 +1711,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
     return key.trim();
   }
 
-  private readonly LIST_FIELDS: Array<'island'|'moku'|'ahupuaa'|'watershed'|'division'> =
-    ['island', 'moku', 'ahupuaa', 'watershed', 'division'];
+  private readonly LIST_FIELDS: Array<'island'|'moku'|'ahupuaa'|'watershed'|'division'|'climate'> =
+    ['island', 'moku', 'ahupuaa', 'watershed', 'division', 'climate'];
 
   private mergeDedup(oldVals: string[] = [], newVals: string[] = []): string[] {
     const normalize = (s: string) => s.normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[ʻ''`]/gu, '').toLowerCase();

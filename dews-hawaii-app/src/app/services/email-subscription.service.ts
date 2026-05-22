@@ -3,7 +3,7 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export type ListField = 'county' | 'moku' | 'ahupuaa' | 'watershed';
+export type ListField = 'county' | 'moku' | 'ahupuaa' | 'watershed' | 'climate';
 
 export interface SubscriptionRecord {
   email: string;
@@ -13,6 +13,7 @@ export interface SubscriptionRecord {
   ahupuaa?: string[];
   watershed?: string[];
   division?: string[];
+  climate?: string[];
 }
 
 export interface EmailLookupResponse {
