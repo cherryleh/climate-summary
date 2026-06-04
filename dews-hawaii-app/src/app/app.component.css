@@ -1,0 +1,11 @@
+/* Keep app-root as a plain block — footer sits in normal
+   document flow below whatever the routed page renders. */
+:host {
+  display: block;
+}
+
+/* Custom elements default to display:inline — make sure the
+   footer is always a block so it stacks predictably. */
+app-footer {
+  display: block;
+}

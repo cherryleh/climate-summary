@@ -1,4 +1,8 @@
 /* CSS */
+:host {
+  display: block;
+}
+
 .powered-footer {
   display: flex;
   align-items: center;

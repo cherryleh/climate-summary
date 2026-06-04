@@ -44,7 +44,10 @@
 /* ── Viewport-locked layout on desktop ──────────── */
 @media (min-width: 1024px) {
   .page {
-    height: 100dvh;
+    /* Always at least the full viewport tall, but never shorter
+       than 600px — ensures the footer can't creep into view
+       on very short windows without scrolling past the dashboard. */
+    min-height: max(100dvh, 600px);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -64,6 +67,7 @@
     overflow-y: scroll; /* always reserve scrollbar gutter — prevents layout shift */
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
+    padding-bottom: var(--gap);
   }
 
   /* Pin email panel to the bottom of the aside column */
@@ -73,11 +77,6 @@
   }
 }
 
-@media (min-width: 1280px) {
-  .page {
-    max-height: 800px;
-  }
-}
 
 /* ── Main responsive grid ───────────────────────── */
 .dashboard-grid {

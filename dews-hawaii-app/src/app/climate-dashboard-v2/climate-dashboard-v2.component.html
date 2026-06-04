@@ -74,8 +74,8 @@
             (click)="openRankTable()">
           </app-stat-box>
           <app-stat-box class="clickable-stat" label="Rank"
-            [value]="formatRank(stats()?.rank)"
-            [note]="(getRankSentiment(stats()?.rank, rainfallYears()) === 'high' ? 'Wettest' : 'Driest') + ' out of ' + rainfallYears() + ' years'"
+            [value]="formatRank(getDirectionalRank(stats()?.rank, rainfallYears()))"
+            [note]="rainfallYears() > 0 ? (getRankSentiment(stats()?.rank, rainfallYears()) === 'high' ? 'Wettest' : 'Driest') + ' out of ' + rainfallYears() + ' years' : undefined"
             (click)="openRankTable()">
           </app-stat-box>
           <app-stat-box *ngIf="dataset() === 'Rainfall'" class="clickable-stat"
@@ -97,8 +97,8 @@
             (click)="openRankTable()">
           </app-stat-box>
           <app-stat-box class="clickable-stat" label="Rank"
-            [value]="formatRank(stats()?.rank)"
-            [note]="(getRankSentiment(stats()?.rank, temperatureYears()) === 'high' ? 'Warmest' : 'Coolest') + ' out of ' + temperatureYears() + ' years'"
+            [value]="formatRank(getDirectionalRank(stats()?.rank, temperatureYears()))"
+            [note]="temperatureYears() > 0 ? (getRankSentiment(stats()?.rank, temperatureYears()) === 'high' ? 'Warmest' : 'Coolest') + ' out of ' + temperatureYears() + ' years' : undefined"
             (click)="openRankTable()">
           </app-stat-box>
           <app-stat-box class="clickable-stat" label="Max temp"
@@ -374,5 +374,3 @@
     <button class="toast-bottom-close" (click)="subscribeNotice.set(null)">✕</button>
   </div>
 </div>
-
-<app-footer></app-footer>

@@ -1158,8 +1158,13 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
   getRankSentiment(rank: number | undefined, totalYears: number): 'high' | 'low' {
     if (rank == null || totalYears <= 0) return 'low';
-    // Top half (e.g., 1-15 out of 30)
     return rank <= (totalYears / 2) ? 'high' : 'low';
+  }
+
+  // Returns rank counted from the sentiment's end so "107th of 107" becomes "1st Driest" not "107th Driest"
+  getDirectionalRank(rank: number | undefined, totalYears: number): number | undefined {
+    if (rank == null) return undefined;
+    return this.getRankSentiment(rank, totalYears) === 'high' ? rank : totalYears - rank + 1;
   }
 
   // Helper to draw categorical legends consistently
@@ -1260,10 +1265,16 @@ export class ClimateDashboardV2Component implements OnDestroy {
     return Object.entries(args).reduce((p, [k, v]) => p.set(k, v), new HttpParams());
   }
 
+  private nextMonthDate(year: number, month: number): string {
+    const m = month === 12 ? 1 : month + 1;
+    const y = month === 12 ? year + 1 : year;
+    return `${y}-${String(m).padStart(2, '0')}`;
+  }
+
   private loadRainfallData() {
     const endYear = this.selectedYear();
     const endMonth = this.selectedMonth();
-    const endDate = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+    const endDate = this.nextMonthDate(endYear, endMonth);
 
     // fetch 120 months back so Aprils (10 yr) mode has enough data
     const totalMonths0 = endYear * 12 + (endMonth - 1) - 119;
@@ -1297,7 +1308,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   private loadTemperatureData() {
     const endYear = this.selectedYear();
     const endMonth = this.selectedMonth();
-    const endDate = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+    const endDate = this.nextMonthDate(endYear, endMonth);
 
     const totalMonths0 = endYear * 12 + (endMonth - 1) - 119;
     const startYear = Math.floor(totalMonths0 / 12);
@@ -1414,7 +1425,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   private async loadDroughtDistribution() {
     const endYear = this.selectedYear();
     const endMonth = this.selectedMonth();
-    const endDate = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+    const endDate = this.nextMonthDate(endYear, endMonth);
 
     const totalMonths0 = endYear * 12 + (endMonth - 1) - 59;
     const startYear = Math.floor(totalMonths0 / 12);
@@ -1769,7 +1780,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
     this.rankTableRows.set([]);
 
     const startDate = dataset === 'Rainfall' ? '1920-01' : '1990-01';
-    const endDate = `${year}-${String(month).padStart(2, '0')}`;
+    const { month: latestM, year: latestY } = this.latestMonth();
+    const endDate = `${latestY}-${String(latestM).padStart(2, '0')}`;
     const statsUrl = dataset === 'Rainfall' ? this.rainfallStatsUrl : this.temperatureStatsUrl;
     const args = this.buildRainfallQueryArgs({ startDate, endDate });
     const params = Object.entries(args).reduce((p, [k, v]) => p.set(k, v), new HttpParams());
