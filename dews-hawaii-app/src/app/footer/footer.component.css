@@ -42,3 +42,13 @@
 .powered-footer .logos img:hover {
   transform: scale(1.05);
 }
+
+.powered-footer .logos img.logo-small {
+  height: 60px;
+}
+
+@media (max-width: 639px) {
+  .powered-footer .logos img.logo-small {
+    height: 40px;
+  }
+}
