@@ -369,7 +369,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
     if (islandSel) {
       const islandKey = this.slugifySelection(islandSel);
-      newBody.island = [this.ISLAND_CANONICAL[islandKey] ?? islandSel];
+      newBody.island = [this.ISLAND_CANONICAL[islandKey] ?? islandSel, 'Statewide'];
     } else {
       newBody.island = ['Statewide'];
     }

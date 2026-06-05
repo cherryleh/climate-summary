@@ -198,6 +198,7 @@
                   [class.active]="selectedScope() === 'watershed'"
                   (click)="closeCountyMenu(); setScope('watershed')">Watershed</button>
               </div>
+              <span class="division-hint" *ngIf="selectedScope() && !selectedIsland()">Select an island to view divisions</span>
             </div>
 
             <!-- Scoped dropdown (watershed / ahupuaa) -->
@@ -216,7 +217,7 @@
             </div>
 
             <button class="btn btn-reset-inline" type="button"
-              *ngIf="selectedIsland() || selectedScope() || selectedDivision()"
+              *ngIf="selectedIsland() || selectedDivision() || (selectedScope() && selectedIsland())"
               (click)="closeCountyMenu(); reset()">
               Reset
             </button>

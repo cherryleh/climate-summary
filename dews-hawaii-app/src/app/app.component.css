@@ -1,11 +1,16 @@
 /* Keep app-root as a plain block — footer sits in normal
    document flow below whatever the routed page renders. */
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* Custom elements default to display:inline — make sure the
-   footer is always a block so it stacks predictably. */
+router-outlet + * {
+  flex: 1;
+}
+
 app-footer {
   display: block;
+  margin-top: auto;
 }

@@ -157,9 +157,16 @@ export class DataHighchartComponent implements OnChanges, OnInit, OnDestroy {
         shared: true,
         valueDecimals: 2,
         formatter: isDistribution ? function(this: any) {
-          let s = `<b>${this.x}</b>`;
-          // Sort points so they appear in the tooltip top-to-bottom as they appear on the graph
-          const sortedPoints = [...this.points].sort((a, b) => b.y - a.y);
+          let s = `<b>${this.points?.[0]?.key ?? this.x}</b>`;
+          const order = [
+            'D4 Exceptional Drought', 'D3 Extreme Drought', 'D2 Severe Drought',
+            'D1 Moderate Drought', 'D0 Abnormally Dry',
+            'W0 Abnormally Wet', 'W1 Moderately Wet', 'W2 Severely Wet',
+            'W3 Extremely Wet', 'W4 Exceptionally Wet'
+          ];
+          const sortedPoints = [...this.points].sort((a, b) =>
+            order.indexOf(a.series.name) - order.indexOf(b.series.name)
+          );
           sortedPoints.forEach((p: any) => {
             if (p.y !== 0) {
               s += `<br/><span style="color:${p.color}">\u25CF</span> ${p.series.name}: ${Math.abs(p.y)}%`;

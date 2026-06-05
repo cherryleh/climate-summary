@@ -7,6 +7,18 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+.home-link {
+  display: inline-block;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+  margin-bottom: 14px;
+}
+
+.home-link:hover {
+  color: rgba(0, 0, 0, 0.8);
+}
+
 h2 {
   margin: 0 0 4px 0;
   font-size: 20px;

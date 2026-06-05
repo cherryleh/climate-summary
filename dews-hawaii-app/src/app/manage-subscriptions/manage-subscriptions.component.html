@@ -1,8 +1,10 @@
 <div class="wrap">
 
+  <a class="home-link" routerLink="/">← Back to main</a>
+
   <!-- Step 1: Email lookup -->
   <ng-container *ngIf="view === 'email'">
-    <h2>Manage Subscriptions</h2>
+    <h2>Manage Preferences</h2>
     <p class="subtext">Enter your email address to view and manage your report preferences.</p>
 
     <form #f="ngForm" (ngSubmit)="lookup(f)" novalidate>
