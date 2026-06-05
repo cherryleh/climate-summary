@@ -20,6 +20,15 @@
   white-space: nowrap;
 }
 
+.supported-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
 .powered-footer .logos {
   display: flex;
   align-items: center;
