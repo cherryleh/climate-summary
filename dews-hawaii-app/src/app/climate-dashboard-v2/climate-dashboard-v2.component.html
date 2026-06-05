@@ -106,7 +106,7 @@
             (click)="openRankTable()">
           </app-stat-box>
         </div>
-        <div class="stats-hint" *ngIf="selectedDataset() === 'Temperature'">Click any stat to view full year rankings</div>
+        <div class="stats-hint" *ngIf="selectedDataset() === 'Temperature'">Click any stat to view full rankings</div>
 
         <!-- Drought stats -->
         <ng-container *ngIf="selectedDataset() === 'Drought'">
@@ -333,22 +333,37 @@
         <button class="btn" (click)="closeRankTable()">✕ Close</button>
       </div>
       <div class="rank-modal-body">
+        <div *ngIf="!rankTableLoading() && rankTableRows().length" class="rank-sort-note">
+          <ng-container *ngIf="selectedDataset() === 'Rainfall'">
+            {{ rankTableSentiment() === 'low' ? '↓ Ranked driest to wettest' : '↓ Ranked wettest to driest' }}
+          </ng-container>
+          <ng-container *ngIf="selectedDataset() === 'Temperature'">
+            {{ rankTableSentiment() === 'low' ? '↓ Ranked coolest to warmest' : '↓ Ranked warmest to coolest' }}
+          </ng-container>
+        </div>
         <div *ngIf="rankTableLoading()" class="rank-empty">Loading…</div>
         <table *ngIf="!rankTableLoading() && rankTableRows().length" class="rank-table">
           <thead>
             <tr>
-              <th>Rank</th>
+              <th>
+                <ng-container *ngIf="selectedDataset() === 'Rainfall'">
+                  {{ rankTableSentiment() === 'low' ? 'Dry Rank' : 'Wet Rank' }}
+                </ng-container>
+                <ng-container *ngIf="selectedDataset() === 'Temperature'">
+                  {{ rankTableSentiment() === 'low' ? 'Cool Rank' : 'Warm Rank' }}
+                </ng-container>
+              </th>
               <th>Year</th>
               <th class="col-num">Value</th>
               <th class="col-num">Anomaly</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of rankTableRows()"
+            <tr *ngFor="let row of rankTableRows(); let i = index"
                 [class.rank-current]="row.year === selectedYear()"
                 (click)="goToYear(row.year)"
                 title="View {{ monthNames[selectedMonth() - 1] }} {{ row.year }}">
-              <td><span [innerHTML]="formatRank(row.rank)"></span></td>
+              <td><span [innerHTML]="formatRank(i + 1)"></span></td>
               <td>{{ row.year }}{{ row.year === selectedYear() ? ' ★' : '' }}</td>
               <td class="col-num">{{ row.value | number:'1.2-2' }} {{ unit() }}</td>
               <td class="col-num">

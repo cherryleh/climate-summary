@@ -1765,6 +1765,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   rankTableVisible = signal(false);
   rankTableLoading = signal(false);
   rankTableTitle = signal('');
+  rankTableSentiment = signal<'high' | 'low'>('high');
   rankTableRows = signal<{ year: number; value: number; anomaly: number; pchange: number; rank: number }[]>([]);
 
   openRankTable() {
@@ -1778,6 +1779,11 @@ export class ClimateDashboardV2Component implements OnDestroy {
     this.rankTableVisible.set(true);
     this.rankTableLoading.set(true);
     this.rankTableRows.set([]);
+
+    const totalYears = dataset === 'Rainfall' ? this.rainfallYears() : this.temperatureYears();
+    const currentRank = this.stats()?.rank;
+    const sentiment = this.getRankSentiment(currentRank, totalYears);
+    this.rankTableSentiment.set(sentiment);
 
     const startDate = dataset === 'Rainfall' ? '1920-01' : '1990-01';
     const { month: latestM, year: latestY } = this.latestMonth();
@@ -1798,7 +1804,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
             rank: +r.rank
           }))
           .filter(r => !isNaN(r.rank))
-          .sort((a, b) => a.rank - b.rank);
+          .sort((a, b) => sentiment === 'low' ? b.rank - a.rank : a.rank - b.rank);
         this.rankTableRows.set(rows);
         this.rankTableLoading.set(false);
         setTimeout(() => {

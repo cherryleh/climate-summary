@@ -839,6 +839,14 @@ app-data-highchart {
   padding: 28px;
 }
 
+.rank-sort-note {
+  font-size: 12px;
+  color: #64748b;
+  padding: 6px 16px 4px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
 /* ── Compact layout on short viewport heights ────── */
 @media (min-width: 1024px) and (max-height: 800px) {
   .chart-section {
