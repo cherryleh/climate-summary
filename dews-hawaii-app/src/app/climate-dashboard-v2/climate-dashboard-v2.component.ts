@@ -511,7 +511,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const params = new HttpParams()
       .set('division_type', divisionType)
       .set('island', apiIsland)
-      .set('name', name)
+      .set('name', this.escapeName(name))
       .set('date', date);
 
     console.log('[loadDroughtStats] params:', { division_type: divisionType, island: apiIsland, name, date });
@@ -569,7 +569,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const params = new HttpParams()
       .set('division_type', divisionType)
       .set('island', apiIsland)
-      .set('name', name)
+      .set('name', this.escapeName(name))
       .set('date', date);
 
     console.log('[loadRainfallStats] params:', { division_type: divisionType, island: apiIsland, name, date });
@@ -624,7 +624,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const params = new HttpParams()
       .set('division_type', divisionType)
       .set('island', apiIsland)
-      .set('name', name)
+      .set('name', this.escapeName(name))
       .set('date', date);
 
     console.log('[loadTemperatureStats] params:', { division_type: divisionType, island: apiIsland, name, date });
@@ -1257,7 +1257,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
       apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
     }
 
-    return { division_type, island: apiIsland, name, ...extraDates };
+    return { division_type, island: apiIsland, name: this.escapeName(name), ...extraDates };
   }
 
   private rainfallApiParams(startDate: string, endDate: string): HttpParams {
@@ -1290,10 +1290,10 @@ export class ClimateDashboardV2Component implements OnDestroy {
       .subscribe({
         next: (results) => {
           console.log('[loadRainfallData] API response:', results);
-          const mapped = (results ?? []).map(r => ({
-            month: (r.date as string).slice(0, 7),
-            value: +r.value
-          }));
+          const cutoff = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+          const mapped = (results ?? [])
+            .map(r => ({ month: (r.date as string).slice(0, 7), value: +r.value }))
+            .filter(r => r.month <= cutoff);
           this.tsData.set(mapped);
         },
         error: (err) => {
@@ -1323,10 +1323,10 @@ export class ClimateDashboardV2Component implements OnDestroy {
       .subscribe({
         next: (results) => {
           console.log('[loadTemperatureData] API response:', results);
-          const mapped = (results ?? []).map(r => ({
-            month: (r.date as string).slice(0, 7),
-            value: +r.value
-          }));
+          const cutoff = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+          const mapped = (results ?? [])
+            .map(r => ({ month: (r.date as string).slice(0, 7), value: +r.value }))
+            .filter(r => r.month <= cutoff);
           this.tsData.set(mapped);
         },
         error: (err) => {
@@ -1442,19 +1442,22 @@ export class ClimateDashboardV2Component implements OnDestroy {
       );
       console.log('[loadDroughtDistribution] API response:', results);
 
-      const mapped = (results ?? []).map(r => ({
-        month: (r.date as string).slice(0, 7),
-        'D0 Abnormally Dry':      parseFloat(r.d0 || '0'),
-        'D1 Moderate Drought':    parseFloat(r.d1 || '0'),
-        'D2 Severe Drought':      parseFloat(r.d2 || '0'),
-        'D3 Extreme Drought':     parseFloat(r.d3 || '0'),
-        'D4 Exceptional Drought': parseFloat(r.d4 || '0'),
-        'W0 Abnormally Wet':      parseFloat(r.w0 || '0'),
-        'W1 Moderately Wet':      parseFloat(r.w1 || '0'),
-        'W2 Severely Wet':        parseFloat(r.w2 || '0'),
-        'W3 Extremely Wet':       parseFloat(r.w3 || '0'),
-        'W4 Exceptionally Wet':   parseFloat(r.w4 || '0'),
-      }));
+      const cutoff = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+      const mapped = (results ?? [])
+        .map(r => ({
+          month: (r.date as string).slice(0, 7),
+          'D0 Abnormally Dry':      parseFloat(r.d0 || '0'),
+          'D1 Moderate Drought':    parseFloat(r.d1 || '0'),
+          'D2 Severe Drought':      parseFloat(r.d2 || '0'),
+          'D3 Extreme Drought':     parseFloat(r.d3 || '0'),
+          'D4 Exceptional Drought': parseFloat(r.d4 || '0'),
+          'W0 Abnormally Wet':      parseFloat(r.w0 || '0'),
+          'W1 Moderately Wet':      parseFloat(r.w1 || '0'),
+          'W2 Severely Wet':        parseFloat(r.w2 || '0'),
+          'W3 Extremely Wet':       parseFloat(r.w3 || '0'),
+          'W4 Exceptionally Wet':   parseFloat(r.w4 || '0'),
+        }))
+        .filter(r => r.month <= cutoff);
 
       this.tsData.set(mapped);
     } catch (err) {
@@ -1710,6 +1713,10 @@ export class ClimateDashboardV2Component implements OnDestroy {
   private canonicalIslandName(island: string): string {
     const key = this.normalizeKey(island);
     return this.ISLAND_CANONICAL[key] ?? island;
+  }
+
+  private escapeName(name: string): string {
+    return name.replace(/,/g, '\\,');
   }
 
   private extractScopedName(key: string): string {
