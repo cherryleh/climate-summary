@@ -1,9 +1,13 @@
-import { Component, Input, Output, EventEmitter, signal, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, OnChanges, SimpleChanges, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import type { Scope } from '../climate-dashboard/climate-dashboard.component';
 type RasterRect = { x: number; y: number; width: number; height: number };
 type Dataset = 'Rainfall' | 'Temperature' | 'Drought';
+
+const FULL_VIEWBOX = '-30 -5 490 320';
+const ZOOM_SCOPES = new Set(['ahupuaa', 'watershed']);
+const ZOOM_PAD = 40;
 
 @Component({
   selector: 'app-map-panel',
@@ -12,7 +16,7 @@ type Dataset = 'Rainfall' | 'Temperature' | 'Drought';
   templateUrl: './map-panel.component.html',
   styleUrls: ['./map-panel.component.css']
 })
-export class MapPanelComponent implements OnInit {
+export class MapPanelComponent implements OnInit, OnChanges {
   // ===== Inputs =====
   @Input() selectedDataset!: Dataset;
   @Input() selectedScope!: string | null;
@@ -32,11 +36,43 @@ export class MapPanelComponent implements OnInit {
   @Output() resetSelection = new EventEmitter<void>();
   @Output() scopeSelected = new EventEmitter<Scope>();
 
+  @ViewChild('mapSvg') mapSvgRef!: ElementRef<SVGSVGElement>;
 
   hoveredFeature = signal<string | null>(null);
   hoveredLabel = signal<{ name: string; x: number; y: number } | null>(null);
+  viewBox = FULL_VIEWBOX;
 
   ngOnInit() {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['selectedDivision'] || changes['selectedScope'] || changes['selectedIsland']) {
+      this.updateViewBox();
+    }
+  }
+
+  private updateViewBox() {
+    const shouldZoom = this.selectedDivision && this.selectedScope && ZOOM_SCOPES.has(this.selectedScope);
+    if (!shouldZoom) {
+      this.viewBox = FULL_VIEWBOX;
+      return;
+    }
+    // Defer until paths are rendered
+    setTimeout(() => {
+      if (!this.mapSvgRef) return;
+      const svg = this.mapSvgRef.nativeElement;
+      const paths = svg.querySelectorAll<SVGPathElement>('path[data-key]');
+      let target: SVGPathElement | null = null;
+      paths.forEach(p => { if (p.dataset['key'] === this.selectedDivision) target = p; });
+      if (!target) return;
+      const bb = (target as SVGPathElement).getBBox();
+      if (bb.width < 1 && bb.height < 1) return;
+      const x = bb.x - ZOOM_PAD;
+      const y = bb.y - ZOOM_PAD;
+      const w = bb.width + ZOOM_PAD * 2;
+      const h = bb.height + ZOOM_PAD * 2;
+      this.viewBox = `${x} ${y} ${w} ${h}`;
+    }, 50);
+  }
 
   onHover(feature: any, event: MouseEvent) {
     const scope = this.selectedScope;
@@ -91,6 +127,21 @@ export class MapPanelComponent implements OnInit {
       return 2;
     }
     return this.hoveredFeature() === feature.name ? 2 : 1;
+  }
+
+  fillColor(feature: any): string {
+    if (this.hoveredFeature() === feature.name) return 'rgba(107, 114, 128, 0.15)';
+    return 'transparent';
+  }
+
+  get isZoomed(): boolean {
+    return this.viewBox !== FULL_VIEWBOX;
+  }
+
+  get zoomedRect(): { x: number; y: number; width: number; height: number } | null {
+    if (!this.isZoomed) return null;
+    const parts = this.viewBox.split(' ').map(Number);
+    return { x: parts[0], y: parts[1], width: parts[2], height: parts[3] };
   }
 
   filterGlow(feature: any): string | null {

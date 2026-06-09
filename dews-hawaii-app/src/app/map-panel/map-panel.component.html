@@ -1,5 +1,5 @@
 <div class="map">
-  <svg viewBox="-30 -5 490 320" class="map-svg" role="img" aria-label="Hawaiʻi islands (abstract)">
+  <svg #mapSvg [attr.viewBox]="viewBox" class="map-svg" role="img" aria-label="Hawaiʻi islands (abstract)" style="transition: all 0.4s ease;">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur stdDeviation="3" result="blur" />
@@ -31,7 +31,8 @@
       <path
         *ngFor="let feature of islands; trackBy: trackByIsle"
         [attr.d]="pathById[feature.id]"
-        fill="transparent"
+        [attr.data-key]="feature.key"
+        [attr.fill]="fillColor(feature)"
         [attr.stroke]="strokeColor(feature)"
         [attr.stroke-width]="strokeWidth(feature)"
         [attr.filter]="filterGlow(feature)"
@@ -67,6 +68,27 @@
         </ng-container>
       </g>
     </g>
+  </svg>
+
+  <!-- Inset overview box shown when zoomed in -->
+  <svg *ngIf="isZoomed" class="inset-map" viewBox="-30 -5 490 320" aria-hidden="true">
+    <path
+      *ngFor="let feature of islands; trackBy: trackByIsle"
+      [attr.d]="pathById[feature.id]"
+      fill="rgba(200,220,240,0.5)"
+      stroke="#9ca3af"
+      stroke-width="1"
+    ></path>
+    <rect
+      *ngIf="zoomedRect as r"
+      [attr.x]="r.x"
+      [attr.y]="r.y"
+      [attr.width]="r.width"
+      [attr.height]="r.height"
+      fill="rgba(14,165,233,0.15)"
+      stroke="#0ea5e9"
+      stroke-width="3"
+    ></rect>
   </svg>
 
   <div class="selection-overlay">
