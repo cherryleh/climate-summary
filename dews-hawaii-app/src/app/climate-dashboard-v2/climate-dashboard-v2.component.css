@@ -34,6 +34,11 @@
   border-bottom: 1px solid var(--border);
   background: var(--panel);
 }
+
+@media (min-width: 1024px) and (max-width: 1599px) {
+  .topbar { padding: 8px 16px; }
+  .brand h1 { font-size: 18px; }
+}
 .topbar-date { display:flex; align-items:center; gap:8px; }
 .topbar-date .tiny { font-size: 14px; }
 .date-selectors { display:flex; gap:6px; }

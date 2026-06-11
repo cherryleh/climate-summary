@@ -117,7 +117,9 @@ export class ManagePreferencesComponent implements OnInit {
     this.items = {};
     this.checked = {};
     for (const cat of this.categories) {
-      const vals = sub[cat] ?? [];
+      const vals = (sub[cat] ?? []).filter(
+        (v: string) => !(cat === 'island' && v === 'Statewide')
+      );
       this.items[cat] = [...vals];
       this.checked[cat] = {};
       for (const v of vals) {
@@ -145,7 +147,10 @@ export class ManagePreferencesComponent implements OnInit {
     const body: SubscriptionRecord = { email: this.email.trim().toLowerCase() };
     for (const cat of this.categories) {
       const kept = (this.items[cat] ?? []).filter((v) => this.checked[cat]?.[v]);
-      if (kept.length) {
+      if (cat === 'island') {
+        const withStatewide = kept.includes('Statewide') ? kept : [...kept, 'Statewide'];
+        if (withStatewide.length) (body as any)[cat] = withStatewide;
+      } else if (kept.length) {
         (body as any)[cat] = kept;
       }
     }

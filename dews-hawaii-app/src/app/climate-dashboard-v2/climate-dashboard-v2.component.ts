@@ -256,11 +256,15 @@ export class ClimateDashboardV2Component implements OnDestroy {
             const canonF = canonIsland(featureIsland);
 
             let isMatch = canonF === islandCanon || canonF.includes(islandCanon);
-            if (!isMatch && scope === 'divisions') {
+            if (!isMatch) {
               const isMauiNui = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(islandCanon);
-              const regionCanon = isMauiNui ? 'maui' : islandCanon;
-
-              isMatch = canonF === regionCanon || canonF.includes(regionCanon);
+              if (scope === 'divisions') {
+                const regionCanon = isMauiNui ? 'maui' : islandCanon;
+                isMatch = canonF === regionCanon || canonF.includes(regionCanon);
+              } else if (isMauiNui) {
+                // Moku like Honuaʻula span multiple Maui Nui islands; include any Maui Nui feature
+                isMatch = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(canonF);
+              }
             }
 
             if (islandCanon === 'maui') {
@@ -293,19 +297,19 @@ export class ClimateDashboardV2Component implements OnDestroy {
           let prefixCanon = islandCanon;
           let displayIsland = island;
 
-          // if (scope === 'divisions') {
-          //   const isMauiNui = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(islandCanon);
+          if (scope === 'divisions') {
+            const isMauiNui = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(islandCanon);
 
-          //   if (isMauiNui) {
-          //     if (canonIsland(name) === 'hilo') {
-          //       prefixCanon = 'hawaii';
-          //       displayIsland = 'Hawaiʻi';
-          //     } else {
-          //       prefixCanon = 'maui';
-          //       displayIsland = 'Maui';
-          //     }
-          //   }
-          // }
+            if (isMauiNui) {
+              if (canonIsland(name) === 'hilo') {
+                prefixCanon = 'hawaii';
+                displayIsland = 'Hawaiʻi';
+              } else {
+                prefixCanon = 'maui';
+                displayIsland = 'Maui';
+              }
+            }
+          }
 
           const key = `${prefixCanon}::${name}`;
           const id = `${prefixCanon}-${name}`.toLowerCase().replace(/\s+/g, '-');
@@ -321,15 +325,23 @@ export class ClimateDashboardV2Component implements OnDestroy {
           } as Island;
         });
 
+        // Deduplicate by id — keep the first (largest-area) feature per name
+        const seen = new Set<string>();
+        const uniqueFeatures = features.filter(d => {
+          if (seen.has(d.id)) return false;
+          seen.add(d.id);
+          return true;
+        });
+
         const pathById: Record<string, string> = {};
         const centroidById: Record<string, [number, number]> = {};
 
-        for (const d of features) {
+        for (const d of uniqueFeatures) {
           pathById[d.id] = path(d.feature)!;
           centroidById[d.id] = path.centroid(d.feature) as [number, number];
         }
 
-        this.islands.set(features);
+        this.islands.set(uniqueFeatures);
         this.pathById.set(pathById);
         this.centroidById.set(centroidById);
       });
@@ -383,7 +395,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
       if (islandSel) {
         const islandKey = this.slugifySelection(islandSel);
-        newBody.island = [this.ISLAND_CANONICAL[islandKey] ?? islandSel];
+        newBody.island = [this.ISLAND_CANONICAL[islandKey] ?? islandSel, 'Statewide'];
       }
     }
 
@@ -490,9 +502,9 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
     let divisionType: string, apiIsland: string, name: string;
 
-    if (!scope && !island && !division) {
+    if (!island && !division) {
       divisionType = 'Statewide'; apiIsland = 'Statewide'; name = 'Statewide';
-    } else if (!scope && island && !division) {
+    } else if (island && !division) {
       divisionType = 'island';
       apiIsland = this.canonicalIslandName(island);
       name = this.canonicalIslandName(island);
@@ -505,7 +517,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
       const divStr = division ?? '';
       const parts = divStr.split('::');
       name = parts.length === 2 ? parts[1].trim() : divStr.trim();
-      apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
+      const divPrefix = parts.length === 2 ? parts[0].trim() : '';
+      apiIsland = divPrefix ? (this.ISLAND_CANONICAL[divPrefix] ?? this.canonicalIslandName(island || '')) : (island ? this.canonicalIslandName(island) : '');
     }
 
     const params = new HttpParams()
@@ -545,11 +558,11 @@ export class ClimateDashboardV2Component implements OnDestroy {
     let apiIsland: string;
     let name: string;
 
-    if (!scope && !island && !division) {
+    if (!island && !division) {
       divisionType = 'Statewide';
       apiIsland = 'Statewide';
       name = 'Statewide';
-    } else if (!scope && island && !division) {
+    } else if (island && !division) {
       divisionType = 'island';
       apiIsland = this.canonicalIslandName(island);
       name = this.canonicalIslandName(island);
@@ -563,7 +576,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
       const divisionStr = division ?? '';
       const parts = divisionStr.split('::');
       name = parts.length === 2 ? parts[1].trim() : divisionStr.trim();
-      apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
+      const divPrefix = parts.length === 2 ? parts[0].trim() : '';
+      apiIsland = divPrefix ? (this.ISLAND_CANONICAL[divPrefix] ?? this.canonicalIslandName(island || '')) : (island ? this.canonicalIslandName(island) : '');
     }
 
     const params = new HttpParams()
@@ -603,9 +617,9 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
     let divisionType: string, apiIsland: string, name: string;
 
-    if (!scope && !island && !division) {
+    if (!island && !division) {
       divisionType = 'Statewide'; apiIsland = 'Statewide'; name = 'Statewide';
-    } else if (!scope && island && !division) {
+    } else if (island && !division) {
       divisionType = 'island';
       apiIsland = this.canonicalIslandName(island);
       name = this.canonicalIslandName(island);
@@ -618,7 +632,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
       const divStr = division ?? '';
       const parts = divStr.split('::');
       name = parts.length === 2 ? parts[1].trim() : divStr.trim();
-      apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
+      const divPrefix = parts.length === 2 ? parts[0].trim() : '';
+      apiIsland = divPrefix ? (this.ISLAND_CANONICAL[divPrefix] ?? this.canonicalIslandName(island || '')) : (island ? this.canonicalIslandName(island) : '');
     }
 
     const params = new HttpParams()
@@ -1239,9 +1254,9 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
     let division_type: string, apiIsland: string, name: string;
 
-    if (!scope && !island && !division) {
+    if (!island && !division) {
       division_type = 'Statewide'; apiIsland = 'Statewide'; name = 'Statewide';
-    } else if (!scope && island && !division) {
+    } else if (island && !division) {
       division_type = 'island';
       apiIsland = this.canonicalIslandName(island);
       name = this.canonicalIslandName(island);
@@ -1254,7 +1269,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
       const divStr = division ?? '';
       const parts = divStr.split('::');
       name = parts.length === 2 ? parts[1].trim() : divStr.trim();
-      apiIsland = island ? this.canonicalIslandName(island) : (parts.length === 2 ? parts[0].trim() : '');
+      const divPrefix = parts.length === 2 ? parts[0].trim() : '';
+      apiIsland = divPrefix ? (this.ISLAND_CANONICAL[divPrefix] ?? this.canonicalIslandName(island || '')) : (island ? this.canonicalIslandName(island) : '');
     }
 
     return { division_type, island: apiIsland, name: this.escapeName(name), ...extraDates };

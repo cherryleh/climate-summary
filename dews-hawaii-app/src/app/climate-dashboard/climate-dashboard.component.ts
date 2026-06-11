@@ -254,11 +254,15 @@ export class ClimateDashboardComponent implements OnDestroy {
             const canonF = canonIsland(featureIsland);
 
             let isMatch = canonF === islandCanon || canonF.includes(islandCanon);
-            if (!isMatch && scope === 'divisions') {
+            if (!isMatch) {
               const isMauiNui = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(islandCanon);
-              const regionCanon = isMauiNui ? 'maui' : islandCanon;
-
-              isMatch = canonF === regionCanon || canonF.includes(regionCanon);
+              if (scope === 'divisions') {
+                const regionCanon = isMauiNui ? 'maui' : islandCanon;
+                isMatch = canonF === regionCanon || canonF.includes(regionCanon);
+              } else if (isMauiNui) {
+                // Moku like Honuaʻula span multiple Maui Nui islands; include any Maui Nui feature
+                isMatch = ['kahoolawe', 'lanai', 'molokai', 'maui'].includes(canonF);
+              }
             }
 
             if (islandCanon === 'maui') {

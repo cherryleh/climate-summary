@@ -33,13 +33,26 @@
         [attr.d]="pathById[feature.id]"
         [attr.data-key]="feature.key"
         [attr.fill]="fillColor(feature)"
-        [attr.stroke]="strokeColor(feature)"
-        [attr.stroke-width]="strokeWidth(feature)"
-        [attr.filter]="filterGlow(feature)"
+        stroke="#9ca3af"
+        stroke-width="1"
         (click)="viewMode === 'islands' ? pickIsland(feature.name) : pickDivision(feature.key)"
         (mouseenter)="onHover(feature, $event)"
         (mouseleave)="onLeave()"
       ></path>
+
+      <!-- Selected/hovered highlight rendered on top of all boundary lines -->
+      <ng-container *ngFor="let feature of islands; trackBy: trackByIsle">
+        <path
+          *ngIf="(viewMode === 'divisions' && selectedDivision === feature.key) || (viewMode === 'islands' && selectedIsland === feature.name) || hoveredFeature() === feature.name"
+          [attr.d]="pathById[feature.id]"
+          [attr.data-key]="feature.key"
+          fill="none"
+          [attr.stroke]="strokeColor(feature)"
+          [attr.stroke-width]="strokeWidth(feature)"
+          [attr.filter]="filterGlow(feature)"
+          style="pointer-events: none;"
+        ></path>
+      </ng-container>
 
       <g class="labels">
         <g *ngIf="viewMode === 'divisions' && (selectedScope === 'ahupuaa' || selectedScope === 'watershed') && hoveredLabel() as hl">
@@ -97,8 +110,8 @@
       {{ selectionLabel || 'Statewide' }}
     </div>
 
-    <div class="disclaimer" *ngIf="showDivisionDisclaimer">
-      * Some climate divisions span multiple islands. Selecting one may include data from all associated areas.
+    <div class="disclaimer" *ngIf="isMultiIslandDivision">
+      * This climate division spans multiple islands.
     </div>
   </div>
 

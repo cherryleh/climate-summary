@@ -198,6 +198,12 @@ select.input option {
   color: var(--sub);
 }
 
+.selection-overlay .disclaimer {
+  font-size: 11px;
+  color: var(--sub);
+  margin-top: 6px;
+}
+
 @media (max-width: 639px) {
   /* Stack: SVG → selection row → legend row */
   .map {

@@ -50,12 +50,22 @@ export class MapPanelComponent implements OnInit, OnChanges {
     }
   }
 
+  private static readonly MULTIISLAND_SUFFIXES = ['::Hilo', '::Leeward Maui Nui', '::Windward Maui Nui'];
+
+  get isMultiIslandDivision(): boolean {
+    return this.selectedDivision != null &&
+      MapPanelComponent.MULTIISLAND_SUFFIXES.some(s => this.selectedDivision!.endsWith(s));
+  }
+
   private updateViewBox() {
+    const isHilo = this.isMultiIslandDivision;
     const shouldZoom = this.selectedDivision && this.selectedScope && ZOOM_SCOPES.has(this.selectedScope);
-    if (!shouldZoom) {
+
+    if (!shouldZoom && !isHilo) {
       this.viewBox = FULL_VIEWBOX;
       return;
     }
+
     // Defer until paths are rendered
     setTimeout(() => {
       if (!this.mapSvgRef) return;
@@ -66,11 +76,22 @@ export class MapPanelComponent implements OnInit, OnChanges {
       if (!target) return;
       const bb = (target as SVGPathElement).getBBox();
       if (bb.width < 1 && bb.height < 1) return;
-      const x = bb.x - ZOOM_PAD;
-      const y = bb.y - ZOOM_PAD;
-      const w = bb.width + ZOOM_PAD * 2;
-      const h = bb.height + ZOOM_PAD * 2;
-      this.viewBox = `${x} ${y} ${w} ${h}`;
+
+      if (isHilo) {
+        // Expand viewBox to encompass both Hilo sub-polygons with padding
+        const fullParts = FULL_VIEWBOX.split(' ').map(Number);
+        const x = Math.min(bb.x - ZOOM_PAD, fullParts[0]);
+        const y = Math.min(bb.y - ZOOM_PAD, fullParts[1]);
+        const x2 = Math.max(bb.x + bb.width + ZOOM_PAD, fullParts[0] + fullParts[2]);
+        const y2 = Math.max(bb.y + bb.height + ZOOM_PAD, fullParts[1] + fullParts[3]);
+        this.viewBox = `${x} ${y} ${x2 - x} ${y2 - y}`;
+      } else {
+        const x = bb.x - ZOOM_PAD;
+        const y = bb.y - ZOOM_PAD;
+        const w = bb.width + ZOOM_PAD * 2;
+        const h = bb.height + ZOOM_PAD * 2;
+        this.viewBox = `${x} ${y} ${w} ${h}`;
+      }
     }, 50);
   }
 
