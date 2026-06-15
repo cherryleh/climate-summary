@@ -30,6 +30,7 @@ export class MapPanelComponent implements OnInit, OnChanges {
   @Input() centroidById!: Record<string, [number, number]>;
   @Input() selectionLabel: string | null = null;
   @Input() showDivisionDisclaimer: boolean = false;
+  @Input() mapTitle: string | null = null;
   // ===== Outputs =====
   @Output() islandSelected = new EventEmitter<string>();
   @Output() divisionSelected = new EventEmitter<string | null>();
@@ -86,10 +87,13 @@ export class MapPanelComponent implements OnInit, OnChanges {
         const y2 = Math.max(bb.y + bb.height + ZOOM_PAD, fullParts[1] + fullParts[3]);
         this.viewBox = `${x} ${y} ${x2 - x} ${y2 - y}`;
       } else {
-        const x = bb.x - ZOOM_PAD;
-        const y = bb.y - ZOOM_PAD;
-        const w = bb.width + ZOOM_PAD * 2;
-        const h = bb.height + ZOOM_PAD * 2;
+        const MIN_ZOOM_SIZE = 120;
+        const rawW = bb.width + ZOOM_PAD * 2;
+        const rawH = bb.height + ZOOM_PAD * 2;
+        const w = Math.max(rawW, MIN_ZOOM_SIZE);
+        const h = Math.max(rawH, MIN_ZOOM_SIZE);
+        const x = bb.x + bb.width / 2 - w / 2;
+        const y = bb.y + bb.height / 2 - h / 2;
         this.viewBox = `${x} ${y} ${w} ${h}`;
       }
     }, 50);

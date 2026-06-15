@@ -191,6 +191,20 @@ export class ClimateDashboardV2Component implements OnDestroy {
           fcIsland
         );
 
+        const islandZoomFactor: Record<string, number> = {
+          'molokai': 0.75,
+          'kahoolawe': 0.9,
+        };
+        const zoomFactor = islandZoomFactor[islandCanon];
+        if (zoomFactor) {
+          const f = zoomFactor;
+          const vx = 215, vy = 155;
+          const [tx, ty] = (projection as any).translate() as [number, number];
+          (projection as any)
+            .scale((projection as any).scale() * f)
+            .translate([vx - (vx - tx) * f, vy + (ty - vy) * f]);
+        }
+
         const path = geoPath(projection as any);
         this.project = projection as any;
         this.updateRasterRect();

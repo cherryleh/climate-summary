@@ -179,6 +179,15 @@ select.input option {
   box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
+.selection-overlay .map-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0c4a6e;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
 .selection-overlay .eyebrow {
   font-size: 11px;
   letter-spacing: 0.08em;

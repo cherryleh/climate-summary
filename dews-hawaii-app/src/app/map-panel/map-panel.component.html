@@ -105,8 +105,9 @@
   </svg>
 
   <div class="selection-overlay">
+    <div class="map-title" *ngIf="mapTitle">{{ mapTitle }}</div>
     <div class="eyebrow">Selection:</div>
-  <div class="main">
+    <div class="main">
       {{ selectionLabel || 'Statewide' }}
     </div>
 
