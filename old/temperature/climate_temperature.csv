@@ -1,0 +1,721 @@
+island,division_type,name,date,value
+Kauaʻi,climate,Leeward Kauaʻi,2021-04,68.18078910858915
+Kauaʻi,climate,Windward Kauaʻi,2021-04,69.04867315849717
+Oʻahu,climate,Waianae,2021-04,71.63862907925409
+Oʻahu,climate,Koʻolau,2021-04,69.85597328709449
+Maui,climate,Leeward Maui Nui,2021-04,68.47117592098238
+Maui,climate,Windward Maui Nui,2021-04,65.38897861930695
+Hawaiʻi,climate,Leeward Kohala,2021-04,66.89672629385203
+Hawaiʻi,climate,Windward Kohala,2021-04,62.46325928143713
+Hawaiʻi,climate,Kona,2021-04,60.81609863672814
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-04,47.79109947537019
+Hawaiʻi,climate,Kaʻu,2021-04,62.825028391565255
+Hawaiʻi,climate,Hilo,2021-04,63.17946309335923
+Kauaʻi,climate,Leeward Kauaʻi,2021-05,70.89301382361764
+Kauaʻi,climate,Windward Kauaʻi,2021-05,71.73142926878535
+Oʻahu,climate,Waianae,2021-05,74.36946751165502
+Oʻahu,climate,Koʻolau,2021-05,72.75231231164688
+Maui,climate,Leeward Maui Nui,2021-05,71.44029631607049
+Maui,climate,Windward Maui Nui,2021-05,68.48071548267401
+Hawaiʻi,climate,Leeward Kohala,2021-05,69.34494244033147
+Hawaiʻi,climate,Windward Kohala,2021-05,65.2898359281437
+Hawaiʻi,climate,Kona,2021-05,63.84754410585405
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-05,51.276494214362764
+Hawaiʻi,climate,Kaʻu,2021-05,65.63770189557512
+Hawaiʻi,climate,Hilo,2021-05,65.94588594148355
+Kauaʻi,climate,Leeward Kauaʻi,2021-06,71.95045589191082
+Kauaʻi,climate,Windward Kauaʻi,2021-06,72.81970694182601
+Oʻahu,climate,Waianae,2021-06,76.05714597902099
+Oʻahu,climate,Koʻolau,2021-06,74.48340830526502
+Maui,climate,Leeward Maui Nui,2021-06,72.7448545114789
+Maui,climate,Windward Maui Nui,2021-06,69.86496573702794
+Hawaiʻi,climate,Leeward Kohala,2021-06,70.25022329181759
+Hawaiʻi,climate,Windward Kohala,2021-06,66.35221856287424
+Hawaiʻi,climate,Kona,2021-06,64.88427977145147
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-06,53.62528335730396
+Hawaiʻi,climate,Kaʻu,2021-06,66.66515794122596
+Hawaiʻi,climate,Hilo,2021-06,67.00481136943063
+Kauaʻi,climate,Leeward Kauaʻi,2021-07,73.47793783121688
+Kauaʻi,climate,Windward Kauaʻi,2021-07,74.31963371936439
+Oʻahu,climate,Waianae,2021-07,76.90889423076923
+Oʻahu,climate,Koʻolau,2021-07,75.05704163712107
+Maui,climate,Leeward Maui Nui,2021-07,74.29903897490658
+Maui,climate,Windward Maui Nui,2021-07,71.52710964151056
+Hawaiʻi,climate,Leeward Kohala,2021-07,71.74506432044856
+Hawaiʻi,climate,Windward Kohala,2021-07,68.14771856287425
+Hawaiʻi,climate,Kona,2021-07,66.88021251002405
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-07,55.60420847906384
+Hawaiʻi,climate,Kaʻu,2021-07,68.45941653580843
+Hawaiʻi,climate,Hilo,2021-07,68.73734141677795
+Kauaʻi,climate,Leeward Kauaʻi,2021-08,73.4536908809119
+Kauaʻi,climate,Windward Kauaʻi,2021-08,74.29799269458658
+Oʻahu,climate,Waianae,2021-08,76.97202797202797
+Oʻahu,climate,Koʻolau,2021-08,75.26466606098211
+Maui,climate,Leeward Maui Nui,2021-08,73.8897156967432
+Maui,climate,Windward Maui Nui,2021-08,70.95224803997846
+Hawaiʻi,climate,Leeward Kohala,2021-08,71.38325063266015
+Hawaiʻi,climate,Windward Kohala,2021-08,67.4772616766467
+Hawaiʻi,climate,Kona,2021-08,66.07111066559744
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-08,54.135317311149606
+Hawaiʻi,climate,Kaʻu,2021-08,67.80783326790421
+Hawaiʻi,climate,Hilo,2021-08,68.11919919266722
+Kauaʻi,climate,Leeward Kauaʻi,2021-09,73.0974249450055
+Kauaʻi,climate,Windward Kauaʻi,2021-09,73.91729396714247
+Oʻahu,climate,Waianae,2021-09,76.68898601398601
+Oʻahu,climate,Koʻolau,2021-09,75.00716849849317
+Maui,climate,Leeward Maui Nui,2021-09,73.61672784303256
+Maui,climate,Windward Maui Nui,2021-09,70.43441408821593
+Hawaiʻi,climate,Leeward Kohala,2021-09,71.22192229444748
+Hawaiʻi,climate,Windward Kohala,2021-09,67.1325886227545
+Hawaiʻi,climate,Kona,2021-09,65.62611267040899
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-09,53.48098380348446
+Hawaiʻi,climate,Kaʻu,2021-09,67.47000834221299
+Hawaiʻi,climate,Hilo,2021-09,67.7897095423091
+Kauaʻi,climate,Leeward Kauaʻi,2021-10,72.1276397360264
+Kauaʻi,climate,Windward Kauaʻi,2021-10,72.8904246902774
+Oʻahu,climate,Waianae,2021-10,75.92159090909091
+Oʻahu,climate,Koʻolau,2021-10,74.23281610086863
+Maui,climate,Leeward Maui Nui,2021-10,72.9174819807795
+Maui,climate,Windward Maui Nui,2021-10,70.15537247890359
+Hawaiʻi,climate,Leeward Kohala,2021-10,70.53133094328388
+Hawaiʻi,climate,Windward Kohala,2021-10,66.54239880239521
+Hawaiʻi,climate,Kona,2021-10,65.12678177626304
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-10,52.72959316673749
+Hawaiʻi,climate,Kaʻu,2021-10,66.88553957994503
+Hawaiʻi,climate,Hilo,2021-10,67.21412756464733
+Kauaʻi,climate,Leeward Kauaʻi,2021-11,70.93868425657435
+Kauaʻi,climate,Windward Kauaʻi,2021-11,71.74082573054133
+Oʻahu,climate,Waianae,2021-11,75.10959353146853
+Oʻahu,climate,Koʻolau,2021-11,73.89008597766355
+Maui,climate,Leeward Maui Nui,2021-11,71.83978910838228
+Maui,climate,Windward Maui Nui,2021-11,69.09227474714226
+Hawaiʻi,climate,Leeward Kohala,2021-11,69.61685046891282
+Hawaiʻi,climate,Windward Kohala,2021-11,65.84684970059881
+Hawaiʻi,climate,Kona,2021-11,64.5635926222935
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-11,52.29126311574544
+Hawaiʻi,climate,Kaʻu,2021-11,66.18533733385676
+Hawaiʻi,climate,Hilo,2021-11,66.4604649751123
+Kauaʻi,climate,Leeward Kauaʻi,2021-12,68.71395485451455
+Kauaʻi,climate,Windward Kauaʻi,2021-12,69.49002280837598
+Oʻahu,climate,Waianae,2021-12,71.85067744755244
+Oʻahu,climate,Koʻolau,2021-12,70.1333318560539
+Maui,climate,Leeward Maui Nui,2021-12,69.33090296316071
+Maui,climate,Windward Maui Nui,2021-12,66.52756224190557
+Hawaiʻi,climate,Leeward Kohala,2021-12,67.56124274301592
+Hawaiʻi,climate,Windward Kohala,2021-12,63.487405389221564
+Hawaiʻi,climate,Kona,2021-12,62.16222935044106
+Hawaiʻi,climate,Hawaiʻi Mauka,2021-12,48.275055772562354
+Hawaiʻi,climate,Kaʻu,2021-12,63.86936795468566
+Hawaiʻi,climate,Hilo,2021-12,64.13874514386306
+Kauaʻi,climate,Leeward Kauaʻi,2022-01,67.99954442055795
+Kauaʻi,climate,Windward Kauaʻi,2022-01,68.77214600727174
+Oʻahu,climate,Waianae,2022-01,71.65042977855478
+Oʻahu,climate,Koʻolau,2022-01,70.64153131093778
+Maui,climate,Leeward Maui Nui,2022-01,68.63801388147357
+Maui,climate,Windward Maui Nui,2022-01,65.77437645879466
+Hawaiʻi,climate,Leeward Kohala,2022-01,67.00330347839031
+Hawaiʻi,climate,Windward Kohala,2022-01,62.97955209580839
+Hawaiʻi,climate,Kona,2022-01,61.588412189254214
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-01,48.707496608701334
+Hawaiʻi,climate,Kaʻu,2022-01,63.33535415848802
+Hawaiʻi,climate,Hilo,2022-01,63.61829549593298
+Kauaʻi,climate,Leeward Kauaʻi,2022-02,67.63107626737326
+Kauaʻi,climate,Windward Kauaʻi,2022-02,68.40907369377862
+Oʻahu,climate,Waianae,2022-02,72.2756993006993
+Oʻahu,climate,Koʻolau,2022-02,70.99195455149797
+Maui,climate,Leeward Maui Nui,2022-02,68.89880539241858
+Maui,climate,Windward Maui Nui,2022-02,66.17483915853731
+Hawaiʻi,climate,Leeward Kohala,2022-02,67.13367240609338
+Hawaiʻi,climate,Windward Kohala,2022-02,62.910386826347306
+Hawaiʻi,climate,Kona,2022-02,61.361086607858866
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-02,48.7485776975125
+Hawaiʻi,climate,Kaʻu,2022-02,63.26019222141215
+Hawaiʻi,climate,Hilo,2022-02,63.62141177006192
+Kauaʻi,climate,Leeward Kauaʻi,2022-03,68.76843878112189
+Kauaʻi,climate,Windward Kauaʻi,2022-03,69.59178940546727
+Oʻahu,climate,Waianae,2022-03,73.31590909090909
+Oʻahu,climate,Koʻolau,2022-03,72.04536318915086
+Maui,climate,Leeward Maui Nui,2022-03,70.49662306460223
+Maui,climate,Windward Maui Nui,2022-03,67.60889266263689
+Hawaiʻi,climate,Leeward Kohala,2022-03,68.53399679948396
+Hawaiʻi,climate,Windward Kohala,2022-03,64.35238083832336
+Hawaiʻi,climate,Kona,2022-03,62.839750400962316
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-03,50.13877071552316
+Hawaiʻi,climate,Kaʻu,2022-03,64.70464464976726
+Hawaiʻi,climate,Hilo,2022-03,65.04213912832341
+Kauaʻi,climate,Leeward Kauaʻi,2022-04,70.12546370362963
+Kauaʻi,climate,Windward Kauaʻi,2022-04,70.98742341098841
+Oʻahu,climate,Waianae,2022-04,73.88855987762238
+Oʻahu,climate,Koʻolau,2022-04,72.0491972832831
+Maui,climate,Leeward Maui Nui,2022-04,71.161025093433
+Maui,climate,Windward Maui Nui,2022-04,68.1496521335807
+Hawaiʻi,climate,Leeward Kohala,2022-04,68.8551155535156
+Hawaiʻi,climate,Windward Kohala,2022-04,64.8210005988024
+Hawaiʻi,climate,Kona,2022-04,63.40348336006416
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-04,50.72370967214722
+Hawaiʻi,climate,Kaʻu,2022-04,65.17151870338176
+Hawaiʻi,climate,Hilo,2022-04,65.47271533932258
+Kauaʻi,climate,Leeward Kauaʻi,2022-05,70.78255549445055
+Kauaʻi,climate,Windward Kauaʻi,2022-05,71.63884325343389
+Oʻahu,climate,Waianae,2022-05,74.85971008158509
+Oʻahu,climate,Koʻolau,2022-05,73.19936569313951
+Maui,climate,Leeward Maui Nui,2022-05,71.97323144687667
+Maui,climate,Windward Maui Nui,2022-05,69.15664462265845
+Hawaiʻi,climate,Leeward Kohala,2022-05,69.47535881754578
+Hawaiʻi,climate,Windward Kohala,2022-05,65.52475748502994
+Hawaiʻi,climate,Kona,2022-05,64.10533279871692
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-05,52.008415323766876
+Hawaiʻi,climate,Kaʻu,2022-05,65.86012772699232
+Hawaiʻi,climate,Hilo,2022-05,66.18866623163774
+Kauaʻi,climate,Leeward Kauaʻi,2022-06,71.92155753174683
+Kauaʻi,climate,Windward Kauaʻi,2022-06,72.77843598505251
+Oʻahu,climate,Waianae,2022-06,76.24028263403264
+Oʻahu,climate,Koʻolau,2022-06,74.6668265821663
+Maui,climate,Leeward Maui Nui,2022-06,72.92073545114789
+Maui,climate,Windward Maui Nui,2022-06,69.96623189598421
+Hawaiʻi,climate,Leeward Kohala,2022-06,69.9161229097405
+Hawaiʻi,climate,Windward Kohala,2022-06,65.79423473053893
+Hawaiʻi,climate,Kona,2022-06,64.29852145148357
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-06,51.81848952374726
+Hawaiʻi,climate,Kaʻu,2022-06,66.13985089170546
+Hawaiʻi,climate,Hilo,2022-06,66.5001160920238
+Kauaʻi,climate,Leeward Kauaʻi,2022-07,73.89033565393461
+Kauaʻi,climate,Windward Kauaʻi,2022-07,74.70191556692701
+Oʻahu,climate,Waianae,2022-07,76.74957750582752
+Oʻahu,climate,Koʻolau,2022-07,74.94708939017904
+Maui,climate,Leeward Maui Nui,2022-07,74.20311665776828
+Maui,climate,Windward Maui Nui,2022-07,71.57033484948232
+Hawaiʻi,climate,Leeward Kohala,2022-07,71.63703015680048
+Hawaiʻi,climate,Windward Kohala,2022-07,67.6330640718563
+Hawaiʻi,climate,Kona,2022-07,66.2344977947073
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-07,53.56559139345602
+Hawaiʻi,climate,Kaʻu,2022-07,67.98341301665639
+Hawaiʻi,climate,Hilo,2022-07,68.32525342964672
+Kauaʻi,climate,Leeward Kauaʻi,2022-08,73.46278278422159
+Kauaʻi,climate,Windward Kauaʻi,2022-08,74.32273178696471
+Oʻahu,climate,Waianae,2022-08,78.0972974941725
+Oʻahu,climate,Koʻolau,2022-08,76.82970938220174
+Maui,climate,Leeward Maui Nui,2022-08,74.82227709556861
+Maui,climate,Windward Maui Nui,2022-08,71.87460126279251
+Hawaiʻi,climate,Leeward Kohala,2022-08,71.87789224929291
+Hawaiʻi,climate,Windward Kohala,2022-08,67.75325179640718
+Hawaiʻi,climate,Kona,2022-08,66.30505713712911
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-08,53.326553255646715
+Hawaiʻi,climate,Kaʻu,2022-08,68.11186276709103
+Hawaiʻi,climate,Hilo,2022-08,68.45310944518636
+Kauaʻi,climate,Leeward Kauaʻi,2022-09,74.01203442155784
+Kauaʻi,climate,Windward Kauaʻi,2022-09,74.88620135335309
+Oʻahu,climate,Waianae,2022-09,78.17675553613054
+Oʻahu,climate,Koʻolau,2022-09,76.92578609732317
+Maui,climate,Leeward Maui Nui,2022-09,74.79855178857449
+Maui,climate,Windward Maui Nui,2022-09,71.7705577832306
+Hawaiʻi,climate,Leeward Kohala,2022-09,72.10054210291273
+Hawaiʻi,climate,Windward Kohala,2022-09,67.8860880239521
+Hawaiʻi,climate,Kona,2022-09,66.38707898957497
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-09,53.321362730036284
+Hawaiʻi,climate,Kaʻu,2022-09,68.24715803936964
+Hawaiʻi,climate,Hilo,2022-09,68.59093571688722
+Kauaʻi,climate,Leeward Kauaʻi,2022-10,72.73803463403661
+Kauaʻi,climate,Windward Kauaʻi,2022-10,73.53773145030972
+Oʻahu,climate,Waianae,2022-10,76.95262966200465
+Oʻahu,climate,Koʻolau,2022-10,75.77958141287006
+Maui,climate,Leeward Maui Nui,2022-10,74.31873331553658
+Maui,climate,Windward Maui Nui,2022-10,71.51556272068945
+Hawaiʻi,climate,Leeward Kohala,2022-10,72.18385228005756
+Hawaiʻi,climate,Windward Kohala,2022-10,68.04276616766467
+Hawaiʻi,climate,Kona,2022-10,66.62531575781877
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-10,53.221016245546366
+Hawaiʻi,climate,Kaʻu,2022-10,68.41261777241883
+Hawaiʻi,climate,Hilo,2022-10,68.72880979118611
+Kauaʻi,climate,Leeward Kauaʻi,2022-11,71.1641398360164
+Kauaʻi,climate,Windward Kauaʻi,2022-11,71.9597091300835
+Oʻahu,climate,Waianae,2022-11,75.03991841491842
+Oʻahu,climate,Koʻolau,2022-11,73.58457000088637
+Maui,climate,Leeward Maui Nui,2022-11,72.19331954084356
+Maui,climate,Windward Maui Nui,2022-11,69.17585358190198
+Hawaiʻi,climate,Leeward Kohala,2022-11,70.0188985510842
+Hawaiʻi,climate,Windward Kohala,2022-11,65.68335149700599
+Hawaiʻi,climate,Kona,2022-11,64.1745514234162
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-11,50.39892949367503
+Hawaiʻi,climate,Kaʻu,2022-11,66.06402963939207
+Hawaiʻi,climate,Hilo,2022-11,66.39418553478208
+Kauaʻi,climate,Leeward Kauaʻi,2022-12,68.6566305869413
+Kauaʻi,climate,Windward Kauaʻi,2022-12,69.42202439065446
+Oʻahu,climate,Waianae,2022-12,73.2412805944056
+Oʻahu,climate,Koʻolau,2022-12,72.17871886633576
+Maui,climate,Leeward Maui Nui,2022-12,70.19368993593167
+Maui,climate,Windward Maui Nui,2022-12,67.55165629301574
+Hawaiʻi,climate,Leeward Kohala,2022-12,68.3841065846276
+Hawaiʻi,climate,Windward Kohala,2022-12,64.33499520958084
+Hawaiʻi,climate,Kona,2022-12,62.91074829591019
+Hawaiʻi,climate,Hawaiʻi Mauka,2022-12,50.2040577092799
+Hawaiʻi,climate,Kaʻu,2022-12,64.68669802590993
+Hawaiʻi,climate,Hilo,2022-12,65.01123816316621
+Kauaʻi,climate,Leeward Kauaʻi,2023-01,66.92918301919808
+Kauaʻi,climate,Windward Kauaʻi,2023-01,67.70859227713439
+Oʻahu,climate,Waianae,2023-01,71.91842584498835
+Oʻahu,climate,Koʻolau,2023-01,70.98338891597234
+Maui,climate,Leeward Maui Nui,2023-01,68.50373064602243
+Maui,climate,Windward Maui Nui,2023-01,66.19003194386258
+Hawaiʻi,climate,Leeward Kohala,2023-01,67.29880786979606
+Hawaiʻi,climate,Windward Kohala,2023-01,63.5742634730539
+Hawaiʻi,climate,Kona,2023-01,62.28057087008821
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-01,50.417135864413424
+Hawaiʻi,climate,Kaʻu,2023-01,63.90215705793281
+Hawaiʻi,climate,Hilo,2023-01,64.19027406822872
+Kauaʻi,climate,Leeward Kauaʻi,2023-02,68.3399803769623
+Kauaʻi,climate,Windward Kauaʻi,2023-02,69.09109926272556
+Oʻahu,climate,Waianae,2023-02,71.67408216783217
+Oʻahu,climate,Koʻolau,2023-02,70.07206612302784
+Maui,climate,Leeward Maui Nui,2023-02,68.794811131874
+Maui,climate,Windward Maui Nui,2023-02,65.91629249207014
+Hawaiʻi,climate,Leeward Kohala,2023-02,66.99321627053044
+Hawaiʻi,climate,Windward Kohala,2023-02,62.74501856287425
+Hawaiʻi,climate,Kona,2023-02,61.3051072574178
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-02,47.41607434707286
+Hawaiʻi,climate,Kaʻu,2023-02,63.128102041388594
+Hawaiʻi,climate,Hilo,2023-02,63.433727388612354
+Kauaʻi,climate,Leeward Kauaʻi,2023-03,68.46736826317368
+Kauaʻi,climate,Windward Kauaʻi,2023-03,69.21859345542688
+Oʻahu,climate,Waianae,2023-03,72.98975815850815
+Oʻahu,climate,Koʻolau,2023-03,71.75239651657508
+Maui,climate,Leeward Maui Nui,2023-03,69.57605445808863
+Maui,climate,Windward Maui Nui,2023-03,66.92309645999163
+Hawaiʻi,climate,Leeward Kohala,2023-03,68.34146342976231
+Hawaiʻi,climate,Windward Kohala,2023-03,64.29580479041917
+Hawaiʻi,climate,Kona,2023-03,62.89675721732157
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-03,49.95195040532148
+Hawaiʻi,climate,Kaʻu,2023-03,64.65323067971511
+Hawaiʻi,climate,Hilo,2023-03,64.94732608959572
+Kauaʻi,climate,Leeward Kauaʻi,2023-04,68.62767598240177
+Kauaʻi,climate,Windward Kauaʻi,2023-04,69.36775897185564
+Oʻahu,climate,Waianae,2023-04,73.08527826340327
+Oʻahu,climate,Koʻolau,2023-04,71.53591727973765
+Maui,climate,Leeward Maui Nui,2023-04,70.0625
+Maui,climate,Windward Maui Nui,2023-04,67.21242593811718
+Hawaiʻi,climate,Leeward Kohala,2023-04,68.14718838386345
+Hawaiʻi,climate,Windward Kohala,2023-04,63.98736077844312
+Hawaiʻi,climate,Kona,2023-04,62.56513632718524
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-04,49.09067433726669
+Hawaiʻi,climate,Kaʻu,2023-04,64.3594505355841
+Hawaiʻi,climate,Hilo,2023-04,64.66542278742261
+Kauaʻi,climate,Leeward Kauaʻi,2023-05,69.68016573342666
+Kauaʻi,climate,Windward Kauaʻi,2023-05,70.47222007137086
+Oʻahu,climate,Waianae,2023-05,73.79447115384616
+Oʻahu,climate,Koʻolau,2023-05,72.10584116291437
+Maui,climate,Leeward Maui Nui,2023-05,70.71411839295249
+Maui,climate,Windward Maui Nui,2023-05,67.62460051469267
+Hawaiʻi,climate,Leeward Kohala,2023-05,68.90955130749765
+Hawaiʻi,climate,Windward Kohala,2023-05,64.65418802395209
+Hawaiʻi,climate,Kona,2023-05,63.14309091820369
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-05,49.92910326708724
+Hawaiʻi,climate,Kaʻu,2023-05,65.01998976501599
+Hawaiʻi,climate,Hilo,2023-05,65.33048212334589
+Kauaʻi,climate,Leeward Kauaʻi,2023-06,71.50861695080492
+Kauaʻi,climate,Windward Kauaʻi,2023-06,72.31471056086723
+Oʻahu,climate,Waianae,2023-06,75.68876748251748
+Oʻahu,climate,Koʻolau,2023-06,73.96963470572594
+Maui,climate,Leeward Maui Nui,2023-06,72.60476508275494
+Maui,climate,Windward Maui Nui,2023-06,69.51632279011312
+Hawaiʻi,climate,Leeward Kohala,2023-06,69.85887647000447
+Hawaiʻi,climate,Windward Kohala,2023-06,65.70397065868264
+Hawaiʻi,climate,Kona,2023-06,64.1691259021652
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-06,51.86761289347236
+Hawaiʻi,climate,Kaʻu,2023-06,66.04526596937917
+Hawaiʻi,climate,Hilo,2023-06,66.3974520456477
+Kauaʻi,climate,Leeward Kauaʻi,2023-07,73.6746553469653
+Kauaʻi,climate,Windward Kauaʻi,2023-07,74.51547855507675
+Oʻahu,climate,Waianae,2023-07,77.08044507575758
+Oʻahu,climate,Koʻolau,2023-07,75.38573169650772
+Maui,climate,Leeward Maui Nui,2023-07,74.28132674853177
+Maui,climate,Windward Maui Nui,2023-07,71.73083704889581
+Hawaiʻi,climate,Leeward Kohala,2023-07,72.11220351808663
+Hawaiʻi,climate,Windward Kohala,2023-07,68.53810838323353
+Hawaiʻi,climate,Kona,2023-07,67.29253207698477
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-07,55.95513066714608
+Hawaiʻi,climate,Kaʻu,2023-07,68.85170279288879
+Hawaiʻi,climate,Hilo,2023-07,69.1308797195581
+Kauaʻi,climate,Leeward Kauaʻi,2023-08,74.34481270622939
+Kauaʻi,climate,Windward Kauaʻi,2023-08,75.21281645569621
+Oʻahu,climate,Waianae,2023-08,77.9395104895105
+Oʻahu,climate,Koʻolau,2023-08,76.27074931306507
+Maui,climate,Leeward Maui Nui,2023-08,74.91593032568073
+Maui,climate,Windward Maui Nui,2023-08,71.93129900053863
+Hawaiʻi,climate,Leeward Kohala,2023-08,72.12118543144942
+Hawaiʻi,climate,Windward Kohala,2023-08,68.04942455089821
+Hawaiʻi,climate,Kona,2023-08,66.58898105453088
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-08,54.09541480077142
+Hawaiʻi,climate,Kaʻu,2023-08,68.39555759632101
+Hawaiʻi,climate,Hilo,2023-08,68.73249059123468
+Kauaʻi,climate,Leeward Kauaʻi,2023-09,74.10983776622338
+Kauaʻi,climate,Windward Kauaʻi,2023-09,74.93814132776731
+Oʻahu,climate,Waianae,2023-09,77.7410984848485
+Oʻahu,climate,Koʻolau,2023-09,76.12825961708917
+Maui,climate,Leeward Maui Nui,2023-09,74.71879337960492
+Maui,climate,Windward Maui Nui,2023-09,71.71293763839847
+Hawaiʻi,climate,Leeward Kohala,2023-09,72.18441330074927
+Hawaiʻi,climate,Windward Kohala,2023-09,68.14123532934133
+Hawaiʻi,climate,Kona,2023-09,66.65464615076183
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-09,54.614272464289215
+Hawaiʻi,climate,Kaʻu,2023-09,68.47526218383715
+Hawaiʻi,climate,Hilo,2023-09,68.81061369430618
+Kauaʻi,climate,Leeward Kauaʻi,2023-10,72.11411296370363
+Kauaʻi,climate,Windward Kauaʻi,2023-10,72.87903607258282
+Oʻahu,climate,Waianae,2023-10,76.56355623543124
+Oʻahu,climate,Koʻolau,2023-10,75.13400272558057
+Maui,climate,Leeward Maui Nui,2023-10,73.405072076882
+Maui,climate,Windward Maui Nui,2023-10,70.84346796636544
+Hawaiʻi,climate,Leeward Kohala,2023-10,70.99177262690418
+Hawaiʻi,climate,Windward Kohala,2023-10,67.26634910179641
+Hawaiʻi,climate,Kona,2023-10,65.8673391138733
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-10,55.07252986794364
+Hawaiʻi,climate,Kaʻu,2023-10,67.56641663395212
+Hawaiʻi,climate,Hilo,2023-10,67.91053857593784
+Kauaʻi,climate,Leeward Kauaʻi,2023-11,70.99868856864313
+Kauaʻi,climate,Windward Kauaʻi,2023-11,71.7423747643415
+Oʻahu,climate,Waianae,2023-11,74.92357590326341
+Oʻahu,climate,Koʻolau,2023-11,73.29269023666018
+Maui,climate,Leeward Maui Nui,2023-11,72.18692271756541
+Maui,climate,Windward Maui Nui,2023-11,69.4469638368544
+Hawaiʻi,climate,Leeward Kohala,2023-11,69.88648929439785
+Hawaiʻi,climate,Windward Kohala,2023-11,65.96727185628743
+Hawaiʻi,climate,Kona,2023-11,64.52549619085806
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-11,52.863633020625635
+Hawaiʻi,climate,Kaʻu,2023-11,66.29106752285347
+Hawaiʻi,climate,Hilo,2023-11,66.62890767269637
+Kauaʻi,climate,Leeward Kauaʻi,2023-12,67.88124843765624
+Kauaʻi,climate,Windward Kauaʻi,2023-12,68.6320626009965
+Oʻahu,climate,Waianae,2023-12,71.85579108391607
+Oʻahu,climate,Koʻolau,2023-12,70.34025327956036
+Maui,climate,Leeward Maui Nui,2023-12,69.54502469300587
+Maui,climate,Windward Maui Nui,2023-12,67.10434945239092
+Hawaiʻi,climate,Leeward Kohala,2023-12,67.48794999503795
+Hawaiʻi,climate,Windward Kohala,2023-12,63.78531077844311
+Hawaiʻi,climate,Kona,2023-12,62.41705844025661
+Hawaiʻi,climate,Hawaiʻi Mauka,2023-12,51.45830418723237
+Hawaiʻi,climate,Kaʻu,2023-12,64.08918491671808
+Hawaiʻi,climate,Hilo,2023-12,64.42210756343329
+Kauaʻi,climate,Leeward Kauaʻi,2024-01,66.82810343965605
+Kauaʻi,climate,Windward Kauaʻi,2024-01,67.58830544707783
+Oʻahu,climate,Waianae,2024-01,71.49093094405595
+Oʻahu,climate,Koʻolau,2024-01,70.04569114518702
+Maui,climate,Leeward Maui Nui,2024-01,69.09422717565403
+Maui,climate,Windward Maui Nui,2024-01,66.75588156083549
+Hawaiʻi,climate,Leeward Kohala,2024-01,67.47668771398799
+Hawaiʻi,climate,Windward Kohala,2024-01,63.91264730538922
+Hawaiʻi,climate,Kona,2024-01,62.6269747393745
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-01,51.76148199751577
+Hawaiʻi,climate,Kaʻu,2024-01,64.21367246649095
+Hawaiʻi,climate,Hilo,2024-01,64.51075861964307
+Kauaʻi,climate,Leeward Kauaʻi,2024-02,66.19513486151385
+Kauaʻi,climate,Windward Kauaʻi,2024-02,66.99106012658228
+Oʻahu,climate,Waianae,2024-02,70.24012966200466
+Oʻahu,climate,Koʻolau,2024-02,68.50828421379188
+Maui,climate,Leeward Maui Nui,2024-02,66.66808929524827
+Maui,climate,Windward Maui Nui,2024-02,63.80390283679454
+Hawaiʻi,climate,Leeward Kohala,2024-02,65.15825993648588
+Hawaiʻi,climate,Windward Kohala,2024-02,60.95553293413174
+Hawaiʻi,climate,Kona,2024-02,59.23787089013633
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-02,48.472865729088355
+Hawaiʻi,climate,Kaʻu,2024-02,61.257015871235495
+Hawaiʻi,climate,Hilo,2024-02,61.658052082068714
+Kauaʻi,climate,Leeward Kauaʻi,2024-03,67.17013673632637
+Kauaʻi,climate,Windward Kauaʻi,2024-03,67.9384211722327
+Oʻahu,climate,Waianae,2024-03,71.35168269230769
+Oʻahu,climate,Koʻolau,2024-03,69.5983286429711
+Maui,climate,Leeward Maui Nui,2024-03,68.33068606513615
+Maui,climate,Windward Maui Nui,2024-03,65.63360838470285
+Hawaiʻi,climate,Leeward Kohala,2024-03,66.6891598025108
+Hawaiʻi,climate,Windward Kohala,2024-03,62.67001946107784
+Hawaiʻi,climate,Kona,2024-03,61.22373195669607
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-03,48.94993442127284
+Hawaiʻi,climate,Kaʻu,2024-03,63.010415848802644
+Hawaiʻi,climate,Hilo,2024-03,63.33231759135607
+Kauaʻi,climate,Leeward Kauaʻi,2024-04,68.57266617088291
+Kauaʻi,climate,Windward Kauaʻi,2024-04,69.34456133854027
+Oʻahu,climate,Waianae,2024-04,72.47990967365968
+Oʻahu,climate,Koʻolau,2024-04,70.82342891331325
+Maui,climate,Leeward Maui Nui,2024-04,69.74234516817938
+Maui,climate,Windward Maui Nui,2024-04,67.00948291339996
+Hawaiʻi,climate,Leeward Kohala,2024-04,68.24864660348335
+Hawaiʻi,climate,Windward Kohala,2024-04,64.41456706586825
+Hawaiʻi,climate,Kona,2024-04,63.04204089815558
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-04,51.253194766776716
+Hawaiʻi,climate,Kaʻu,2024-04,64.7412161404296
+Hawaiʻi,climate,Hilo,2024-04,65.02612525798227
+Kauaʻi,climate,Leeward Kauaʻi,2024-05,69.75754674532547
+Kauaʻi,climate,Windward Kauaʻi,2024-05,70.5377415499596
+Oʻahu,climate,Waianae,2024-05,73.67185314685315
+Oʻahu,climate,Koʻolau,2024-05,72.13080016840985
+Maui,climate,Leeward Maui Nui,2024-05,71.30693739989323
+Maui,climate,Windward Maui Nui,2024-05,68.60134882398708
+Hawaiʻi,climate,Leeward Kohala,2024-05,69.17334267850941
+Hawaiʻi,climate,Windward Kohala,2024-05,65.39024520958084
+Hawaiʻi,climate,Kona,2024-05,64.0174193063352
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-05,52.56884683587749
+Hawaiʻi,climate,Kaʻu,2024-05,65.70747574448993
+Hawaiʻi,climate,Hilo,2024-05,66.0174919570232
+Kauaʻi,climate,Leeward Kauaʻi,2024-06,72.32433756624337
+Kauaʻi,climate,Windward Kauaʻi,2024-06,73.10455115472664
+Oʻahu,climate,Waianae,2024-06,75.66715472027971
+Oʻahu,climate,Koʻolau,2024-06,74.05137719375998
+Maui,climate,Leeward Maui Nui,2024-06,73.04090363053925
+Maui,climate,Windward Maui Nui,2024-06,70.555155155904
+Hawaiʻi,climate,Leeward Kohala,2024-06,70.28945566416911
+Hawaiʻi,climate,Windward Kohala,2024-06,66.70573532934132
+Hawaiʻi,climate,Kona,2024-06,65.38210455092221
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-06,54.77892777759618
+Hawaiʻi,climate,Kaʻu,2024-06,67.00049387303011
+Hawaiʻi,climate,Hilo,2024-06,67.33613345271337
+Kauaʻi,climate,Leeward Kauaʻi,2024-07,73.18865050994901
+Kauaʻi,climate,Windward Kauaʻi,2024-07,73.98899264408834
+Oʻahu,climate,Waianae,2024-07,76.56394230769232
+Oʻahu,climate,Koʻolau,2024-07,74.91030900992732
+Maui,climate,Leeward Maui Nui,2024-07,74.03647891083823
+Maui,climate,Windward Maui Nui,2024-07,71.52662487282302
+Hawaiʻi,climate,Leeward Kohala,2024-07,71.24021268545627
+Hawaiʻi,climate,Windward Kohala,2024-07,67.53433353293414
+Hawaiʻi,climate,Kona,2024-07,66.12018344025662
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-07,55.60846680613212
+Hawaiʻi,climate,Kaʻu,2024-07,67.8270953676182
+Hawaiʻi,climate,Hilo,2024-07,68.19540108656065
+Kauaʻi,climate,Leeward Kauaʻi,2024-08,74.27484189081092
+Kauaʻi,climate,Windward Kauaʻi,2024-08,75.07236567465662
+Oʻahu,climate,Waianae,2024-08,77.62058566433566
+Oʻahu,climate,Koʻolau,2024-08,75.96971060095728
+Maui,climate,Leeward Maui Nui,2024-08,74.88293179391351
+Maui,climate,Windward Maui Nui,2024-08,72.44160220539828
+Hawaiʻi,climate,Leeward Kohala,2024-08,72.01963789510248
+Hawaiʻi,climate,Windward Kohala,2024-08,68.41877215568863
+Hawaiʻi,climate,Kona,2024-08,67.11145248596631
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-08,56.212921256496585
+Hawaiʻi,climate,Kaʻu,2024-08,68.72063786383265
+Hawaiʻi,climate,Hilo,2024-08,69.05804904698313
+Kauaʻi,climate,Leeward Kauaʻi,2024-09,73.81078079692031
+Kauaʻi,climate,Windward Kauaʻi,2024-09,74.63056154053326
+Oʻahu,climate,Waianae,2024-09,77.80962995337995
+Oʻahu,climate,Koʻolau,2024-09,76.16411762098919
+Maui,climate,Leeward Maui Nui,2024-09,74.5492859049653
+Maui,climate,Windward Maui Nui,2024-09,71.68061972589624
+Hawaiʻi,climate,Leeward Kohala,2024-09,71.73875911774923
+Hawaiʻi,climate,Windward Kohala,2024-09,67.81444640718563
+Hawaiʻi,climate,Kona,2024-09,66.34656174819567
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-09,54.9157899682934
+Hawaiʻi,climate,Kaʻu,2024-09,68.13219743704784
+Hawaiʻi,climate,Hilo,2024-09,68.48419023916475
+Kauaʻi,climate,Leeward Kauaʻi,2024-10,73.30006218128187
+Kauaʻi,climate,Windward Kauaʻi,2024-10,74.13575696875841
+Oʻahu,climate,Waianae,2024-10,76.9281687062937
+Oʻahu,climate,Koʻolau,2024-10,75.26555353660699
+Maui,climate,Leeward Maui Nui,2024-10,73.96125867592099
+Maui,climate,Windward Maui Nui,2024-10,71.03518388293735
+Hawaiʻi,climate,Leeward Kohala,2024-10,71.2845863519079
+Hawaiʻi,climate,Windward Kohala,2024-10,67.2034488023952
+Hawaiʻi,climate,Kona,2024-10,65.72609011627907
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-10,53.33343534468669
+Hawaiʻi,climate,Kaʻu,2024-10,67.54643528125175
+Hawaiʻi,climate,Hilo,2024-10,67.89140843146777
+Kauaʻi,climate,Leeward Kauaʻi,2024-11,71.05567255774423
+Kauaʻi,climate,Windward Kauaʻi,2024-11,71.8070175733908
+Oʻahu,climate,Waianae,2024-11,74.33128642191141
+Oʻahu,climate,Koʻolau,2024-11,72.67043769943272
+Maui,climate,Leeward Maui Nui,2024-11,71.6536205285638
+Maui,climate,Windward Maui Nui,2024-11,69.01118708480459
+Hawaiʻi,climate,Leeward Kohala,2024-11,69.23133714583437
+Hawaiʻi,climate,Windward Kohala,2024-11,65.33934670658684
+Hawaiʻi,climate,Kona,2024-11,63.94129661186848
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-11,52.020087111430726
+Hawaiʻi,climate,Kaʻu,2024-11,65.66959824182604
+Hawaiʻi,climate,Hilo,2024-11,66.00541611023431
+Kauaʻi,climate,Leeward Kauaʻi,2024-12,70.10272691480853
+Kauaʻi,climate,Windward Kauaʻi,2024-12,70.76095391193105
+Oʻahu,climate,Waianae,2024-12,73.81861523892775
+Oʻahu,climate,Koʻolau,2024-12,72.37840088193582
+Maui,climate,Leeward Maui Nui,2024-12,71.05441137213028
+Maui,climate,Windward Maui Nui,2024-12,68.61875336644923
+Hawaiʻi,climate,Leeward Kohala,2024-12,68.67186274996278
+Hawaiʻi,climate,Windward Kohala,2024-12,64.91512874251498
+Hawaiʻi,climate,Kona,2024-12,63.54439153969527
+Hawaiʻi,climate,Hawaiʻi Mauka,2024-12,52.24962491419606
+Hawaiʻi,climate,Kaʻu,2024-12,65.22829552464808
+Hawaiʻi,climate,Hilo,2024-12,65.57381783416292
+Kauaʻi,climate,Leeward Kauaʻi,2025-01,67.92771472852715
+Kauaʻi,climate,Windward Kauaʻi,2025-01,68.67685581066523
+Oʻahu,climate,Waianae,2025-01,71.96104312354313
+Oʻahu,climate,Koʻolau,2025-01,70.42156200141818
+Maui,climate,Leeward Maui Nui,2025-01,69.3092698878804
+Maui,climate,Windward Maui Nui,2025-01,66.57719043629181
+Hawaiʻi,climate,Leeward Kohala,2025-01,67.7976724929291
+Hawaiʻi,climate,Windward Kohala,2025-01,63.62469850299401
+Hawaiʻi,climate,Kona,2025-01,62.11945669607057
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-01,49.40444464419966
+Hawaiʻi,climate,Kaʻu,2025-01,63.97726852111491
+Hawaiʻi,climate,Hilo,2025-01,64.31277846910282
+Kauaʻi,climate,Leeward Kauaʻi,2025-02,67.9365900909909
+Kauaʻi,climate,Windward Kauaʻi,2025-02,68.66512254241853
+Oʻahu,climate,Waianae,2025-02,71.91694711538462
+Oʻahu,climate,Koʻolau,2025-02,70.62567142350647
+Maui,climate,Leeward Maui Nui,2025-02,69.03243459690336
+Maui,climate,Windward Maui Nui,2025-02,66.51887007002215
+Hawaiʻi,climate,Leeward Kohala,2025-02,67.14198444400338
+Hawaiʻi,climate,Windward Kohala,2025-02,63.22276766467066
+Hawaiʻi,climate,Kona,2025-02,61.72139384522855
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-02,50.66242910960024
+Hawaiʻi,climate,Kaʻu,2025-02,63.53088371375694
+Hawaiʻi,climate,Hilo,2025-02,63.89985962729149
+Kauaʻi,climate,Leeward Kauaʻi,2025-03,69.45363588641136
+Kauaʻi,climate,Windward Kauaʻi,2025-03,70.23379006194452
+Oʻahu,climate,Waianae,2025-03,73.11320294289044
+Oʻahu,climate,Koʻolau,2025-03,71.58303326094665
+Maui,climate,Leeward Maui Nui,2025-03,70.00789508809396
+Maui,climate,Windward Maui Nui,2025-03,67.02352773954156
+Hawaiʻi,climate,Leeward Kohala,2025-03,67.81806182702329
+Hawaiʻi,climate,Windward Kohala,2025-03,63.51904550898203
+Hawaiʻi,climate,Kona,2025-03,61.899909783480354
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-03,49.49864817932207
+Hawaiʻi,climate,Kaʻu,2025-03,63.864554007066346
+Hawaiʻi,climate,Hilo,2025-03,64.24001608595363
+Kauaʻi,climate,Leeward Kauaʻi,2025-04,70.02885555194482
+Kauaʻi,climate,Windward Kauaʻi,2025-04,70.7950250807972
+Oʻahu,climate,Waianae,2025-04,74.01769740675991
+Oʻahu,climate,Koʻolau,2025-04,72.44939145319978
+Maui,climate,Leeward Maui Nui,2025-04,71.04218499733048
+Maui,climate,Windward Maui Nui,2025-04,68.00635585612544
+Hawaiʻi,climate,Leeward Kohala,2025-04,68.97287128467227
+Hawaiʻi,climate,Windward Kohala,2025-04,64.62277155688622
+Hawaiʻi,climate,Kona,2025-04,63.03244787489976
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-04,49.987703069329584
+Hawaiʻi,climate,Kaʻu,2025-04,64.98475583253884
+Hawaiʻi,climate,Hilo,2025-04,65.33975810367852
+Kauaʻi,climate,Leeward Kauaʻi,2025-05,71.15623187681231
+Kauaʻi,climate,Windward Kauaʻi,2025-05,71.94955140721788
+Oʻahu,climate,Waianae,2025-05,74.88217147435898
+Oʻahu,climate,Koʻolau,2025-05,73.17495263472789
+Maui,climate,Leeward Maui Nui,2025-05,71.85384410037373
+Maui,climate,Windward Maui Nui,2025-05,68.73224310251959
+Hawaiʻi,climate,Leeward Kohala,2025-05,69.2080087331911
+Hawaiʻi,climate,Windward Kohala,2025-05,64.9559359281437
+Hawaiʻi,climate,Kona,2025-05,63.346175821972736
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-05,51.154223596901254
+Hawaiʻi,climate,Kaʻu,2025-05,65.29523021703774
+Hawaiʻi,climate,Hilo,2025-05,65.66827121524827
+Kauaʻi,climate,Leeward Kauaʻi,2025-06,72.6038355539446
+Kauaʻi,climate,Windward Kauaʻi,2025-06,73.42614799353623
+Oʻahu,climate,Waianae,2025-06,76.18159965034965
+Oʻahu,climate,Koʻolau,2025-06,74.41852286828576
+Maui,climate,Leeward Maui Nui,2025-06,73.49020288307528
+Maui,climate,Windward Maui Nui,2025-06,70.6109069214196
+Hawaiʻi,climate,Leeward Kohala,2025-06,70.46590644072842
+Hawaiʻi,climate,Windward Kohala,2025-06,66.60760299401198
+Hawaiʻi,climate,Kona,2025-06,65.0812199278268
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-06,54.68794740626941
+Hawaiʻi,climate,Kaʻu,2025-06,66.89804764174752
+Hawaiʻi,climate,Hilo,2025-06,67.27820808546801
+Kauaʻi,climate,Leeward Kauaʻi,2025-07,73.60272722727727
+Kauaʻi,climate,Windward Kauaʻi,2025-07,74.41038664826286
+Oʻahu,climate,Waianae,2025-07,77.1479458041958
+Oʻahu,climate,Koʻolau,2025-07,75.54158837085623
+Maui,climate,Leeward Maui Nui,2025-07,74.39456753870795
+Maui,climate,Windward Maui Nui,2025-07,71.62974257884972
+Hawaiʻi,climate,Leeward Kohala,2025-07,71.60281905919715
+Hawaiʻi,climate,Windward Kohala,2025-07,67.79906287425149
+Hawaiʻi,climate,Kona,2025-07,66.37820018043304
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-07,55.27275397966855
+Hawaiʻi,climate,Kaʻu,2025-07,68.10736112668948
+Hawaiʻi,climate,Hilo,2025-07,68.45167764355955
+Kauaʻi,climate,Leeward Kauaʻi,2025-08,74.37975452454755
+Kauaʻi,climate,Windward Kauaʻi,2025-08,75.21585013802854
+Oʻahu,climate,Waianae,2025-08,78.09909309440559
+Oʻahu,climate,Koʻolau,2025-08,76.48900848697039
+Maui,climate,Leeward Maui Nui,2025-08,75.09572877736252
+Maui,climate,Windward Maui Nui,2025-08,72.36263540606859
+Hawaiʻi,climate,Leeward Kohala,2025-08,72.09846269786135
+Hawaiʻi,climate,Windward Kohala,2025-08,68.34437125748504
+Hawaiʻi,climate,Kona,2025-08,66.95005513231757
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-08,55.909987987448105
+Hawaiʻi,climate,Kaʻu,2025-08,68.65096811732377
+Hawaiʻi,climate,Hilo,2025-08,68.99538894621828
+Kauaʻi,climate,Leeward Kauaʻi,2025-09,73.8628152809719
+Kauaʻi,climate,Windward Kauaʻi,2025-09,74.68480423511986
+Oʻahu,climate,Waianae,2025-09,77.93149402680652
+Oʻahu,climate,Koʻolau,2025-09,76.36656177982627
+Maui,climate,Leeward Maui Nui,2025-09,75.03518419647625
+Maui,climate,Windward Maui Nui,2025-09,72.16852257765277
+Hawaiʻi,climate,Leeward Kohala,2025-09,71.82730827916438
+Hawaiʻi,climate,Windward Kohala,2025-09,67.73044461077845
+Hawaiʻi,climate,Kona,2025-09,66.17226844426625
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-09,54.500911973327234
+Hawaiʻi,climate,Kaʻu,2025-09,68.05527837754474
+Hawaiʻi,climate,Hilo,2025-09,68.4552719436688
+Kauaʻi,climate,Leeward Kauaʻi,2025-10,73.106949930007
+Kauaʻi,climate,Windward Kauaʻi,2025-10,73.89183527471047
+Oʻahu,climate,Waianae,2025-10,76.96414627039627
+Oʻahu,climate,Koʻolau,2025-10,75.44269965431661
+Maui,climate,Leeward Maui Nui,2025-10,73.99779765082755
+Maui,climate,Windward Maui Nui,2025-10,70.94169085522773
+Hawaiʻi,climate,Leeward Kohala,2025-10,71.09553633454075
+Hawaiʻi,climate,Windward Kohala,2025-10,66.89205149700598
+Hawaiʻi,climate,Kona,2025-10,65.35883620689656
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-10,52.7097632628379
+Hawaiʻi,climate,Kaʻu,2025-10,67.24231429813247
+Hawaiʻi,climate,Hilo,2025-10,67.60262383149205
+Kauaʻi,climate,Leeward Kauaʻi,2025-11,70.88546864063593
+Kauaʻi,climate,Windward Kauaʻi,2025-11,71.6501712732292
+Oʻahu,climate,Waianae,2025-11,74.88973630536131
+Oʻahu,climate,Koʻolau,2025-11,73.34159363366425
+Maui,climate,Leeward Maui Nui,2025-11,71.90455152162306
+Maui,climate,Windward Maui Nui,2025-11,69.07776871745766
+Hawaiʻi,climate,Leeward Kohala,2025-11,69.70533543393043
+Hawaiʻi,climate,Windward Kohala,2025-11,65.59244071856287
+Hawaiʻi,climate,Kona,2025-11,64.08022754611066
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-11,51.832610401072145
+Hawaiʻi,climate,Kaʻu,2025-11,65.93267133082833
+Hawaiʻi,climate,Hilo,2025-11,66.28413257253854
+Kauaʻi,climate,Leeward Kauaʻi,2025-12,69.37042233276674
+Kauaʻi,climate,Windward Kauaʻi,2025-12,70.13215223538917
+Oʻahu,climate,Waianae,2025-12,73.29658362470863
+Oʻahu,climate,Koʻolau,2025-12,71.83484200496366
+Maui,climate,Leeward Maui Nui,2025-12,70.81744193806728
+Maui,climate,Windward Maui Nui,2025-12,68.03467106050631
+Hawaiʻi,climate,Leeward Kohala,2025-12,68.30463981789312
+Hawaiʻi,climate,Windward Kohala,2025-12,64.27303532934133
+Hawaiʻi,climate,Kona,2025-12,62.715727746591824
+Hawaiʻi,climate,Hawaiʻi Mauka,2025-12,51.46723086163502
+Hawaiʻi,climate,Kaʻu,2025-12,64.5861855756828
+Hawaiʻi,climate,Hilo,2025-12,64.97016890251305
+Kauaʻi,climate,Leeward Kauaʻi,2026-01,67.47398572642736
+Kauaʻi,climate,Windward Kauaʻi,2026-01,68.19659852208457
+Oʻahu,climate,Waianae,2026-01,71.29317817599068
+Oʻahu,climate,Koʻolau,2026-01,69.96985435871301
+Maui,climate,Leeward Maui Nui,2026-01,69.13024225840897
+Maui,climate,Windward Maui Nui,2026-01,66.44096706864565
+Hawaiʻi,climate,Leeward Kohala,2026-01,67.2872525182355
+Hawaiʻi,climate,Windward Kohala,2026-01,63.22989221556887
+Hawaiʻi,climate,Kona,2026-01,61.78805132317562
+Hawaiʻi,climate,Hawaiʻi Mauka,2026-01,49.196860392900334
+Hawaiʻi,climate,Kaʻu,2026-01,63.57824399921485
+Hawaiʻi,climate,Hilo,2026-01,63.905646017967705
+Kauaʻi,climate,Leeward Kauaʻi,2026-02,66.74371156634336
+Kauaʻi,climate,Windward Kauaʻi,2026-02,67.4887582480474
+Oʻahu,climate,Waianae,2026-02,70.09813155594406
+Oʻahu,climate,Koʻolau,2026-02,68.49331928071264
+Maui,climate,Leeward Maui Nui,2026-02,67.55906967431928
+Maui,climate,Windward Maui Nui,2026-02,64.76428346998624
+Hawaiʻi,climate,Leeward Kohala,2026-02,66.56894507021286
+Hawaiʻi,climate,Windward Kohala,2026-02,62.32026437125748
+Hawaiʻi,climate,Kona,2026-02,60.77993935445068
+Hawaiʻi,climate,Hawaiʻi Mauka,2026-02,47.90583895825843
+Hawaiʻi,climate,Kaʻu,2026-02,62.677023161909034
+Hawaiʻi,climate,Hilo,2026-02,63.000699587228354
+Kauaʻi,climate,Leeward Kauaʻi,2026-03,68.28963603639636
+Kauaʻi,climate,Windward Kauaʻi,2026-03,69.05648650013467
+Oʻahu,climate,Waianae,2026-03,71.85654137529139
+Oʻahu,climate,Koʻolau,2026-03,70.26742792722922
+Maui,climate,Leeward Maui Nui,2026-03,69.16824612920448
+Maui,climate,Windward Maui Nui,2026-03,66.49766480639177
+Hawaiʻi,climate,Leeward Kohala,2026-03,68.40859611472237
+Hawaiʻi,climate,Windward Kohala,2026-03,64.28693952095809
+Hawaiʻi,climate,Kona,2026-03,62.84346932638332
+Hawaiʻi,climate,Hawaiʻi Mauka,2026-03,49.83546971529435
+Hawaiʻi,climate,Kaʻu,2026-03,64.64640724019966
+Hawaiʻi,climate,Hilo,2026-03,64.93851447735827
