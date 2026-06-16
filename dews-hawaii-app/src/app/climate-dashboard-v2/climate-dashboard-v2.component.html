@@ -3,25 +3,26 @@
     <div class="brand">
       <h1>Hawai&#x02BB;i Monthly Climate Summary (Beta)</h1>
     </div>
-    <div class="topbar-date">
-      <span class="tiny muted">Select a month &amp; year</span>
-      <div class="date-selectors">
-        <button class="date-arrow" (click)="stepMonth(-1)" title="Previous month">&#8249;</button>
-        <select class="dropdown"
-                [ngModel]="selectedMonth()"
-                (ngModelChange)="setMonth(+$event)">
-          <option *ngFor="let name of monthNames; let i = index" [value]="i + 1">{{ name }}</option>
-        </select>
-        <select class="dropdown"
-                [ngModel]="selectedYear()"
-                (ngModelChange)="setYear(+$event)">
-          <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
-        </select>
-        <button class="date-arrow" (click)="stepMonth(1)" title="Next month">&#8250;</button>
-        <button class="date-latest" (click)="goToLatest()">Latest</button>
-      </div>
-    </div>
   </header>
+
+  <div class="date-bar">
+    <span class="tiny muted">Select a month &amp; year</span>
+    <div class="date-selectors">
+      <button class="date-arrow" (click)="stepMonth(-1)" title="Previous month">&#8249;</button>
+      <select class="dropdown"
+              [ngModel]="selectedMonth()"
+              (ngModelChange)="setMonth(+$event)">
+        <option *ngFor="let name of monthNames; let i = index" [value]="i + 1">{{ name }}</option>
+      </select>
+      <select class="dropdown"
+              [ngModel]="selectedYear()"
+              (ngModelChange)="setYear(+$event)">
+        <option *ngFor="let y of availableYears" [value]="y">{{ y }}</option>
+      </select>
+      <button class="date-arrow" (click)="stepMonth(1)" title="Next month">&#8250;</button>
+      <button class="date-latest" (click)="goToLatest()">Latest</button>
+    </div>
+  </div>
 
   <div class="dashboard-grid">
     <!-- ── LEFT COLUMN ── -->
