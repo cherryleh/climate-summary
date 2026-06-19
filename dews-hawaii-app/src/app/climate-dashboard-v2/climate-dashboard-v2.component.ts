@@ -289,6 +289,20 @@ export class ClimateDashboardV2Component implements OnDestroy {
           })
         };
 
+        const islandZoomFactorDiv: Record<string, number> = {
+          'molokai': 0.75,
+          'kahoolawe': 0.9,
+        };
+        const zoomFactorDiv = islandZoomFactorDiv[islandCanon];
+        if (zoomFactorDiv) {
+          const f = zoomFactorDiv;
+          const vx = 215, vy = 155;
+          const [tx, ty] = (projection as any).translate() as [number, number];
+          (projection as any)
+            .scale((projection as any).scale() * f)
+            .translate([vx - (vx - tx) * f, vy + (ty - vy) * f]);
+        }
+
         const path = geoPath(projection as any);
         this.project = projection as any;
         this.updateRasterRect();
@@ -846,6 +860,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
   selectedMonth = signal<number>(new Date().getMonth() === 0 ? 12 : new Date().getMonth());
   selectedYear = signal<number>(new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear());
+  private intendedMonth: number = this.selectedMonth();
 
   private latestMonth(): { month: number; year: number } {
     const now = new Date();
@@ -884,6 +899,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
   setMonth(month: number) {
+    this.intendedMonth = month;
     const clamped = this.clampToLatest(month, this.selectedYear());
     this.selectedMonth.set(clamped.month);
     this.selectedYear.set(clamped.year);
@@ -891,7 +907,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
   setYear(year: number) {
-    const clamped = this.clampToLatest(this.selectedMonth(), year);
+    const clamped = this.clampToLatest(this.intendedMonth, year);
     this.selectedMonth.set(clamped.month);
     this.selectedYear.set(clamped.year);
     this.applyDate(clamped.month, clamped.year);

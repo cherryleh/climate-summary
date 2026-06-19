@@ -29,10 +29,20 @@
 .topbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 14px 16px;
   border-bottom: 1px solid var(--border);
   background: var(--panel);
 }
+
+.tutorial-link {
+  font-size: 0.95rem;
+  color: var(--sub);
+  text-decoration: none;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.tutorial-link:hover { color: var(--text); }
 
 @media (min-width: 1024px) and (max-width: 1599px) {
   .topbar { padding: 8px 16px; }

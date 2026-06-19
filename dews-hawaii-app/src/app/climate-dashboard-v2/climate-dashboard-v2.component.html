@@ -3,6 +3,7 @@
     <div class="brand">
       <h1>Hawai&#x02BB;i Monthly Climate Summary (Beta)</h1>
     </div>
+    <a routerLink="/tutorial" target="_blank" class="tutorial-link">How to use</a>
   </header>
 
   <div class="date-bar">
@@ -240,7 +241,8 @@
             (islandSelected)="pickIsland($event)"
             (divisionSelected)="pickDivision($event)"
             (resetSelection)="reset()"
-            [selectionLabel]="selectionLabel()">
+            [selectionLabel]="selectionLabel()"
+            [mapSubtitle]="selectedDataset() + ' ' + selectedDateLabel()">
           </app-map-panel>
         </div>
       </section>

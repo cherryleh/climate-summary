@@ -1,0 +1,194 @@
+<div class="page">
+  <header class="topbar">
+    <div class="brand">
+      <h1>Hawai&#x02BB;i Monthly Climate Summary</h1>
+      <span class="brand-sub">How to Guide</span>
+    </div>
+    <a routerLink="/" class="back-btn">← Back to Dashboard</a>
+  </header>
+
+  <div class="tutorial-body">
+
+    <!-- Overview screenshot -->
+    <section class="tut-section hero-section">
+      <h2 class="section-title">How to Subscribe</h2>
+      <p class="section-desc">
+        The Hawai&#x02BB;i Monthly Climate Dashboard lets you explore rainfall, temperature, and drought
+        conditions across the Hawaiian Islands by month, year, island, and geographic division.
+      </p>
+      <div class="screenshot-wrap">
+        <img src="tutorial.png" alt="Dashboard overview screenshot" class="screenshot" />
+      </div>
+    </section>
+
+    <!-- Step 1 -->
+    <section class="tut-section">
+      <h2 class="section-title">Select a Month &amp; Year</h2>
+      <p class="section-desc">
+        At the top of the dashboard, use the <strong>month</strong> and <strong>year</strong> dropdowns to pick the
+        time period you want to explore. Use the <strong>‹ ›</strong> arrows to step one month at a time,
+        or click <strong>Latest</strong> to jump straight to the most recent data. Data availability varies by dataset.
+      </p>
+      <div class="screenshot-wrap">
+        <img src="date-selector.png" alt="Date selector screenshot" style="width: 70%;display: block; margin:auto" />
+      </div>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="tut-section">
+      <h2 class="section-title">Choose a Dataset</h2>
+      <p class="section-desc">
+        Toggle between three datasets using the buttons in the Climate Snapshot panel:
+      </p>
+      <div class="dataset-cards">
+        <div class="dataset-card rainfall">
+          <div class="dataset-name">Rainfall</div>
+          <p>Monthly precipitation totals and anomalies compared to the long-term average. Shows how wet or dry a period was relative to history.</p>
+        </div>
+        <div class="dataset-card temperature">
+          <div class="dataset-name">Temperature</div>
+          <p>Average monthly temperature, anomaly from normal, and the highest recorded temperature for the period.</p>
+        </div>
+        <div class="dataset-card drought">
+          <div class="dataset-name">Drought</div>
+          <p>U.S. Drought Monitor categories derived from the 3-month Standardized Precipitation Index (SPI-3), which compares cumulative rainfall over the past three months to the historical distribution for that period.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="tut-section">
+      <h2 class="section-title">Navigate the Map</h2>
+      <p class="section-desc">
+        The interactive map lets you zoom into specific areas. Start by choosing an <strong>Island</strong>,
+        then refine further with a <strong>Division</strong> type:
+      </p>
+      <div class="division-list">
+        <div class="division-item">
+          <span class="division-label">Moku</span>
+          <span class="division-desc">Traditional Hawaiian land districts — large regional sections of each island.</span>
+        </div>
+        <div class="division-item">
+          <span class="division-label">Ahupua&#x02BB;a</span>
+          <span class="division-desc">Traditional land divisions running from mountain to sea — the finest geographic resolution available.</span>
+        </div>
+        <div class="division-item">
+          <span class="division-label">Climate</span>
+          <span class="division-desc">NOAA climate divisions — the standard regions used for official long-term climate records.</span>
+        </div>
+        <div class="division-item">
+          <span class="division-label">Watershed</span>
+          <span class="division-desc">Hydrological catchment areas — useful for understanding water resource patterns.</span>
+        </div>
+      </div>
+      <p class="section-desc">
+        Click any region on the map to select it. The Climate Snapshot and chart panels will update to reflect
+        conditions for that specific area. Click <strong>Reset</strong> to return to the statewide view.
+      </p>
+    </section>
+
+    <!-- Step 4 — Statistics -->
+    <section class="tut-section">
+      <h2 class="section-title">Understanding the Statistics</h2>
+
+      <h3 class="subsection-title">Rainfall &amp; Temperature Stats</h3>
+      <div class="stat-explanations">
+        <div class="stat-row">
+          <div class="stat-name">Observed Average</div>
+          <div class="stat-explanation">
+            The actual measured value for the selected month and area — inches of rain or degrees Fahrenheit.
+            This is computed from station data within the selected region.
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-name">Anomaly</div>
+          <div class="stat-explanation">
+            How much the observed value differs from the long-term average (normal) for the same month.
+            A <span class="tag positive">positive anomaly</span> means wetter or warmer than normal;
+            a <span class="tag negative">negative anomaly</span> means drier or cooler.
+            The percentage shown (e.g. <em>+23%</em>) expresses the departure as a share of the normal value.
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-name">Rank</div>
+          <div class="stat-explanation">
+            Where this month falls in the historical record — e.g. <em>2nd Wettest out of 30 years</em>.
+            Rank 1 is the most extreme (wettest, driest, warmest, or coolest depending on context).
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-name">Year-to-date % of Normal <em>(Rainfall only)</em></div>
+          <div class="stat-explanation">
+            Cumulative rainfall from January through the selected month as a percentage of the normal
+            year-to-date total. Values above 100% mean above-normal accumulation so far this year.
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-name">Max Temp <em>(Temperature only)</em></div>
+          <div class="stat-explanation">
+            The highest average daily maximum temperature recorded in the region during the month.
+          </div>
+        </div>
+      </div>
+      <p class="stat-note">Click any stat box to open the full ranked table for all years on record.</p>
+
+      <h3 class="subsection-title">Drought Stats</h3>
+      <p class="section-desc">
+        Drought statistics show what percentage of the selected area falls into each U.S. Drought Monitor category,
+        derived from the 3-month Standardized Precipitation Index (SPI-3). SPI-3 measures how unusual the past three
+        months of rainfall are relative to the historical record — negative values indicate dryness, positive values
+        indicate wetness. Categories are cumulative — <em>D1 or worse</em> includes all area in D1, D2, D3, and D4.
+      </p>
+      <div class="drought-table">
+        <div class="drought-row header-row">
+          <span>Category</span><span>Label</span><span>What it means</span>
+        </div>
+        <div class="drought-row normal-row">
+          <span>—</span><span>Near Normal</span><span>No significant dryness or wetness detected.</span>
+        </div>
+        <div class="drought-row d0-row">
+          <span>D0</span><span>Abnormally Dry</span><span>Short-term dryness slowing crop growth or fire risk increasing; not yet drought.</span>
+        </div>
+        <div class="drought-row d1-row">
+          <span>D1</span><span>Moderate Drought</span><span>Some crop damage; streams and wells below normal; voluntary water use restrictions possible.</span>
+        </div>
+        <div class="drought-row d2-row">
+          <span>D2</span><span>Severe Drought</span><span>Crop or pasture losses; water shortages common; water restrictions likely.</span>
+        </div>
+        <div class="drought-row d3-row">
+          <span>D3</span><span>Extreme Drought</span><span>Major crop and pasture losses; widespread water shortages or restrictions.</span>
+        </div>
+        <div class="drought-row d4-row">
+          <span>D4</span><span>Exceptional Drought</span><span>Exceptional and widespread crop and pasture losses; water emergencies in multiple sectors.</span>
+        </div>
+        <div class="drought-row w0-row">
+          <span>W0</span><span>Abnormally Wet</span><span>Short-term wetness above normal; flooding possible in low-lying areas.</span>
+        </div>
+        <div class="drought-row w1-row">
+          <span>W1–W4</span><span>Moderate–Exceptional Wetness</span><span>Progressively wetter conditions with increased flooding, runoff, and saturated soils.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 5 — Chart -->
+    <section class="tut-section">
+      <div class="step-badge">Step 5</div>
+      <h2 class="section-title">Reading the Historical Chart</h2>
+      <p class="section-desc">
+        The chart on the right side of the dashboard shows the full historical record for your selected
+        dataset, location, and month. Each bar or data point represents one year.
+        The highlighted bar corresponds to the currently selected year.
+      </p>
+      <ul class="tip-list">
+        <li>Hover over bars to see exact values for individual years.</li>
+        <li>Use <strong>Expand</strong> to open the chart in a larger fullscreen view.</li>
+      </ul>
+    </section>
+
+    <!-- CTA -->
+    <section class="tut-section cta-section">
+      <a routerLink="/" class="cta-btn">Explore the Dashboard →</a>
+    </section>
+
+  </div>
+</div>

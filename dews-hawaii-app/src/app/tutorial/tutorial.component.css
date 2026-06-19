@@ -1,0 +1,303 @@
+.page {
+  min-height: 100vh;
+  background: #f8f9fa;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.topbar {
+  background: #fff;
+  color: #111827;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'Roboto Condensed', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.brand-sub {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.back-btn {
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.back-btn:hover { color: #111827; }
+
+.tutorial-body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Sections */
+.tut-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.step-badge {
+  display: inline-block;
+  background: #1a3a5c;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  margin-bottom: 0.6rem;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a3a5c;
+  margin: 0 0 0.75rem;
+}
+
+.subsection-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a3a5c;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.section-desc {
+  color: #374151;
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+
+/* Screenshot */
+.hero-section { }
+.screenshot-wrap {
+  margin-top: 1.25rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  margin-left: -2rem;
+  margin-right: -2rem;
+  width: calc(100% + 4rem);
+}
+.screenshot {
+  width: 100%;
+  display: block;
+}
+.screenshot-caption {
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+}
+
+/* Callout */
+.callout {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 0 6px 6px 0;
+  padding: 0.75rem 1rem;
+  color: #1e40af;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.callout-icon { font-size: 1rem; flex-shrink: 0; }
+
+/* Dataset cards */
+.dataset-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.dataset-card {
+  border-radius: 8px;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+}
+.dataset-card p {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+.dataset-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+.dataset-name { font-weight: 700; font-size: 0.95rem; }
+
+.rainfall  { background: #eff6ff; border-color: #bfdbfe; }
+.rainfall .dataset-name { color: #1d4ed8; }
+.temperature { background: #fff7ed; border-color: #fed7aa; }
+.temperature .dataset-name { color: #c2410c; }
+.drought { background: #fefce8; border-color: #fde68a; }
+.drought .dataset-name { color: #92400e; }
+
+/* Division list */
+.division-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.division-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+}
+.division-label {
+  font-weight: 700;
+  color: #1a3a5c;
+  min-width: 90px;
+  font-size: 0.9rem;
+}
+.division-desc {
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Stat rows */
+.stat-explanations {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.stat-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+.stat-name {
+  font-weight: 600;
+  color: #1a3a5c;
+  font-size: 0.9rem;
+}
+.stat-explanation {
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+.tag.positive { background: #dcfce7; color: #166534; }
+.tag.negative { background: #fee2e2; color: #991b1b; }
+
+.stat-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Drought table */
+.drought-table {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 0.75rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  font-size: 0.85rem;
+}
+.drought-row {
+  display: grid;
+  grid-template-columns: 60px 160px 1fr;
+  gap: 1rem;
+  padding: 0.55rem 0.75rem;
+  align-items: center;
+  background: #fff;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+.drought-row:last-child { border-bottom: none; }
+.header-row {
+  background: #1a3a5c;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: none;
+}
+
+/* Tips */
+.tip-list {
+  color: #374151;
+  line-height: 1.9;
+  padding-left: 1.25rem;
+  margin: 0.5rem 0 0;
+}
+.tip-list li { margin-bottom: 0.25rem; }
+
+/* CTA */
+.cta-section {
+  display: flex;
+  justify-content: center;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+.cta-btn {
+  display: inline-block;
+  background: #1a3a5c;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.85rem 2.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.cta-btn:hover { background: #2563eb; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .tut-section { padding: 1.25rem; }
+  .stat-row { grid-template-columns: 1fr; gap: 0.25rem; }
+  .drought-row { grid-template-columns: 40px 1fr; }
+  .drought-row span:nth-child(3) { display: none; }
+  .dataset-cards { grid-template-columns: 1fr; }
+}

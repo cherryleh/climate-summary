@@ -188,16 +188,27 @@ select.input option {
   border-bottom: 1px solid var(--border);
 }
 
+.selection-overlay .map-subtitle {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--sub);
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
 .selection-overlay .eyebrow {
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--sub);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .selection-overlay .main {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
 }

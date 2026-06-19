@@ -6,6 +6,7 @@ import { UnsubscribeComponent } from './unsubscribe/unsubscribe.component';
 import { ManagePreferencesComponent } from './manage-subscriptions/manage-subscriptions.component';
 import { StormViewerComponent } from './storm-viewer/storm-viewer.component';
 import { StormViewerMarch20262Component } from './storm-viewer-march2026-2/storm-viewer-march2026-2.component';
+import { TutorialComponent } from './tutorial/tutorial.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,7 @@ export const routes: Routes = [
     path: 'manage-preferences', component: ManagePreferencesComponent
   },
   { path: 'storm-viewer', component: StormViewerComponent},
-  { path: 'storm-viewer-march2026-2', component: StormViewerMarch20262Component}
+  { path: 'storm-viewer-march2026-2', component: StormViewerMarch20262Component},
+  { path: 'tutorial', component: TutorialComponent }
 
 ];

@@ -31,6 +31,7 @@ export class MapPanelComponent implements OnInit, OnChanges {
   @Input() selectionLabel: string | null = null;
   @Input() showDivisionDisclaimer: boolean = false;
   @Input() mapTitle: string | null = null;
+  @Input() mapSubtitle: string | null = null;
   // ===== Outputs =====
   @Output() islandSelected = new EventEmitter<string>();
   @Output() divisionSelected = new EventEmitter<string | null>();
