@@ -2,7 +2,7 @@
   <header class="topbar">
     <div class="brand">
       <h1>Hawai&#x02BB;i Monthly Climate Summary</h1>
-      <span class="brand-sub">How to Guide</span>
+      <span class="brand-sub">How-To Guide</span>
     </div>
     <a routerLink="/" class="back-btn">← Back to Dashboard</a>
   </header>
@@ -17,7 +17,7 @@
         conditions across the Hawaiian Islands by month, year, island, and geographic division.
       </p>
       <div class="screenshot-wrap">
-        <img src="tutorial.png" alt="Dashboard overview screenshot" class="screenshot" />
+        <img src="tutorial.png" alt="Dashboard overview screenshot" class="screenshot clickable-img" (click)="openLightbox('tutorial.png')" />
       </div>
     </section>
 
@@ -30,7 +30,7 @@
         or click <strong>Latest</strong> to jump straight to the most recent data. Data availability varies by dataset.
       </p>
       <div class="screenshot-wrap">
-        <img src="date-selector.png" alt="Date selector screenshot" style="width: 70%;display: block; margin:auto" />
+        <img src="date-selector.png" alt="Date selector screenshot" style="width: 70%;display: block; margin:auto" (click)="openLightbox('date-selector.png')" />
       </div>
     </section>
 
@@ -191,4 +191,10 @@
     </section>
 
   </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox-overlay" *ngIf="lightboxSrc" (click)="closeLightbox()">
+  <img [src]="lightboxSrc" class="lightbox-img" (click)="$event.stopPropagation()" />
+  <button class="lightbox-close" (click)="closeLightbox()">✕</button>
 </div>

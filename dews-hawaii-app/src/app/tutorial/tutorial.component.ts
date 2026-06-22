@@ -9,4 +9,14 @@ import { RouterModule } from '@angular/router';
   templateUrl: './tutorial.component.html',
   styleUrl: './tutorial.component.css'
 })
-export class TutorialComponent {}
+export class TutorialComponent {
+  lightboxSrc: string | null = null;
+
+  openLightbox(src: string) {
+    this.lightboxSrc = src;
+  }
+
+  closeLightbox() {
+    this.lightboxSrc = null;
+  }
+}
