@@ -472,6 +472,11 @@ export class ClimateDashboardV2Component implements OnDestroy {
     }
   }
 
+  mapFullscreen = signal(false);
+  toggleMapFullscreen() {
+    this.mapFullscreen.set(!this.mapFullscreen());
+  }
+
 
   rasterHref = signal<string | null>(null); // Object URL to a PNG/WEBP
   rasterRect = signal<{ x: number; y: number; width: number; height: number } | null>(null);
