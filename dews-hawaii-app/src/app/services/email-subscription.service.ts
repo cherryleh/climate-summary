@@ -29,7 +29,12 @@ export class EmailSubscriptionService {
   constructor(private http: HttpClient) {}
 
   private logToSheet(action: string, body: any): void {
-    this.http.post(this.logUrl, { action, ...body }).subscribe({ error: () => {} });
+    fetch(this.logUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...body }),
+    }).catch(() => {});
   }
 
   private headers(): HttpHeaders {

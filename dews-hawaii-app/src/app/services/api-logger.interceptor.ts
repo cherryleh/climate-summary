@@ -1,18 +1,15 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
 const LOG_URL = 'https://script.google.com/macros/s/AKfycbwrLfGoerk6TXndVfN_OnUg84WstKCn-fXlZO173BQmpYMIczwvnmAmHapfoi9RUczHvQ/exec';
 
-// Avoid logging the log requests themselves
-const isLogRequest = (url: string) => url.includes('script.google.com');
+const shouldLog = (url: string) =>
+  /_stats/.test(url) && !url.includes('script.google.com');
 
 export const apiLoggerInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
-  if (isLogRequest(req.url)) return next(req);
+  if (!shouldLog(req.url)) return next(req);
 
-  const http = inject(HttpClient);
   const start = Date.now();
 
   const sendLog = (status: number | string, error?: string) => {
@@ -30,7 +27,12 @@ export const apiLoggerInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown
     const body = req.body;
     if (body) entry['body'] = body;
 
-    http.post(LOG_URL, entry).subscribe({ error: () => {} });
+    fetch(LOG_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry),
+    }).catch(() => {});
   };
 
   return next(req).pipe(

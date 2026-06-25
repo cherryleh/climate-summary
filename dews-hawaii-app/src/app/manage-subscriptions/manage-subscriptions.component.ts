@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import {
   EmailSubscriptionService,
@@ -23,7 +23,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
 @Component({
   selector: 'app-manage-preferences',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './manage-subscriptions.component.html',
   styleUrls: ['./manage-subscriptions.component.css'],
 })

@@ -1,7 +1,7 @@
 import { Component, computed, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { geoIdentity, geoPath } from 'd3-geo';
 import type { FeatureCollection } from 'geojson';
@@ -52,7 +52,7 @@ function canonIsland(name: string): string {
 @Component({
   selector: 'app-climate-dashboard-v2',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, StatBoxComponent, DataHighchartComponent, FooterComponent, MapPanelComponent, RouterModule],
+  imports: [CommonModule, FormsModule, StatBoxComponent, DataHighchartComponent, FooterComponent, MapPanelComponent, RouterModule],
   templateUrl: './climate-dashboard-v2.component.html',
   styleUrls: ['./climate-dashboard-v2.component.css']
 })
@@ -1161,7 +1161,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
           "W0 Abnormally Wet", "W1 Moderately Wet", "W2 Very Wet",
           "W3 Extremely Wet", "W4 Exceptionally Wet"
         ];
-        this.buildLegend(legendDiv, droughtColors, droughtLabels);
+        this.buildLegend(legendDiv, droughtColors, droughtLabels, true);
         return;
       }
 
@@ -1216,26 +1216,26 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
   // Helper to draw categorical legends consistently
-  private buildLegend(container: HTMLDivElement, colors: string[], labels: string[]) {
+  private buildLegend(container: HTMLDivElement, colors: string[], labels: string[], compact = false) {
     container.innerHTML = '';
     colors.forEach((color, i) => {
       const item = document.createElement('div');
       item.style.display = 'flex';
       item.style.alignItems = 'center';
-      item.style.gap = '6px';
-      item.style.marginBottom = '4px';
+      item.style.gap = compact ? '4px' : '6px';
+      item.style.marginBottom = compact ? '2px' : '4px';
 
       const swatch = document.createElement('span');
       swatch.style.display = 'inline-block';
-      swatch.style.width = '18px';
-      swatch.style.height = '18px';
+      swatch.style.width = compact ? '12px' : '18px';
+      swatch.style.height = compact ? '12px' : '18px';
       swatch.style.border = '1px solid #ccc';
       swatch.style.backgroundColor = color;
       swatch.style.flexShrink = '0';
 
       const label = document.createElement('span');
       label.textContent = labels[i];
-      label.style.fontSize = '0.85rem';
+      label.style.fontSize = compact ? '0.72rem' : '0.85rem';
       label.style.color = '#333';
 
       item.appendChild(swatch);

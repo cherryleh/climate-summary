@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -103,7 +103,7 @@ type DroughtAreaKey = DryBin | WetBin | 'Near Normal';
 @Component({
   selector: 'app-climate-summary-2025',
   standalone: true,
-  imports: [NgFor, NgIf, HttpClientModule, HighchartsChartModule, FormsModule],
+  imports: [NgFor, NgIf, HighchartsChartModule, FormsModule],
   templateUrl: './climate-summary-2025.component.html',
   styleUrls: ['./climate-summary-2025.component.css'],
 })
