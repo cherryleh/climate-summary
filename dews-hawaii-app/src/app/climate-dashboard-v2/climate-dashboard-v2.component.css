@@ -60,10 +60,11 @@
 }
 .date-selectors { display:flex; gap:6px; align-items: center; }
 
-/* On larger screens: show date selector in topbar, hide the date-bar */
+/* Mid-size screens (tablet): show date selector in topbar, hide the date-bar */
+/* Large screens (monitor): put it back below the header */
 .topbar-date { display: none; }
 
-@media (min-width: 640px) {
+@media (min-width: 640px) and (max-width: 1599px) {
   .topbar-date { display: flex; }
   .date-bar    { display: none; }
 }
