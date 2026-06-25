@@ -92,6 +92,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
   pickDataset(d: Dataset) {
     this.dataset.set(d);
+    if (d === 'Drought') this.aprilMode.set(false);
     this.loadRasterOnce(d);
     this.loadStats();
 

@@ -333,6 +333,26 @@ a.btn                { color: inherit; text-decoration: none; }
 .stats-temperature ::ng-deep .stat {
   height: 100%;
   box-sizing: border-box;
+  position: relative;
+  padding-bottom: 28px;
+}
+
+.stats-rainfall ::ng-deep .stat-note-inline,
+.stats-temperature ::ng-deep .stat-note-inline {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+  right: 16px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.stats-rainfall ::ng-deep .stat-label,
+.stats-temperature ::ng-deep .stat-label {
+  min-height: 30px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
 /* Drought/wet boxes size to content — notes are too long to force a fixed height */
@@ -753,6 +773,19 @@ app-data-highchart {
 
 /* ── Small screen overrides (<640px) ────────────── */
 @media (max-width: 639px) {
+  /* Allow full-page vertical scroll — dashboard-grid must not clip */
+  .dashboard-grid {
+    overflow: visible;
+    overflow-x: clip;
+  }
+
+  /* Left column and aside must not clip their children either */
+  .left-col,
+  .aside {
+    overflow: visible;
+    overflow-x: clip;
+  }
+
   /* Header */
   .topbar {
     flex-direction: column;
@@ -781,7 +814,14 @@ app-data-highchart {
   .map-wrap     { flex: 0 0 auto; height: auto; overflow: visible; min-height: 0; }
   app-map-panel { height: auto; min-height: 0; }
 
+  /* Chart — fixed height on mobile so it renders at a usable size */
+  .chart-section { min-height: 0; height: 280px; }
+  .panel-grow.chart-section { flex: 0 0 auto; }
+  .chart-wrap { height: 220px; min-height: 0; flex: none; overflow: hidden; }
+  app-data-highchart { height: 220px; }
+
   /* Selection toolbar */
+  .selection-bar { border-top: none; }
   .selection-toolbar  { flex-direction: column; align-items: flex-start; }
   .toolbar-group      { width: 100%; }
   .segmented          { width: 100%; justify-content: space-between; }
