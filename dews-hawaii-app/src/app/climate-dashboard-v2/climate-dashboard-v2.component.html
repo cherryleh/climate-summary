@@ -327,6 +327,7 @@
 
           <label class="label" for="email">Email address</label>
           <input id="email" class="input" type="email"
+            autocomplete="email"
             [ngModel]="email()"
             (ngModelChange)="email.set($event)"
             placeholder="you@example.com" />
@@ -344,6 +345,23 @@
           </div>
 
           <div class="tiny muted email-footer-note">Reports arrive around the 1st of each month. Unsubscribe anytime.</div>
+        </div>
+      </div>
+
+      <!-- Mobile-only logo footer -->
+      <div class="mobile-logo-footer">
+        <span class="mobile-logo-label">Supported by</span>
+        <div class="mobile-logos">
+          <a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener"><img src="logos/hcdp.png" alt="HCDP"></a>
+          <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/" target="_blank" rel="noopener"><img src="logos/mesonet.png" alt="Mesonet"></a>
+          <a href="https://pdke.soest.hawaii.edu/" target="_blank" rel="noopener"><img src="logos/pdke.png" alt="PDKE"></a>
+          <a href="https://pi-casc.soest.hawaii.edu/" target="_blank" rel="noopener"><img src="logos/picasc.png" alt="PICASC"></a>
+          <a href="https://seagrant.soest.hawaii.edu/" target="_blank" rel="noopener"><img src="logos/SeaGrant.jpg" alt="Sea Grant"></a>
+          <a href="https://www.hawaii.edu/" target="_blank" rel="noopener"><img src="logos/UH.jpg" alt="University of Hawaiʻi"></a>
+          <a href="https://dlnr.hawaii.gov/cwrm/" target="_blank" rel="noopener"><img src="logos/cwrm.png" alt="CWRM"></a>
+          <a href="https://www.drought.gov/" target="_blank" rel="noopener"><img src="logos/nidis.png" alt="NIDIS"></a>
+          <a href="https://datascience.hawaii.edu/" target="_blank" rel="noopener"><img src="logos/hidsi.png" alt="HIDSI"></a>
+          <a href="https://hawaii.edu/epscor/change-hi/" target="_blank" rel="noopener"><img src="logos/changehi.png" alt="Change Hawaiʻi"></a>
         </div>
       </div>
     </aside>
