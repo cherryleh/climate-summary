@@ -387,6 +387,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   email = signal<string>('');
   private emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   isEmailValid = computed(() => this.emailRegex.test(this.email().trim()));
+  isSubscribing = signal<boolean>(false);
   subscribeNotice = signal<{ type: 'success' | 'error'; message: string } | null>(null);
   private noticeTimer: any = null;
   private showNotice(type: 'success' | 'error', message: string) {
@@ -396,7 +397,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
   subscribe() {
     const email = this.email().trim();
-    if (!this.isEmailValid()) return;
+    if (!this.isEmailValid() || this.isSubscribing()) return;
+    this.isSubscribing.set(true);
 
     // your existing "new_body" construction
     const newBody: any = { email };
@@ -446,18 +448,19 @@ export class ClimateDashboardV2Component implements OnDestroy {
       }),
       catchError(err => {
         console.error('Subscription error:', err);
-        // show the API error details if present
         const msg =
           typeof err?.error === 'string'
             ? err.error
             : JSON.stringify(err?.error ?? err, null, 2);
         this.showNotice('error', msg);
+        this.isSubscribing.set(false);
         return throwError(() => err);
       })
     ).subscribe(({ mode }) => {
       const label = this.selectedDivisionName() || this.islandLabel() || 'Statewide';
       const verb = mode === 'created' ? "You're subscribed!" : 'Subscription updated!';
       this.showNotice('success', `${verb} You'll receive monthly climate reports for ${label}.`);
+      this.isSubscribing.set(false);
     });
   }
 
