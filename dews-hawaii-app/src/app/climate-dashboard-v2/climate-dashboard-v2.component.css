@@ -781,6 +781,8 @@ app-data-highchart {
 
 /* ── Small screen overrides (<640px) ────────────── */
 @media (max-width: 639px) {
+  .hide-mobile { display: none; }
+
   /* Allow full-page vertical scroll — dashboard-grid must not clip */
   .dashboard-grid {
     overflow: visible;
