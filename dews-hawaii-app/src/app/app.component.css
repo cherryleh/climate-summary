@@ -14,3 +14,12 @@ app-footer {
   display: block;
   margin-top: auto;
 }
+
+.maintenance-banner {
+  display: block;
+  background-color: #b91c1c;
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+}
