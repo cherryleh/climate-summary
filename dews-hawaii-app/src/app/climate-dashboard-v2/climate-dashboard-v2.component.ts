@@ -845,9 +845,14 @@ export class ClimateDashboardV2Component implements OnDestroy {
     const year = this.selectedYear();
     const mm = String(this.selectedMonth()).padStart(2, '0');
     const file = `https://api.hcdp.ikewai.org/files/download/climate_report_data/climate_summary_tifs/rainfall/legend/rainfall_legend_${year}_${mm}.json`;
-    const config = await firstValueFrom(this.http.get<any>(file));
-    this.rainfallConfig.set(config);
-    return config;
+    try {
+      const config = await firstValueFrom(this.http.get<any>(file));
+      this.rainfallConfig.set(config);
+      return config;
+    } catch (err) {
+      console.error('Failed to load rainfall legend config:', err);
+      return null;
+    }
   }
 
   private drawDynamicRainfallLegend(config: any) {
@@ -864,8 +869,8 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
   currentDateLabel = signal<string>('');
-  rainfallYears = signal<number>(-999);
-  temperatureYears = signal<number>(-999);
+  rainfallYears = signal<number>(0);
+  temperatureYears = signal<number>(0);
 
   selectedMonth = signal<number>(new Date().getMonth() === 0 ? 12 : new Date().getMonth());
   selectedYear = signal<number>(new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear());
@@ -1214,7 +1219,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
   // Returns rank counted from the sentiment's end so "107th of 107" becomes "1st Driest" not "107th Driest"
   getDirectionalRank(rank: number | undefined, totalYears: number): number | undefined {
-    if (rank == null) return undefined;
+    if (rank == null || totalYears <= 0) return undefined;
     return this.getRankSentiment(rank, totalYears) === 'high' ? rank : totalYears - rank + 1;
   }
 
@@ -1629,7 +1634,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
   formatRank(rank: number | undefined): string {
-    if (rank == null || Number.isNaN(rank)) return '';
+    if (rank == null || Number.isNaN(rank) || rank <= 0) return '';
 
     const j = rank % 10;
     const k = rank % 100;
