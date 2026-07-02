@@ -13,7 +13,7 @@ import { FooterComponent } from './footer/footer.component';
 })
 export class AppComponent implements OnInit {
   // Toggle this to show/hide the site-wide maintenance banner.
-  maintenanceMode = false;
+  maintenanceMode = true;
 
   constructor(private router: Router) {}
 
