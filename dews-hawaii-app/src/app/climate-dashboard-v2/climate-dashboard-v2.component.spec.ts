@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ClimateDashboardComponent } from './climate-dashboard.component';
+import { ClimateDashboardV2Component } from './climate-dashboard-v2.component';
 
-describe('ClimateDashboardComponent', () => {
-  let component: ClimateDashboardComponent;
-  let fixture: ComponentFixture<ClimateDashboardComponent>;
+describe('ClimateDashboardV2Component', () => {
+  let component: ClimateDashboardV2Component;
+  let fixture: ComponentFixture<ClimateDashboardV2Component>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ClimateDashboardComponent]
+      imports: [ClimateDashboardV2Component]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ClimateDashboardComponent);
+    fixture = TestBed.createComponent(ClimateDashboardV2Component);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

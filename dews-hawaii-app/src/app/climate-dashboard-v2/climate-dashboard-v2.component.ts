@@ -1815,7 +1815,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
   private buildUpdatedBody(existing: any, incoming: any) {
-    const updated: any = { email: existing.email };
+    const updated: any = { email: existing.email || incoming.email };
 
     for (const f of this.LIST_FIELDS) {
       updated[f] = this.mergeDedup(existing?.[f] ?? [], incoming?.[f] ?? []);

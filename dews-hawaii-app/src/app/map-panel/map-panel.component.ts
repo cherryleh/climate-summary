@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal, OnInit, OnChanges, SimpleChanges, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import type { Scope } from '../climate-dashboard/climate-dashboard.component';
+import type { Scope } from '../climate-dashboard-v2/climate-dashboard-v2.component';
 type RasterRect = { x: number; y: number; width: number; height: number };
 type Dataset = 'Rainfall' | 'Temperature' | 'Drought';
 

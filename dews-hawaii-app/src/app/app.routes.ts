@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { ClimateDashboardComponent } from './climate-dashboard/climate-dashboard.component';
+// import { ClimateDashboardComponent } from './climate-dashboard/climate-dashboard.component';
 import { ClimateDashboardV2Component } from './climate-dashboard-v2/climate-dashboard-v2.component';
 import { ClimateSummary2025Component} from './climate-summary-2025/climate-summary-2025.component';
 import { UnsubscribeComponent } from './unsubscribe/unsubscribe.component';
@@ -12,9 +12,9 @@ export const routes: Routes = [
   {
     path: '', component: ClimateDashboardV2Component
   },
-  {
-    path: 'v1', component: ClimateDashboardComponent
-  },
+  // {
+  //   path: 'v1', component: ClimateDashboardComponent
+  // },
   {
     path: 'climate-summary-2025', component: ClimateSummary2025Component
   },
