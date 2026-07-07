@@ -15,12 +15,17 @@ export class AppComponent implements OnInit {
   // Toggle this to show/hide the site-wide maintenance banner.
   maintenanceMode = false;
 
+  // Routes that render their own footer and should not get the global one.
+  private readonly routesWithOwnFooter = ['/climate-summary-2025'];
+  showFooter = true;
+
   constructor(private router: Router) {}
 
   ngOnInit() {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
+        this.showFooter = !this.routesWithOwnFooter.includes(event.urlAfterRedirects.split('?')[0].split('#')[0]);
         window.parent.postMessage({
           type: 'routeChange',
           hash: window.location.hash
