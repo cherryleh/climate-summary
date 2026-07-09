@@ -514,18 +514,69 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
   private async loadStats(divisionArg?: string | null) {
     const dataset = this.selectedDataset();
+    const isStatewide = !this.selectedIsland() && !(divisionArg || this.selectedDivision());
 
     if (dataset === 'Rainfall') {
       await this.loadRainfallStats(divisionArg);
+      if (isStatewide) {
+        this.statewideRainfallRank.set(this.stats()?.rank ?? null);
+      } else {
+        await this.loadStatewideRainfallRank();
+      }
       return;
     }
 
     if (dataset === 'Temperature') {
       await this.loadTemperatureStats(divisionArg);
+      if (isStatewide) {
+        this.statewideTemperatureRank.set(this.stats()?.rank ?? null);
+      } else {
+        await this.loadStatewideTemperatureRank();
+      }
       return;
     }
 
     await this.loadDroughtStats(divisionArg);
+  }
+
+  private async loadStatewideRainfallRank() {
+    const date = `${this.selectedYear()}-${String(this.selectedMonth()).padStart(2, '0')}`;
+    const params = new HttpParams()
+      .set('division_type', 'Statewide')
+      .set('island', 'Statewide')
+      .set('name', 'Statewide')
+      .set('date', date);
+
+    try {
+      const results = await firstValueFrom(
+        this.http.get<any[]>(this.rainfallStatsUrl, { params, headers: this.apiHeaders() })
+      );
+      const record = results?.[0] ?? null;
+      this.statewideRainfallRank.set(record ? +record.rank : null);
+    } catch (err) {
+      console.error('[loadStatewideRainfallRank] Failed:', err);
+      this.statewideRainfallRank.set(null);
+    }
+  }
+
+  private async loadStatewideTemperatureRank() {
+    const date = `${this.selectedYear()}-${String(this.selectedMonth()).padStart(2, '0')}`;
+    const params = new HttpParams()
+      .set('division_type', 'Statewide')
+      .set('island', 'Statewide')
+      .set('name', 'Statewide')
+      .set('date', date);
+
+    try {
+      const results = await firstValueFrom(
+        this.http.get<any[]>(this.temperatureStatsUrl, { params, headers: this.apiHeaders() })
+      );
+      const record = results?.[0] ?? null;
+      this.statewideTemperatureRank.set(record ? +record.rank : null);
+    } catch (err) {
+      console.error('[loadStatewideTemperatureRank] Failed:', err);
+      this.statewideTemperatureRank.set(null);
+    }
   }
 
   private async loadDroughtStats(divisionArg?: string | null) {
@@ -871,6 +922,19 @@ export class ClimateDashboardV2Component implements OnDestroy {
   currentDateLabel = signal<string>('');
   rainfallYears = signal<number>(0);
   temperatureYears = signal<number>(0);
+
+  // Statewide rank drives the wettest/driest (warmest/coolest) wording for every
+  // region so a single month never mixes both labels across areas.
+  statewideRainfallRank = signal<number | null>(null);
+  statewideTemperatureRank = signal<number | null>(null);
+
+  rainfallSentiment = computed<'high' | 'low'>(() =>
+    this.getRankSentiment(this.statewideRainfallRank() ?? undefined, this.rainfallYears())
+  );
+
+  temperatureSentiment = computed<'high' | 'low'>(() =>
+    this.getRankSentiment(this.statewideTemperatureRank() ?? undefined, this.temperatureYears())
+  );
 
   selectedMonth = signal<number>(new Date().getMonth() === 0 ? 12 : new Date().getMonth());
   selectedYear = signal<number>(new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear());
@@ -1218,9 +1282,9 @@ export class ClimateDashboardV2Component implements OnDestroy {
   }
 
   // Returns rank counted from the sentiment's end so "107th of 107" becomes "1st Driest" not "107th Driest"
-  getDirectionalRank(rank: number | undefined, totalYears: number): number | undefined {
+  getDirectionalRank(rank: number | undefined, totalYears: number, sentiment: 'high' | 'low'): number | undefined {
     if (rank == null || totalYears <= 0) return undefined;
-    return this.getRankSentiment(rank, totalYears) === 'high' ? rank : totalYears - rank + 1;
+    return sentiment === 'high' ? rank : totalYears - rank + 1;
   }
 
   // Helper to draw categorical legends consistently
@@ -1668,9 +1732,10 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
     let rankStr = '';
     if (rank != null && years > 0) {
-      const sentiment = this.getRankSentiment(rank, years) === 'high' ? 'wettest' : 'driest';
-      const suffix = this.formatRankSuffix(rank);
-      rankStr = `, ranking as the ${rank}${suffix} ${sentiment} ${month} in the last ${years} years`;
+      const sentiment = this.rainfallSentiment() === 'high' ? 'wettest' : 'driest';
+      const directionalRank = this.getDirectionalRank(rank, years, this.rainfallSentiment()) ?? rank;
+      const suffix = this.formatRankSuffix(directionalRank);
+      rankStr = `, ranking as the ${directionalRank}${suffix} ${sentiment} ${month} in the last ${years} years`;
     }
 
     return `${location} received ${mean} inches of rainfall — ${absAnomaly} inches (${absPchange}%) ${direction} the ${month} average${rankStr}.`;
@@ -1693,9 +1758,10 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
     let rankStr = '';
     if (rank != null && years > 0) {
-      const sentiment = this.getRankSentiment(rank, years) === 'high' ? 'warmest' : 'coolest';
-      const suffix = this.formatRankSuffix(rank);
-      rankStr = `, ranking as the ${rank}${suffix} ${sentiment} ${month} in the last ${years} years`;
+      const sentiment = this.temperatureSentiment() === 'high' ? 'warmest' : 'coolest';
+      const directionalRank = this.getDirectionalRank(rank, years, this.temperatureSentiment()) ?? rank;
+      const suffix = this.formatRankSuffix(directionalRank);
+      rankStr = `, ranking as the ${directionalRank}${suffix} ${sentiment} ${month} in the last ${years} years`;
     }
 
     return `${location} averaged ${mean}°F — ${absAnomaly}°F ${direction} the ${month} average${rankStr}.`;
@@ -1844,9 +1910,7 @@ export class ClimateDashboardV2Component implements OnDestroy {
     this.rankTableLoading.set(true);
     this.rankTableRows.set([]);
 
-    const totalYears = dataset === 'Rainfall' ? this.rainfallYears() : this.temperatureYears();
-    const currentRank = this.stats()?.rank;
-    const sentiment = this.getRankSentiment(currentRank, totalYears);
+    const sentiment = dataset === 'Rainfall' ? this.rainfallSentiment() : this.temperatureSentiment();
     this.rankTableSentiment.set(sentiment);
 
     const startDate = dataset === 'Rainfall' ? '1920-01' : '1990-01';
