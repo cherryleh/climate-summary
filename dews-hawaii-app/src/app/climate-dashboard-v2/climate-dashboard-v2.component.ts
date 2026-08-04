@@ -514,69 +514,18 @@ export class ClimateDashboardV2Component implements OnDestroy {
 
   private async loadStats(divisionArg?: string | null) {
     const dataset = this.selectedDataset();
-    const isStatewide = !this.selectedIsland() && !(divisionArg || this.selectedDivision());
 
     if (dataset === 'Rainfall') {
       await this.loadRainfallStats(divisionArg);
-      if (isStatewide) {
-        this.statewideRainfallRank.set(this.stats()?.rank ?? null);
-      } else {
-        await this.loadStatewideRainfallRank();
-      }
       return;
     }
 
     if (dataset === 'Temperature') {
       await this.loadTemperatureStats(divisionArg);
-      if (isStatewide) {
-        this.statewideTemperatureRank.set(this.stats()?.rank ?? null);
-      } else {
-        await this.loadStatewideTemperatureRank();
-      }
       return;
     }
 
     await this.loadDroughtStats(divisionArg);
-  }
-
-  private async loadStatewideRainfallRank() {
-    const date = `${this.selectedYear()}-${String(this.selectedMonth()).padStart(2, '0')}`;
-    const params = new HttpParams()
-      .set('division_type', 'Statewide')
-      .set('island', 'Statewide')
-      .set('name', 'Statewide')
-      .set('date', date);
-
-    try {
-      const results = await firstValueFrom(
-        this.http.get<any[]>(this.rainfallStatsUrl, { params, headers: this.apiHeaders() })
-      );
-      const record = results?.[0] ?? null;
-      this.statewideRainfallRank.set(record ? +record.rank : null);
-    } catch (err) {
-      console.error('[loadStatewideRainfallRank] Failed:', err);
-      this.statewideRainfallRank.set(null);
-    }
-  }
-
-  private async loadStatewideTemperatureRank() {
-    const date = `${this.selectedYear()}-${String(this.selectedMonth()).padStart(2, '0')}`;
-    const params = new HttpParams()
-      .set('division_type', 'Statewide')
-      .set('island', 'Statewide')
-      .set('name', 'Statewide')
-      .set('date', date);
-
-    try {
-      const results = await firstValueFrom(
-        this.http.get<any[]>(this.temperatureStatsUrl, { params, headers: this.apiHeaders() })
-      );
-      const record = results?.[0] ?? null;
-      this.statewideTemperatureRank.set(record ? +record.rank : null);
-    } catch (err) {
-      console.error('[loadStatewideTemperatureRank] Failed:', err);
-      this.statewideTemperatureRank.set(null);
-    }
   }
 
   private async loadDroughtStats(divisionArg?: string | null) {
@@ -923,17 +872,14 @@ export class ClimateDashboardV2Component implements OnDestroy {
   rainfallYears = signal<number>(0);
   temperatureYears = signal<number>(0);
 
-  // Statewide rank drives the wettest/driest (warmest/coolest) wording for every
-  // region so a single month never mixes both labels across areas.
-  statewideRainfallRank = signal<number | null>(null);
-  statewideTemperatureRank = signal<number | null>(null);
-
+  // Each division's own rank drives its wettest/driest (warmest/coolest) wording,
+  // so a division can read "driest" in a month where the state overall is "wettest".
   rainfallSentiment = computed<'high' | 'low'>(() =>
-    this.getRankSentiment(this.statewideRainfallRank() ?? undefined, this.rainfallYears())
+    this.getRankSentiment(this.stats()?.rank ?? undefined, this.rainfallYears())
   );
 
   temperatureSentiment = computed<'high' | 'low'>(() =>
-    this.getRankSentiment(this.statewideTemperatureRank() ?? undefined, this.temperatureYears())
+    this.getRankSentiment(this.stats()?.rank ?? undefined, this.temperatureYears())
   );
 
   selectedMonth = signal<number>(new Date().getMonth() === 0 ? 12 : new Date().getMonth());
