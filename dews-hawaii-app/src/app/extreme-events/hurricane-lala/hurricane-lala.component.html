@@ -96,6 +96,10 @@
             <span>{{ readoutRain.coord }}</span>
           </div>
         </div>
+        <div class="maplogos">
+          <img src="logos/mesonet.png" alt="Hawaiʻi Mesonet logo" class="logo-mesonet">
+          <img src="logos/hcdp.png" alt="HCDP logo">
+        </div>
       </div>
 
 
@@ -112,7 +116,10 @@
 
       <div class="chartwrap">
         <div class="charthead">
-          <span class="who">{{ selected ? selectedWho : 'No station selected' }}</span>
+          <span class="who" *ngIf="selected; else noStation">
+            <a [href]="mesonetUrl(selected)" target="_blank" rel="noopener">{{ selectedName }}</a> {{ selectedMeta }}
+          </span>
+          <ng-template #noStation><span class="who">No station selected</span></ng-template>
           <span class="stat">{{ rainStatText }}</span>
         </div>
         <div class="empty" *ngIf="!selected">{{ emptyRainText }}</div>
@@ -161,6 +168,10 @@
             <span>{{ readoutWind.coord }}</span>
           </div>
         </div>
+        <div class="maplogos">
+          <img src="logos/mesonet.png" alt="Hawaiʻi Mesonet logo" class="logo-mesonet">
+          <img src="logos/hcdp.png" alt="HCDP logo">
+        </div>
       </div>
 
 
@@ -177,7 +188,10 @@
 
       <div class="chartwrap">
         <div class="charthead">
-          <span class="who">{{ selected ? selectedWho : 'No station selected' }}</span>
+          <span class="who" *ngIf="selected; else noStationWind">
+            <a [href]="mesonetUrl(selected)" target="_blank" rel="noopener">{{ selectedName }}</a> {{ selectedMeta }}
+          </span>
+          <ng-template #noStationWind><span class="who">No station selected</span></ng-template>
           <span class="stat">{{ windStatText }}</span>
           <span class="spacer" style="flex:1"></span>
           <span class="serieskey" *ngIf="windLegendShow">
@@ -192,19 +206,32 @@
   </main>
 
   <section class="storm-highlights">
-    <div class="highlight-card">
-      <div class="highlight-eyebrow">Highlight</div>
-      <h2 class="highlight-title">Wind</h2>
-      <div class="highlight-body">
-        Text
-      </div>
-      <div class="buttons" role="group" aria-label="Wind gif region">
-        <button type="button" *ngFor="let r of windGifRegions; let i = index"
-          [class.active]="windGifIdx === i"
-          (click)="windGifIdx = i">{{ r.name }}</button>
-      </div>
-      <div class="highlight-media wind-gif-media">
-        <img [src]="windGifSrc" [alt]="'Hourly wind speed animation — ' + windGifRegions[windGifIdx].name">
+    <div class="highlight-card highlight-card--wind">
+      <div class="wind-flow">
+        <div class="wind-media">
+          <div class="buttons" role="group" aria-label="Wind gif region">
+            <button type="button" *ngFor="let r of windGifRegions; let i = index"
+              [class.active]="windGifIdx === i"
+              (click)="windGifIdx = i">{{ r.name }}</button>
+          </div>
+          <div class="highlight-media wind-gif-media">
+            <img [src]="windGifSrc" [alt]="'Hourly wind speed animation — ' + windGifRegions[windGifIdx].name">
+          </div>
+        </div>
+        <div class="highlight-eyebrow">Highlight</div>
+        <h2 class="highlight-title">Mapping Hurricane Lala's Winds, Hour by Hour</h2>
+        <div class="highlight-body">
+          When Hurricane Lala passed just south of the islands on August 14–16, its winds did not treat every place the same. Some areas got dangerous gusts while other areas a few miles away stayed almost calm.  So how do we know what the wind was doing in all the places where nobody was measuring it?
+          <br>
+          <br>
+          We start with real measurements. Every hour, dozens of weather stations across Hawaiʻi, including the Hawaiʻi Mesonet, record the wind's speed and direction. But stations can't be everywhere, so a computer model combines each hour's readings with the shape of the land. Hawaiʻi's extreme landscape can speed winds up as they squeeze over ridges and through valleys, and can even change the direction the wind blows. The model uses this to fill in a wind estimate for every spot on every island, one map for each hour. When the maps are played in order, like a flip-book, they tell the story of the whole storm.
+          <br>
+          <br>
+          This is an experimental process that the Hawaiʻi Climate Data Portal (HCDP) is still developing and testing. The goal is a big one: to vastly improve our understanding of how wind moves across our islands, during hurricanes like Lala, and on ordinary trade-wind days, so scientists, land managers and communities can see the wind, not just feel it.
+          <br>
+          <br>
+          Looking at the sequence of wind maps, notice that stronger winds tend to be found along ridgelines, as expected. What might be surprising is that the strongest winds are often seen on the leeward slopes, for example on the western slopes of Hawaiʻi Island's volcanoes late on August 15. Storm winds can be intensified on the leeward slopes of mountains. As air is forced over a ridge and descends the other side, it can accelerate downslope, much like water speeding up as it flows downhill. Mountain-wave effects can further enhance this acceleration, producing localized areas of exceptionally strong winds well down the leeward slope.
+        </div>
       </div>
     </div>
   </section>
@@ -221,14 +248,16 @@
     </div>
   </section>
   <section class="storm-highlights">
-    <div class="highlight-card">
-      <div class="highlight-eyebrow">Highlight</div>
-      <h2 class="highlight-title">Observed Conditions Closely Matched the NWS Forecast</h2>
-      <div class="highlight-body">
-        The patterns of rainfall measured by the Hawaiʻi Mesonet and gridded by the HCDP during Hurricane Lala tracked closely with the National Weather Service's forecast issued ahead of the storm. While the actual storm totals were higher than the forecast, exceeding 45 inches in spots, the placement of the heaviest rainfall lined up well with the NWS outlook below, validating the guidance that communities relied on in the days leading up to the storm.
+    <div class="highlight-card highlight-card--forecast">
+      <div class="highlight-media forecast-media">
+        <img src="data/hurricane-lala/nws_forecast.PNG" alt="NWS forecast for Hurricane Lala">
       </div>
-      <div class="highlight-media">
-        <img src="data/hurricane-lala/nws_forecast.PNG" alt="NWS forecast for Hurricane Lala" style="width: 50%; height: auto; margin: 0 auto;">
+      <div class="forecast-text">
+        <div class="highlight-eyebrow">Highlight</div>
+        <h2 class="highlight-title">Observed Conditions Closely Matched the NWS Forecast</h2>
+        <div class="highlight-body">
+          The patterns of rainfall measured by the Hawaiʻi Mesonet and gridded by the HCDP during Hurricane Lala tracked closely with the National Weather Service's forecast issued ahead of the storm. While the actual storm totals were higher than the forecast, exceeding 45 inches in spots, the placement of the heaviest rainfall lined up well with the NWS outlook below, validating the guidance that communities relied on in the days leading up to the storm.
+        </div>
       </div>
     </div>
   </section>

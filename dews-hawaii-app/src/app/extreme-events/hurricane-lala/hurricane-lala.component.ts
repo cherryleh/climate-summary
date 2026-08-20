@@ -134,6 +134,8 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
   windTickLabels: { value: number; pct: number; shift: string }[] = [];
 
   selectedWho = 'No station selected';
+  selectedName = '';
+  selectedMeta = '';
   rainStatText = '';
   windStatText = '';
   windLegendShow = false;
@@ -1029,12 +1031,18 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  mesonetUrl(id: string): string {
+    return `https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/dashboard?id=${id}`;
+  }
+
   // ----------------------------------------------------------- orchestration
   async select(id: string) {
     this.selected = id;
     this.highlight('rain'); this.highlight('wind');
     const st = this.stationById.get(id)!;
     this.selectedWho = `${st.name} (${id}) · ${st.elev} m`;
+    this.selectedName = `${st.name} (${id})`;
+    this.selectedMeta = `· ${st.elev} m`;
     try {
       const [d0, d1] = this.span(this.dayIdx);
       if (d1 > d0) await this.ensureSpan(d0, d1);      // cumulative mode needs every earlier day

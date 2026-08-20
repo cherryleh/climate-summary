@@ -171,6 +171,16 @@ main {
 .readout b { color: var(--text-primary); font-weight: 700; }
 .readout i { width: 10px; height: 10px; border-radius: 3px; display: block; border: 1px solid var(--border); flex: 0 0 auto; }
 
+.maplogos {
+  position: absolute; bottom: 10px; left: 54px; z-index: 650; pointer-events: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.maplogos img {
+  height: 28px; width: auto; display: block;
+  filter: drop-shadow(0 1px 3px rgba(15,23,42,.35));
+}
+.maplogos img.logo-mesonet { height: 38px; }
+
 .legend { display: flex; align-items: center; gap: 10px; padding: 14px 22px 2px; font-size: 11px; color: var(--muted); }
 .legend .unit { white-space: nowrap; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: 10.5px; }
 .legend .ramp { flex: 1; min-width: 0; }
@@ -187,6 +197,8 @@ main {
 .chartwrap { padding: 18px 22px 22px; }
 .charthead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-height: 30px; }
 .charthead .who { font-size: 0.98rem; font-weight: 800; color: var(--text-primary); }
+.charthead .who a { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); text-underline-offset: 3px; }
+.charthead .who a:hover { text-decoration-color: var(--accent); }
 .charthead .stat { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .serieskey { display: flex; gap: 10px; font-size: 11px; color: var(--text-secondary); }
 .serieskey span { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
@@ -235,6 +247,31 @@ svg.chart.hidden { display: none; }
 .highlight-body { font-size: 1rem; line-height: 1.7; color: var(--text-secondary); text-align: justify; }
 .highlight-media img { width: 100%; display: block; border-radius: 16px; border: 1px solid var(--border); }
 .wind-gif-media img { width: min(600px, 100%); margin: 0 auto; }
+
+.highlight-card--forecast { flex-direction: row; align-items: center; }
+.highlight-card--forecast .forecast-media { flex: 0 0 45%; margin: 0; }
+.highlight-card--forecast .forecast-media img { width: 100%; }
+.highlight-card--forecast .forecast-text { display: flex; flex-direction: column; gap: 16px; }
+
+@media (max-width: 800px) {
+  .highlight-card--forecast { flex-direction: column; }
+  .highlight-card--forecast .forecast-media { flex: 0 0 auto; width: 100%; }
+}
+
+.highlight-card--wind .wind-flow::after { content: ''; display: table; clear: both; }
+.highlight-card--wind .wind-media {
+  float: right; width: min(600px, 55%); margin: 26px 0 16px 24px;
+  display: flex; flex-direction: column; gap: 16px; align-items: center;
+}
+.highlight-card--wind .wind-media .wind-gif-media { margin: 0; width: 100%; }
+.highlight-card--wind .wind-media .wind-gif-media img { width: 100%; margin: 0; }
+.highlight-card--wind .highlight-eyebrow { margin-bottom: 8px; }
+.highlight-card--wind .highlight-title { margin-bottom: 14px; }
+.highlight-card--wind .highlight-body { text-align: justify; font-size: 0.92rem; line-height: 1.5; }
+
+@media (max-width: 800px) {
+  .highlight-card--wind .wind-media { float: none; width: 100%; margin: 0; }
+}
 
 @media (max-width: 480px) {
   .stat-row { grid-template-columns: 1fr; }
