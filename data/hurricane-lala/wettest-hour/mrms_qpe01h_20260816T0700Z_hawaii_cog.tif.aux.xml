@@ -1,0 +1,25 @@
+<PAMDataset>
+  <Metadata>
+    <MDI key="ACCUMULATION">1 hour</MDI>
+    <MDI key="CREDIT">NOAA/NSSL Multi-Radar Multi-Sensor (MRMS)</MDI>
+    <MDI key="CROP">Hawaii County box -156.243,-154.668,18.849,20.334</MDI>
+    <MDI key="MASK_REFERENCE">rainfall_cday_statewide_2026-08-14.tif</MDI>
+    <MDI key="OVERVIEW_RESAMPLING">AVERAGE</MDI>
+    <MDI key="PROCESSING">reprojected to EPSG:4326; land-masked using HCDP rainfall_cday_statewide_2026-08-14.tif footprint (resampled to this grid via average, ocean = HCDP nodata); any negative left (MRMS no-coverage -3, missing -1) set to nodata -9999; float32</MDI>
+    <MDI key="PRODUCT">MRMS MultiSensor_QPE_01H_Pass1</MDI>
+    <MDI key="PROJECT_URL">https://www.nssl.noaa.gov/projects/mrms/</MDI>
+    <MDI key="SOURCE_FILE">MRMS_MultiSensor_QPE_01H_Pass1_00.00_20260816-070000_epsg4326_landmasked.tif</MDI>
+    <MDI key="UNITS">mm</MDI>
+    <MDI key="VALID_TIME_UTC">2026-08-16T07:00:00Z</MDI>
+    <MDI key="VALID_WINDOW_HST">2026-08-15 20:00-21:00</MDI>
+  </Metadata>
+  <PAMRasterBand band="1">
+    <Metadata>
+      <MDI key="STATISTICS_MAXIMUM">96.400001525879</MDI>
+      <MDI key="STATISTICS_MEAN">12.010203364286</MDI>
+      <MDI key="STATISTICS_MINIMUM">4.4703483581543e-08</MDI>
+      <MDI key="STATISTICS_STDDEV">11.427582390324</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">39.52</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>
