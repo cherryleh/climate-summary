@@ -88,7 +88,10 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
     wind: { dir: 'data/hurricane-lala/wind', stem: 'wind_max', unit: v => v * this.MPH_PER_MS }
   };
 
-  private readonly TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+  // Voyager over the plain "light_all" style — same CARTO tile set, but its
+  // ocean fill reads as a clear blue instead of near-white, which reads
+  // better behind these storm maps.
+  private readonly TILE_URL = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 
   // Transcribed from extents_hi_counties.csv. Statewide is the union of the
   // four counties, matching the bounds of the HCDP statewide rasters exactly.
