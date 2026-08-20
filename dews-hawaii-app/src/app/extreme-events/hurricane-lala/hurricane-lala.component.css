@@ -98,8 +98,27 @@ main {
   overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 .sourcenote, .scalenote { align-self: start; }
-.phead { padding: 20px 22px 2px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.phead { padding: 20px 22px 2px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .phead h2 { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary); }
+
+.info-icon {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--muted);
+  color: var(--muted); font-size: 11px; font-weight: 700; font-style: italic;
+  font-family: Georgia, 'Times New Roman', serif; cursor: help; user-select: none;
+}
+.info-icon:hover, .info-icon:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.info-tooltip {
+  position: absolute; top: calc(100% + 8px); right: 0; width: min(300px, 80vw);
+  background: var(--text-primary); color: #fff; font-family: var(--app-font); font-size: 12px; font-weight: 400;
+  font-style: normal; line-height: 1.5; border-radius: 8px; padding: 10px 12px;
+  box-shadow: 0 6px 18px rgba(15,23,42,.25); opacity: 0; visibility: hidden;
+  pointer-events: none; transition: opacity .15s ease, transform .15s ease;
+  transform: translateY(4px); z-index: 1300;
+}
+.info-icon:hover .info-tooltip, .info-icon:focus-visible .info-tooltip {
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
 
 .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px 22px 2px; }
 .stat-card { background: var(--card); border-radius: 10px; padding: 8px 10px; }
