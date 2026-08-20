@@ -650,7 +650,8 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
     try {
       tiff = await GeoTIFF.fromUrl(url);
     } catch (e) {
-      throw new Error(`could not reach ${url} — the COG for this day may be missing`);
+      console.error(`could not reach ${url} — the COG for this day may be missing`, e);
+      throw new Error('please refresh the page');
     }
     const image = await tiff.getImage();
     const [xmin, ymin, xmax, ymax] = image.getBoundingBox() as [number, number, number, number];
@@ -713,7 +714,7 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
       this.gridOverlay[kind] = layer;
       this.renderStats(kind);
     } catch (e: any) {
-      this.setStatus(`${kind === 'rain' ? 'rainfall' : 'wind'} grid unavailable — ${e.message}`, true);
+      this.setStatus(`couldn't load the ${kind === 'rain' ? 'rainfall' : 'wind'} grid — ${e.message}`, true);
     }
   }
 
@@ -1090,10 +1091,10 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
     this.daysLoading = true;
     try {
       const [d0, d1] = this.span(i);
+      this.refreshGrids();                    // independent of station data — starts right away
+      this.refreshStats();
       await this.ensureSpan(d0, d1);          // cumulative markers need the earlier days too
       this.drawMarkers();
-      this.refreshGrids();                    // fire and forget; the grids trail the markers
-      this.refreshStats();
       if (this.selected && this.dayCache.get(this.dayIdx)?.has(this.selected)) this.renderStation(this.selected);
     } catch (e: any) {
       this.setStatus(e.message, true);
@@ -1110,10 +1111,10 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
     this.updateChartHints();
     try {
       const [d0, d1] = this.span(this.dayIdx);
+      this.refreshGrids();                    // independent of station data — starts right away
+      this.refreshStats();
       if (d1 > d0) await this.ensureSpan(d0, d1);
       this.drawMarkers();                     // markers follow the toggle as well
-      this.refreshGrids();
-      this.refreshStats();
       if (this.selected) this.renderStation(this.selected);
     } catch (e: any) {
       this.setStatus(e.message, true);
