@@ -1,0 +1,77 @@
+<div class="boot" *ngIf="loading">
+  <div class="bootcard">
+    <div class="boottitle">The Wettest Hour of the Storm</div>
+    <div class="bootbar"><i [style.width.%]="loadPct"></i></div>
+    <div class="bootpct">{{ loadPct }}%</div>
+  </div>
+</div>
+
+<div class="status" [class.err]="statusErr">{{ statusMsg }}</div>
+
+<main>
+  <section class="panel">
+    <div class="map-wrap">
+      <div class="map" #map></div>
+      <div class="mapcorner">
+        <div class="readout" *ngIf="readout.show">
+          <i [style.background]="readout.color"></i>
+          <b>{{ readout.value }}</b>
+          <span>radar · {{ readout.coord }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <span class="unit">in / hr (log)</span>
+      <div class="ramp">
+        <div class="rampbar" [style.background]="rampStyle"></div>
+        <div class="rampticks">
+          <span *ngFor="let t of tickLabels" [style.left.%]="t.pct" [style.transform]="'translateX(' + t.shift + ')'">{{ t.value }}</span>
+        </div>
+      </div>
+    </div>
+    <p class="sourcenote">
+      Surface: <b>{{ credit }}</b> —
+      <a href="https://www.nssl.noaa.gov/projects/mrms/" target="_blank" rel="noopener">NOAA/NSSL Multi-Radar Multi-Sensor project</a>.
+      Markers: Hawaiʻi Mesonet tipping-bucket gauges via the
+      <a href="https://hcdp.github.io/hcdp_api_docs/" target="_blank" rel="noopener">HCDP API</a>.
+    </p>
+    <p class="scalenote">{{ note }}</p>
+  </section>
+
+  <div class="col-right">
+    <section class="panel">
+      <div class="chartwrap">
+        <div class="charthead">
+          <span class="who">{{ who }}</span>
+          <span class="stat">{{ stat }}</span>
+        </div>
+        <div class="pair" *ngIf="showPair">
+          <div>gauge, this hour<b>{{ vGauge }}</b></div>
+          <div>radar, at this gauge<b>{{ vRadar }}</b></div>
+          <div>rank among gauges<b>{{ vRank }}</b></div>
+          <div>gauge, whole day<b>{{ vDay }}</b></div>
+        </div>
+        <div class="empty" *ngIf="!selected">Click a gauge on the map to plot its rainfall across the whole day, five minutes at a time, with the mapped hour highlighted.</div>
+        <svg class="chart" [class.hidden]="!selected" #chart role="img"></svg>
+        <p class="chartnote">{{ chartNote }}</p>
+      </div>
+    </section>
+
+    <section class="panel blurb">
+      <h2>Why this hour</h2>
+      <p>Of every station-hour in the three days of this storm, <b>none was heavier than this
+         one</b>. <b>Kaiholena (0231)</b>, up the slope in Kaʻū, took <b>4.37 inches in the sixty
+         minutes to 20:30 HST</b> — more than half again the next-heaviest gauge anywhere on the
+         island that hour, Kona Hema at 2.64 in/hr. The radar has <b>2.67 in/hr falling on
+         Nāʻālehu itself</b>, 11 km down the slope from Kaiholena.</p>
+      <p>That is the hour <b>Nāʻālehu flooded</b>, and the reason is not in any daily table:
+         <b>flooding follows the rate, not the total</b>. Kaiholena's 24.41 in for the day ranks
+         only <b>fourth</b> on the island. The island's wettest gauge for the day was
+         <b>Laupāhoehoe with 32.12 in</b> — a third more rain — but it was taking it at
+         <b>1.95 in/hr</b> during this same hour, hard rain that the ground and the streams could
+         still carry. Rain that arrives in an hour has nowhere to go.</p>
+    </section>
+  </div>
+</main>
+
+<div class="tip" #tip></div>

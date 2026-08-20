@@ -215,6 +215,7 @@ svg.chart.hidden { display: none; }
 .highlight-title { margin: 0; text-align: left; font-size: 1.45rem; line-height: 1.2; color: var(--text-primary); }
 .highlight-body { font-size: 1rem; line-height: 1.7; color: var(--text-secondary); text-align: justify; }
 .highlight-media img { width: 100%; display: block; border-radius: 16px; border: 1px solid var(--border); }
+.wind-gif-media img { width: min(600px, 100%); margin: 0 auto; }
 
 @media (max-width: 480px) {
   .stat-row { grid-template-columns: 1fr; }

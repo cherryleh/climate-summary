@@ -6,6 +6,7 @@ import * as L from 'leaflet';
 import * as GeoTIFF from 'geotiff';
 import { Pool } from 'geotiff';
 import { environment } from '../../../environments/environment';
+import { WettestHourComponent } from './wettest-hour/wettest-hour.component';
 
 type Kind = 'rain' | 'wind';
 type Mode = 'day' | 'cum';
@@ -53,7 +54,7 @@ interface ChartOpts {
 @Component({
   selector: 'app-hurricane-lala',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, WettestHourComponent],
   templateUrl: './hurricane-lala.component.html',
   styleUrl: './hurricane-lala.component.css'
 })
@@ -147,6 +148,22 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
   bootVisible = true;
   bootOpacity = 1;
   bootPct = 0;
+
+  // Hourly wind-speed gif for the highlight card, one per region — same
+  // region set as the map's Region buttons above.
+  readonly windGifRegions: { name: string; code: string }[] = [
+    { name: 'Statewide', code: 'statewide' },
+    { name: 'Kauai', code: 'KA' },
+    { name: 'Oahu', code: 'OA' },
+    { name: 'Maui', code: 'MN' },
+    { name: 'Hawaii', code: 'BI' }
+  ];
+  windGifIdx = 0;
+
+  get windGifSrc(): string {
+    const code = this.windGifRegions[this.windGifIdx].code;
+    return `data/hurricane-lala/wind_gifs/wind_${code}_20260815_hourly_mph.gif`;
+  }
 
   // ------------------------------------------------------------- internal state
   private stations: Station[] = [];

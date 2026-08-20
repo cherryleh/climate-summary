@@ -59,7 +59,7 @@
       <div class="phead">
         <h2>Rainfall</h2>
       </div>
-      <div class="stat-row" title="Spatial statistics of the map grid, over the selected domain">
+      <div class="stat-row" title="These statistics represent the average, minimum, or maximum values over all grid point pixels in the selected map region. Daily maps represent the sum total of rainfall and the average wind speed over the 24 hour period for the selected day, and cumulative maps represent the sum of the selected day's values with all prior days in the event period.">
         <div class="stat-card">
           <div class="stat-card-title">Map grid &middot; Daily (in)</div>
           <div class="stat-grid">
@@ -120,7 +120,7 @@
       <div class="phead">
         <h2>Wind speed</h2>
       </div>
-      <div class="stat-row" title="Spatial statistics of the map grid, over the selected domain">
+      <div class="stat-row" title="These statistics represent the average, minimum, or maximum values over all grid point pixels in the selected map region. Daily maps represent the sum total of rainfall and the average wind speed over the 24 hour period for the selected day, and cumulative maps represent the sum of the selected day's values with all prior days in the event period.">
         <div class="stat-card">
           <div class="stat-card-title">Map grid &middot; Daily (mph)</div>
           <div class="stat-grid">
@@ -186,6 +186,35 @@
   <section class="storm-highlights">
     <div class="highlight-card">
       <div class="highlight-eyebrow">Highlight</div>
+      <h2 class="highlight-title">Wind</h2>
+      <div class="highlight-body">
+        Text
+      </div>
+      <div class="buttons" role="group" aria-label="Wind gif region">
+        <button type="button" *ngFor="let r of windGifRegions; let i = index"
+          [class.active]="windGifIdx === i"
+          (click)="windGifIdx = i">{{ r.name }}</button>
+      </div>
+      <div class="highlight-media wind-gif-media">
+        <img [src]="windGifSrc" [alt]="'Hourly wind speed animation — ' + windGifRegions[windGifIdx].name">
+      </div>
+    </div>
+  </section>
+  <section class="storm-highlights">
+    <div class="highlight-card">
+      <div class="highlight-eyebrow">Highlight</div>
+      <h2 class="highlight-title">The Wettest Hour of the Storm</h2>
+      <div class="highlight-body">
+        Hawaiʻi Island. Mesonet gauges for 19:30–20:30 HST, 15 Aug 2026, over the radar-derived hourly rainfall field. Both are inches per hour on one log-spaced radar ramp. Click a gauge to plot its whole day with that hour banded; hover the map for the radar value.
+      </div>
+      <div class="highlight-media">
+        <app-wettest-hour></app-wettest-hour>
+      </div>
+    </div>
+  </section>
+  <section class="storm-highlights">
+    <div class="highlight-card">
+      <div class="highlight-eyebrow">Highlight</div>
       <h2 class="highlight-title">Observed Conditions Closely Matched the NWS Forecast</h2>
       <div class="highlight-body">
         The rainfall and wind measured by the Hawaiʻi Mesonet and gridded by the HCDP during Hurricane Lala tracked
@@ -199,18 +228,7 @@
     </div>
   </section>
 
-  <section class="storm-highlights">
-    <div class="highlight-card">
-      <div class="highlight-eyebrow">Highlight</div>
-      <h2 class="highlight-title">Wind</h2>
-      <div class="highlight-body">
 
-      </div>
-      <div class="highlight-media">
-
-      </div>
-    </div>
-  </section>
 
 </div>
 
