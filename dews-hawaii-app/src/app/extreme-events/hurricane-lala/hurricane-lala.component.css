@@ -1,0 +1,198 @@
+:host {
+  --surface-1: #ffffff;
+  --plane: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --muted: #64748b;
+  --grid: #e2e8f0;
+  --axis: #cbd5e1;
+  --border: #e2e8f0;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #eff6ff;
+  --accent-soft-border: #93c5fd;
+  --card: #f1f5f9;
+  --accent-rain: #2563eb;
+  --accent-wind: #d03b3b;   /* red: the sustained wind trace */
+  --accent-gust: #fb7744;   /* orange: the gust trace, always sitting above */
+  --accent-mark: #5c3617;   /* brown: the vertical rule on the peak */
+  /* The same spectral ramp on both maps, run in opposite directions:
+       rainfall  low -> high = red -> purple
+       wind      low -> high = purple -> red
+     A hue sweep, not a lightness ramp, so the legend carries the ordering. */
+  --rain-1:#ff0000; --rain-2:#ff8000; --rain-3:#ffff00; --rain-4:#00ff00;
+  --rain-5:#00ffff; --rain-6:#0000ff; --rain-7:#8b00ff;
+  --wind-1:#8b00ff; --wind-2:#0000ff; --wind-3:#00ffff; --wind-4:#00ff00;
+  --wind-5:#ffff00; --wind-6:#ff8000; --wind-7:#ff0000;
+
+  display: block;
+  background: var(--plane); color: var(--text-primary);
+  font: 14px/1.45 "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.app-header {
+  width: 100%; text-align: center; padding: 28px 20px 6px; background: var(--plane);
+}
+.app-header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); }
+.app-header .subtitle { margin: 6px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
+
+.page { width: min(1280px, 100%); margin: 0 auto; padding: 10px 20px 40px; }
+
+.intro {
+  width: min(980px, 100%); margin: 8px auto 26px; text-align:justify;
+  font-size: 0.95rem; line-height: 1.55; color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------- controls */
+.controls-panel { width: min(1000px, 100%); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.controls-bar { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 22px; }
+.control-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.control-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+.toggle-wrap {
+  display: flex; align-items: center; gap: 10px; background: var(--surface-1);
+  border: 1px solid var(--border); border-radius: 999px; padding: 9px 14px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+}
+.toggle-wrap span { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+.switch { position: relative; display: inline-block; width: 46px; height: 25px; flex: 0 0 auto; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider { position: absolute; inset: 0; cursor: pointer; background: #cbd5e1; border-radius: 999px; transition: background .2s ease; }
+.switch .slider::before {
+  content: ""; position: absolute; left: 3px; top: 3px; width: 19px; height: 19px;
+  background: #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(15,23,42,.25); transition: transform .2s ease;
+}
+.switch input:checked + .slider { background: var(--accent); }
+.switch input:checked + .slider::before { transform: translateX(21px); }
+
+.buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.buttons button {
+  font: inherit; border: 1px solid #cbd5e1; background: var(--surface-1); color: var(--text-primary);
+  padding: 9px 15px; border-radius: 10px; cursor: pointer; font-size: 0.87rem; font-weight: 600;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.buttons button:hover { background: var(--accent-soft); border-color: var(--accent-soft-border); color: var(--accent-hover); }
+.buttons button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.buttons button:disabled { opacity: .5; cursor: progress; }
+
+.status { font-size: 12px; color: var(--muted); min-height: 1.2em; text-align: center; }
+.status.err { color: #dc2626; font-weight: 600; }
+
+/* ---------------------------------------------------------------- panels */
+main {
+  /* row-gap must stay 0 — each panel's rows are a subgrid of these, so any
+     row-gap set here would land between every section inside each panel too,
+     not just between the two side-by-side panels. */
+  display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; row-gap: 0;
+  grid-template-rows: repeat(7, auto);
+}
+.panel { display: grid; grid-row: span 7; grid-template-rows: subgrid; align-content: start; }
+@media (max-width: 960px) {
+  main { grid-template-columns: 1fr; grid-template-rows: none; }
+  .panel { display: block; grid-row: auto; }
+}
+
+.panel {
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 24px;
+  overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+.sourcenote, .scalenote { align-self: start; }
+.phead { padding: 20px 22px 2px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.phead h2 { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary); }
+
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px 22px 2px; }
+.stat-card { background: var(--card); border-radius: 10px; padding: 6px 9px; }
+.stat-card-title {
+  font-size: 0.56rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 3px;
+}
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+.stat-item { text-align: center; }
+.stat-item h3 { margin: 0; font-size: 0.52rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+.stat-item p { margin: 0; font-size: 0.78rem; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+/* map-wrap holds the Leaflet container plus the plain Angular-bound overlay
+   controls (layer toggle, hover readout) that sit on top of it — kept as
+   siblings of the Leaflet container rather than Leaflet controls, since
+   Leaflet takes ownership of its container's children. */
+.map-wrap { position: relative; margin: 4px 22px 0; }
+.map { height: 420px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: var(--card); }
+
+.mapcorner {
+  position: absolute; top: 10px; right: 10px; z-index: 650;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  pointer-events: none;
+}
+.mapcorner > * { pointer-events: auto; }
+
+.layertoggle {
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font-size: 11.5px; color: var(--text-secondary);
+  box-shadow: 0 1px 4px rgba(15,23,42,.14); display: flex; flex-direction: column; gap: 5px;
+}
+.layertoggle label { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; white-space: nowrap; }
+.layertoggle input[type="checkbox"] { width: 14px; height: 14px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+
+.readout {
+  pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 5px 10px; font-size: 11px; color: var(--text-secondary);
+  font-variant-numeric: tabular-nums; box-shadow: 0 3px 10px rgba(15,23,42,.14);
+  display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  width: max-content; max-width: 100%;
+}
+.readout b { color: var(--text-primary); font-weight: 700; }
+.readout i { width: 10px; height: 10px; border-radius: 3px; display: block; border: 1px solid var(--border); flex: 0 0 auto; }
+
+.legend { display: flex; align-items: center; gap: 10px; padding: 14px 22px 2px; font-size: 11px; color: var(--muted); }
+.legend .unit { white-space: nowrap; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: 10.5px; }
+.legend .ramp { flex: 1; min-width: 0; }
+.legend .rampbar { height: 9px; border-radius: 5px; }
+.legend .rampticks { position: relative; height: 15px; }
+.legend .rampticks span {
+  position: absolute; top: 2px; font-size: 10px; white-space: nowrap;
+  font-variant-numeric: tabular-nums; color: var(--muted);
+}
+
+.sourcenote { margin: 10px 22px 0; padding: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.scalenote { margin: 0; padding: 8px 22px 18px; font-size: 12px; color: var(--muted); border-bottom: 1px solid var(--border); }
+
+.chartwrap { padding: 18px 22px 22px; }
+.charthead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-height: 30px; }
+.charthead .who { font-size: 0.98rem; font-weight: 800; color: var(--text-primary); }
+.charthead .stat { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.serieskey { display: flex; gap: 10px; font-size: 11px; color: var(--text-secondary); }
+.serieskey span { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.serieskey i { width: 12px; height: 2px; border-radius: 1px; display: block; }
+svg.chart { display: block; width: calc(100% + 44px); height: 210px; touch-action: none; margin: 10px -22px 0; }
+svg.chart.hidden { display: none; }
+.empty { height: 210px; display: grid; place-items: center; color: var(--muted); font-size: 12px; text-align: center; padding: 0 20px; }
+.tip {
+  position: fixed; pointer-events: none; z-index: 1200; background: var(--text-primary);
+  color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 12px;
+  box-shadow: 0 6px 18px rgba(15,23,42,.25); white-space: nowrap; opacity: 0; transition: opacity .1s;
+  font-variant-numeric: tabular-nums; left: 0; top: 0;
+}
+
+.leaflet-container { background: var(--card); font: inherit; }
+
+/* First-load cover. The app renders underneath it so Leaflet can measure its
+   containers properly; this just sits on top until the data is in. */
+.boot {
+  position: fixed; inset: 0; z-index: 2000; background: var(--plane);
+  display: grid; place-items: center; transition: opacity .35s ease;
+}
+.bootcard {
+  width: min(300px, 70vw); text-align: center; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 20px; padding: 26px; box-shadow: 0 10px 30px rgba(15,23,42,.08);
+}
+.boottitle { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
+.bootbar { height: 7px; border-radius: 4px; background: var(--grid); overflow: hidden; }
+.bootbar i {
+  display: block; height: 100%; border-radius: 4px;
+  background: var(--accent); transition: width .3s ease;
+}
+.bootpct { margin-top: 9px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 480px) {
+  .stat-row { grid-template-columns: 1fr; }
+}

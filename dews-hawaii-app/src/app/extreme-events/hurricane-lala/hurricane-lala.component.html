@@ -1,0 +1,190 @@
+<div class="boot" *ngIf="bootVisible" [style.opacity]="bootOpacity">
+  <div class="bootcard">
+    <div class="boottitle">Hurricane Lala</div>
+    <div class="bootbar"><i [style.width.%]="bootPct"></i></div>
+    <div class="bootpct">{{ bootPct }}%</div>
+  </div>
+</div>
+
+<header class="app-header">
+  <h1>Hurricane Lala</h1>
+  <p class="subtitle">Aug 14–16, 2026 (HST)</p>
+</header>
+
+<div class="page">
+  <p class="intro">
+    From August 14 to August 16, Hurricane Lala tracked just south of the Hawaiian Islands, delivering the state's most significant tropical cyclone impacts in decades. While Lala never made an official landfall, its close pass skirting the south side of Hawaiʻi Island as a Category 1 hurricane was enough to bring torrential rainfall, damaging winds, and widespread flooding across the state. Now that the storm has moved on, the Hawaiʻi Climate Data Portal (HCDP) and the Hawaiʻi Mesonet are helping tell the story of just how much rain and wind different parts of the islands experienced.
+  </p>
+
+  <div class="controls-panel">
+    <div class="controls-bar">
+      <div class="control-group">
+        <div class="control-label">Mode</div>
+        <div class="toggle-wrap">
+          <span>Day</span>
+          <label class="switch">
+            <input type="checkbox" [checked]="mode === 'cum'" (change)="onModeToggle($event)">
+            <span class="slider"></span>
+          </label>
+          <span>Cumulative</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">Day</div>
+        <div class="buttons" role="group" aria-label="Day">
+          <button type="button" *ngFor="let d of DAYS; let i = index"
+            [class.active]="dayIdx === i" [disabled]="daysLoading"
+            (click)="setDay(i)">{{ dayLabel(d) }}</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">Region</div>
+        <div class="buttons" role="group" aria-label="Map extent">
+          <button type="button" *ngFor="let e of extents; let i = index"
+            [class.active]="activeExtentIdx === i" [title]="'Zoom to ' + e.name"
+            (click)="zoomTo(i)">{{ e.name }}</button>
+        </div>
+      </div>
+    </div>
+    <div class="status" [class.err]="statusErr" role="status">{{ statusMsg }}</div>
+  </div>
+
+  <main>
+    <section class="panel">
+      <div class="phead">
+        <h2>Rainfall</h2>
+      </div>
+      <div class="stat-row" title="Spatial statistics of the map grid, over the selected domain">
+        <div class="stat-card">
+          <div class="stat-card-title">Map grid &middot; Daily (in)</div>
+          <div class="stat-grid">
+            <div class="stat-item"><h3>Min</h3><p>{{ statCell(statsRain.day, 'min', 2) }}</p></div>
+            <div class="stat-item"><h3>Mean</h3><p>{{ statCell(statsRain.day, 'mean', 2) }}</p></div>
+            <div class="stat-item"><h3>Max</h3><p>{{ statCell(statsRain.day, 'max', 2) }}</p></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Map grid &middot; Cumulative (in)</div>
+          <div class="stat-grid">
+            <div class="stat-item"><h3>Min</h3><p>{{ statCell(statsRain.cum, 'min', 2) }}</p></div>
+            <div class="stat-item"><h3>Mean</h3><p>{{ statCell(statsRain.cum, 'mean', 2) }}</p></div>
+            <div class="stat-item"><h3>Max</h3><p>{{ statCell(statsRain.cum, 'max', 2) }}</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-wrap">
+        <div class="map" #mapRain></div>
+        <div class="mapcorner">
+          <div class="layertoggle">
+            <label><input type="checkbox" [checked]="gridOn.rain" (change)="onGridToggle('rain', $event)"> Grid</label>
+            <label><input type="checkbox" [checked]="stationsOn.rain" (change)="onStationsToggle('rain', $event)"> Stations</label>
+          </div>
+          <div class="readout" *ngIf="readoutRain.show">
+            <i [style.background]="readoutRain.color"></i>
+            <b>{{ readoutRain.value }}</b>
+            <span>{{ readoutRain.coord }}</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="sourcenote">Markers = station day total, summed on the client from 5-minute
+         <code>RF_1_Tot300s</code>. Surface = the HCDP statewide grid for the same window,
+         from <code>data/hurricane-lala/rf/</code>.</p>
+
+      <div class="legend">
+        <span class="unit">inches / day (log)</span>
+        <div class="ramp">
+          <div class="rampbar" [style.background]="rainRampStyle"></div>
+          <div class="rampticks">
+            <span *ngFor="let t of rainTickLabels" [style.left.%]="t.pct" [style.transform]="'translateX(' + t.shift + ')'">{{ t.value }}</span>
+          </div>
+        </div>
+      </div>
+      <p class="scalenote">Fixed 0&ndash;30 in scale, pseudo-log spaced &mdash; the same scale colours the
+         station markers and the gridded surface.</p>
+
+      <div class="chartwrap">
+        <div class="charthead">
+          <span class="who">{{ selected ? selectedWho : 'No station selected' }}</span>
+          <span class="stat">{{ rainStatText }}</span>
+        </div>
+        <div class="empty" *ngIf="!selected">{{ emptyRainText }}</div>
+        <svg class="chart" [class.hidden]="!selected" #chartRain role="img"></svg>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="phead">
+        <h2>Wind speed</h2>
+      </div>
+      <div class="stat-row" title="Spatial statistics of the map grid, over the selected domain">
+        <div class="stat-card">
+          <div class="stat-card-title">Map grid &middot; Daily (mph)</div>
+          <div class="stat-grid">
+            <div class="stat-item"><h3>Min</h3><p>{{ statCell(statsWind.day, 'min', 1) }}</p></div>
+            <div class="stat-item"><h3>Mean</h3><p>{{ statCell(statsWind.day, 'mean', 1) }}</p></div>
+            <div class="stat-item"><h3>Max</h3><p>{{ statCell(statsWind.day, 'max', 1) }}</p></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">Map grid &middot; Cumulative (mph)</div>
+          <div class="stat-grid">
+            <div class="stat-item"><h3>Min</h3><p>{{ statCell(statsWind.cum, 'min', 1) }}</p></div>
+            <div class="stat-item"><h3>Mean</h3><p>{{ statCell(statsWind.cum, 'mean', 1) }}</p></div>
+            <div class="stat-item"><h3>Max</h3><p>{{ statCell(statsWind.cum, 'max', 1) }}</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-wrap">
+        <div class="map" #mapWind></div>
+        <div class="mapcorner">
+          <div class="layertoggle">
+            <label><input type="checkbox" [checked]="gridOn.wind" (change)="onGridToggle('wind', $event)"> Grid</label>
+            <label><input type="checkbox" [checked]="stationsOn.wind" (change)="onStationsToggle('wind', $event)"> Stations</label>
+          </div>
+          <div class="readout" *ngIf="readoutWind.show">
+            <i [style.background]="readoutWind.color"></i>
+            <b>{{ readoutWind.value }}</b>
+            <span>{{ readoutWind.coord }}</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="sourcenote">Markers = station maximum, the highest 5-minute <code>WS_1_Avg</code>
+         over the window. Surface = the modelled statewide grid for the same window,
+         from <code>data/hurricane-lala/wind/</code>.</p>
+
+      <div class="legend">
+        <span class="unit">mph max (log)</span>
+        <div class="ramp">
+          <div class="rampbar" [style.background]="windRampStyle"></div>
+          <div class="rampticks">
+            <span *ngFor="let t of windTickLabels" [style.left.%]="t.pct" [style.transform]="'translateX(' + t.shift + ')'">{{ t.value }}</span>
+          </div>
+        </div>
+      </div>
+      <p class="scalenote">Fixed 0&ndash;60 mph scale, pseudo-log spaced &mdash; the same scale colours the
+         station markers and the gridded surface.</p>
+
+      <div class="chartwrap">
+        <div class="charthead">
+          <span class="who">{{ selected ? selectedWho : 'No station selected' }}</span>
+          <span class="stat">{{ windStatText }}</span>
+          <span class="spacer" style="flex:1"></span>
+          <span class="serieskey" *ngIf="windLegendShow">
+            <span><i style="background:var(--accent-wind)"></i>sustained</span>
+            <span><i style="background:var(--accent-gust)"></i>gust</span>
+          </span>
+        </div>
+        <div class="empty" *ngIf="!selected">{{ emptyWindText }}</div>
+        <svg class="chart" [class.hidden]="!selected" #chartWind role="img"></svg>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="tip" #tip></div>

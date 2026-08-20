@@ -7,25 +7,18 @@ import { ManagePreferencesComponent } from './manage-subscriptions/manage-subscr
 import { StormViewerComponent } from './storm-viewer/storm-viewer.component';
 import { StormViewerMarch20262Component } from './storm-viewer-march2026-2/storm-viewer-march2026-2.component';
 import { TutorialComponent } from './tutorial/tutorial.component';
+import { HurricaneLalaComponent } from './extreme-events/hurricane-lala/hurricane-lala.component';
 
 export const routes: Routes = [
-  {
-    path: '', component: ClimateDashboardV2Component
-  },
+  {path: '', component: ClimateDashboardV2Component},
   // {
   //   path: 'v1', component: ClimateDashboardComponent
   // },
-  {
-    path: 'climate-summary-2025', component: ClimateSummary2025Component
-  },
-  {
-    path: 'unsubscribe', component: UnsubscribeComponent
-  },
-  {
-    path: 'manage-preferences', component: ManagePreferencesComponent
-  },
+  {path: 'climate-summary-2025', component: ClimateSummary2025Component},
+  {path: 'unsubscribe', component: UnsubscribeComponent},
+  {path: 'manage-preferences', component: ManagePreferencesComponent},
   { path: 'storm-viewer', component: StormViewerComponent},
   { path: 'storm-viewer-march2026-2', component: StormViewerMarch20262Component},
-  { path: 'tutorial', component: TutorialComponent }
-
+  { path: 'tutorial', component: TutorialComponent },
+  { path: 'hurricane-lala', component: HurricaneLalaComponent }
 ];
