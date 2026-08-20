@@ -1,14 +1,17 @@
 <div class="boot" *ngIf="bootVisible" [style.opacity]="bootOpacity">
   <div class="bootcard">
-    <div class="boottitle">Hurricane Lala</div>
+    <img class="bootlogo" src="/logos/hcdp.png" alt="HCDP">
+    <div class="boottitle">HCDP - Hurricane Lala</div>
     <div class="bootbar"><i [style.width.%]="bootPct"></i></div>
     <div class="bootpct">{{ bootPct }}%</div>
   </div>
 </div>
 
 <header class="app-header">
+  <a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener">
+    <img src="logos/hcdp_text_bottom.png" alt="HCDP Logo" class="logo">
+  </a>
   <h1>Hurricane Lala</h1>
-  <p class="subtitle">Aug 14–16, 2026 (HST)</p>
 </header>
 
 <div class="page">
@@ -48,7 +51,7 @@
         </div>
       </div>
     </div>
-    <div class="status" [class.err]="statusErr" role="status">{{ statusMsg }}</div>
+    <div class="status" [class.err]="statusErr" role="status" *ngIf="statusErr">{{ statusMsg }}</div>
   </div>
 
   <main>
@@ -77,6 +80,7 @@
 
       <div class="map-wrap">
         <div class="map" #mapRain></div>
+        <div class="periodlabel">{{ periodLabel() }}</div>
         <div class="mapcorner">
           <div class="layertoggle">
             <label><input type="checkbox" [checked]="gridOn.rain" (change)="onGridToggle('rain', $event)"> Grid</label>
@@ -90,9 +94,6 @@
         </div>
       </div>
 
-      <p class="sourcenote">Markers = station day total, summed on the client from 5-minute
-         <code>RF_1_Tot300s</code>. Surface = the HCDP statewide grid for the same window,
-         from <code>data/hurricane-lala/rf/</code>.</p>
 
       <div class="legend">
         <span class="unit">inches / day (log)</span>
@@ -103,8 +104,7 @@
           </div>
         </div>
       </div>
-      <p class="scalenote">Fixed 0&ndash;30 in scale, pseudo-log spaced &mdash; the same scale colours the
-         station markers and the gridded surface.</p>
+
 
       <div class="chartwrap">
         <div class="charthead">
@@ -141,6 +141,7 @@
 
       <div class="map-wrap">
         <div class="map" #mapWind></div>
+        <div class="periodlabel">{{ periodLabel() }}</div>
         <div class="mapcorner">
           <div class="layertoggle">
             <label><input type="checkbox" [checked]="gridOn.wind" (change)="onGridToggle('wind', $event)"> Grid</label>
@@ -154,9 +155,6 @@
         </div>
       </div>
 
-      <p class="sourcenote">Markers = station maximum, the highest 5-minute <code>WS_1_Avg</code>
-         over the window. Surface = the modelled statewide grid for the same window,
-         from <code>data/hurricane-lala/wind/</code>.</p>
 
       <div class="legend">
         <span class="unit">mph max (log)</span>
@@ -167,8 +165,7 @@
           </div>
         </div>
       </div>
-      <p class="scalenote">Fixed 0&ndash;60 mph scale, pseudo-log spaced &mdash; the same scale colours the
-         station markers and the gridded surface.</p>
+
 
       <div class="chartwrap">
         <div class="charthead">

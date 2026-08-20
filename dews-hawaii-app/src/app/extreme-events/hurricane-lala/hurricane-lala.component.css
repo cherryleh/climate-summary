@@ -33,19 +33,20 @@
 .app-header {
   width: 100%; text-align: center; padding: 28px 20px 6px; background: var(--plane);
 }
+.app-header .logo { display: inline-block; max-height: 100px; width: auto; object-fit: contain; margin-bottom: 10px; }
 .app-header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); }
 .app-header .subtitle { margin: 6px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
 
 .page { width: min(1280px, 100%); margin: 0 auto; padding: 10px 20px 40px; }
 
 .intro {
-  width: min(980px, 100%); margin: 8px auto 26px; text-align:justify;
+  width: min(980px, 100%); margin: 8px auto 10px; text-align:justify;
   font-size: 0.95rem; line-height: 1.55; color: var(--text-secondary);
 }
 
 /* -------------------------------------------------------------- controls */
 .controls-panel { width: min(1000px, 100%); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.controls-bar { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 22px; }
+.controls-bar { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 22px; margin-bottom: 10px}
 .control-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .control-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 
@@ -101,15 +102,15 @@ main {
 .phead h2 { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary); }
 
 .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px 22px 2px; }
-.stat-card { background: var(--card); border-radius: 10px; padding: 6px 9px; }
+.stat-card { background: var(--card); border-radius: 10px; padding: 8px 10px; }
 .stat-card-title {
-  font-size: 0.56rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 3px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px;
 }
 .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
 .stat-item { text-align: center; }
-.stat-item h3 { margin: 0; font-size: 0.52rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
-.stat-item p { margin: 0; font-size: 0.78rem; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.stat-item h3 { margin: 0; font-size: 0.66rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+.stat-item p { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 
 /* map-wrap holds the Leaflet container plus the plain Angular-bound overlay
    controls (layer toggle, hover readout) that sit on top of it — kept as
@@ -124,6 +125,14 @@ main {
   pointer-events: none;
 }
 .mapcorner > * { pointer-events: auto; }
+
+.periodlabel {
+  position: absolute; top: 10px; left: 10px; z-index: 650; pointer-events: none;
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 5px 10px; font-size: 11px; font-weight: 600;
+  color: var(--text-secondary); box-shadow: 0 1px 4px rgba(15,23,42,.14);
+  white-space: nowrap;
+}
 
 .layertoggle {
   background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
@@ -185,6 +194,7 @@ svg.chart.hidden { display: none; }
   width: min(300px, 70vw); text-align: center; background: var(--surface-1); border: 1px solid var(--border);
   border-radius: 20px; padding: 26px; box-shadow: 0 10px 30px rgba(15,23,42,.08);
 }
+.bootlogo { display: block; max-width: 160px; height: auto; margin: 0 auto 16px; }
 .boottitle { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
 .bootbar { height: 7px; border-radius: 4px; background: var(--grid); overflow: hidden; }
 .bootbar i {

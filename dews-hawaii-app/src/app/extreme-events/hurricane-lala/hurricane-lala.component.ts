@@ -230,6 +230,11 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
     return new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
   }
 
+  /** What the map is currently showing — day + mode — for the corner label on each map. */
+  periodLabel(): string {
+    return `${this.dayLabel(this.DAYS[this.dayIdx])} (${this.mode === 'cum' ? 'Cumulative' : 'Daily'} map)`;
+  }
+
   private css(name: string): string {
     return getComputedStyle(this.host.nativeElement).getPropertyValue(name).trim();
   }
@@ -1090,7 +1095,6 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
       this.refreshGrids();
       this.refreshStats();
       if (this.selected) this.renderStation(this.selected);
-      this.setStatus(`${this.dayLabel(this.DAYS[this.dayIdx])} · ${this.mode === 'cum' ? 'cumulative from 14 Aug' : 'selected day only'}`);
     } catch (e: any) {
       this.setStatus(e.message, true);
     }
