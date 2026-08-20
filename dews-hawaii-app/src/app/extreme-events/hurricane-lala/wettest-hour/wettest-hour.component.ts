@@ -13,6 +13,7 @@ interface ParsedRaster {
   width: number; height: number;
   xmin: number; ymin: number; xmax: number; ymax: number;
   pixelWidth: number; pixelHeight: number;
+  noData: number | null;
 }
 
 @Component({
@@ -223,15 +224,19 @@ export class WettestHourComponent implements AfterViewInit, OnDestroy {
     const band = (await image.readRasters({
       samples: [0], interleave: true, resampleMethod: 'nearest', pool: this.tiffPool
     })) as Float32Array;
+    const noData = image.getGDALNoData();
     this.raster = {
       band, width, height, xmin, ymin, xmax, ymax,
       pixelWidth: (xmax - xmin) / width,
-      pixelHeight: (ymax - ymin) / height
+      pixelHeight: (ymax - ymin) / height,
+      noData
     };
   }
 
   private isNoData(v: number): boolean {
-    return v == null || !isFinite(v) || v < -1e30;
+    if (v == null || !isFinite(v) || v < -1e30) return true;
+    const nd = this.raster?.noData;
+    return nd != null && Math.abs(v - nd) < 1e-3;
   }
 
   /** Radar value under a point, in inches per hour, or null off the field. */
