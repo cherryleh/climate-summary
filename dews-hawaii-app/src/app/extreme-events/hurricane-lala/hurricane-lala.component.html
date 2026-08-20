@@ -1,6 +1,6 @@
 <div class="boot" *ngIf="bootVisible" [style.opacity]="bootOpacity">
   <div class="bootcard">
-    <img class="bootlogo" src="/logos/hcdp.png" alt="HCDP">
+    <img class="bootlogo" src="logos/hcdp.png" alt="HCDP">
     <div class="boottitle">HCDP - Hurricane Lala</div>
     <div class="bootbar"><i [style.width.%]="bootPct"></i></div>
     <div class="bootpct">{{ bootPct }}%</div>
@@ -182,6 +182,36 @@
       </div>
     </section>
   </main>
+
+  <section class="storm-highlights">
+    <div class="highlight-card">
+      <div class="highlight-eyebrow">Highlight</div>
+      <h2 class="highlight-title">Observed Conditions Closely Matched the NWS Forecast</h2>
+      <div class="highlight-body">
+        The rainfall and wind measured by the Hawaiʻi Mesonet and gridded by the HCDP during Hurricane Lala tracked
+        closely with the National Weather Service's forecast issued ahead of the storm. Both the placement of the
+        heaviest rainfall and the strongest wind impacts lined up well with the NWS outlook below, reinforcing the
+        forecast track and intensity guidance that communities relied on in the days leading up to the storm.
+      </div>
+      <div class="highlight-media">
+        <img src="data/hurricane-lala/nws_forecast.PNG" alt="NWS forecast for Hurricane Lala" style="width: 50%; height: auto; margin: 0 auto;">
+      </div>
+    </div>
+  </section>
+
+  <section class="storm-highlights">
+    <div class="highlight-card">
+      <div class="highlight-eyebrow">Highlight</div>
+      <h2 class="highlight-title">Wind</h2>
+      <div class="highlight-body">
+
+      </div>
+      <div class="highlight-media">
+
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <div class="tip" #tip></div>
