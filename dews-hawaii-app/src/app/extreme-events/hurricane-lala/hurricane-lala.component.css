@@ -30,6 +30,8 @@
   font: 14px/1.45 "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+*, *::before, *::after { box-sizing: border-box; }
+
 .app-header {
   width: 100%; text-align: center; padding: 28px 20px 6px; background: var(--plane);
 }
@@ -280,4 +282,22 @@ svg.chart.hidden { display: none; }
 
 @media (max-width: 480px) {
   .stat-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .page { padding: 10px 14px 32px; }
+  .intro { text-align: left; }
+  .controls-bar { gap: 16px; }
+
+  .phead { padding: 16px 14px 2px; }
+  .stat-row { padding: 10px 14px 2px; }
+  .map-wrap { margin: 4px 14px 0; }
+  .map { height: 280px; }
+  .legend { flex-direction: column; align-items: stretch; gap: 6px; padding: 14px 14px 2px; }
+  .chartwrap { padding: 16px 14px 20px; }
+  svg.chart { width: calc(100% + 28px); margin: 10px -14px 0; }
+
+  .highlight-card, .highlight-card--forecast, .highlight-card--wind { padding: 16px; }
+  .highlight-title { font-size: 1.2rem; }
+  .highlight-body, .highlight-card--wind .highlight-body { text-align: left; }
 }
