@@ -158,12 +158,12 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
   // region set as the map's Region buttons above.
   readonly windGifRegions: { name: string; code: string }[] = [
     { name: 'Statewide', code: 'statewide' },
-    { name: 'Kauai', code: 'KA' },
-    { name: 'Oahu', code: 'OA' },
+    { name: 'Hawaii', code: 'BI' },
     { name: 'Maui', code: 'MN' },
-    { name: 'Hawaii', code: 'BI' }
+    { name: 'Oahu', code: 'OA' },
+    { name: 'Kauai', code: 'KA' }
   ];
-  windGifIdx = 0;
+  windGifIdx = this.windGifRegions.findIndex(r => r.code === 'BI');
 
   get windGifSrc(): string {
     const code = this.windGifRegions[this.windGifIdx].code;
