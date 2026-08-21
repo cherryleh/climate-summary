@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, AfterViewInit, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout, retry } from 'rxjs';
 import * as L from 'leaflet';
 import * as GeoTIFF from 'geotiff';
 import { Pool } from 'geotiff';
@@ -118,6 +118,9 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
   domainIdx = 0;          // EXTENTS index the grid statistics cover
   activeExtentIdx = 0;    // which Region button reads as pressed — cleared by a manual pan/zoom, unlike domainIdx
   daysLoading = false;
+  playing = false;
+  private readonly PLAY_INTERVAL_MS = 1500;
+  private playTimer: ReturnType<typeof setTimeout> | null = null;
 
   gridOn: Record<Kind, boolean> = { rain: true, wind: true };
   stationsOn: Record<Kind, boolean> = { rain: true, wind: true };
@@ -221,6 +224,7 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
       this.bootProgress(0.8);
       await Promise.all((['rain', 'wind'] as Kind[]).map(k => this.ensureGridLoaded(k)));
       this.bootProgress(1, true);
+      this.preloadAllGrids();            // fire-and-forget: warms every day's TIFs so Play never stalls
     } catch (e: any) {
       this.setStatus(e.message, true);
       this.bootProgress(1, true);        // never leave the cover stuck over an error
@@ -228,10 +232,41 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.stopPlay();
     for (const kind of ['rain', 'wind'] as Kind[]) {
       this.maps[kind]?.remove();
     }
     (this.tiffPool as any)?.destroy?.();
+  }
+
+  // ------------------------------------------------------------------ play
+  /** Manual day picks always win over the animation. */
+  selectDay(i: number) {
+    this.stopPlay();
+    this.setDay(i);
+  }
+
+  togglePlay() {
+    if (this.playing) { this.stopPlay(); return; }
+    this.playing = true;
+    // Resolves instantly once boot's background warm-up has finished; only
+    // blocks the first frame if the user hits Play before that's done.
+    this.preloadAllGrids().then(() => {
+      if (this.playing) this.scheduleNextFrame();
+    });
+  }
+
+  private scheduleNextFrame() {
+    this.playTimer = setTimeout(async () => {
+      if (!this.playing) return;
+      await this.setDay((this.dayIdx + 1) % this.DAYS.length);
+      if (this.playing) this.scheduleNextFrame();
+    }, this.PLAY_INTERVAL_MS);
+  }
+
+  private stopPlay() {
+    this.playing = false;
+    if (this.playTimer) { clearTimeout(this.playTimer); this.playTimer = null; }
   }
 
   // ---------------------------------------------------------------- helpers
@@ -262,9 +297,16 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
   }
 
   // --------------------------------------------------------------- API layer
+  /** A hung mesonet request used to leave the boot cover stuck forever —
+   *  nothing in `boot()` ever threw, so its progress bar just sat there. A
+   *  bounded timeout plus a couple of retries means a slow or flaky response
+   *  eventually surfaces as an error instead of hanging indefinitely. */
   private async apiGet<T>(path: string, params: Record<string, string>): Promise<T> {
     const headers = new HttpHeaders({ Authorization: `Bearer ${environment.apiToken}` });
-    return firstValueFrom(this.http.get<T>(`${this.API}/${path}`, { headers, params }));
+    return firstValueFrom(this.http.get<T>(`${this.API}/${path}`, { headers, params }).pipe(
+      timeout(30000),
+      retry({ count: 2, delay: 1500 })
+    ));
   }
 
   /** Bucket a UTC timestamp onto the HST 5-minute grid -> [dayIndex, slot].
@@ -794,6 +836,32 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
     this.renderAllStats();                       // show "loading" straight away
     await Promise.all((['rain', 'wind'] as Kind[]).map(k => this.ensureGridLoaded(k)));
     this.renderAllStats();
+  }
+
+  /** Fetch, parse and colourise every day's rasters up front — both kinds,
+   *  both periods — so switching days (Play especially) swaps a cached
+   *  overlay instantly instead of stalling on a cold GeoTIFF fetch. Shared
+   *  across callers so Play can await it without kicking off a second pass
+   *  if boot's background warm-up is already running. */
+  private preloadPromise: Promise<void> | null = null;
+  private preloadAllGrids(): Promise<void> {
+    if (!this.preloadPromise) this.preloadPromise = this.doPreloadAllGrids();
+    return this.preloadPromise;
+  }
+
+  private async doPreloadAllGrids(): Promise<void> {
+    for (let d = 0; d < this.DAYS.length; d++) {
+      for (const kind of ['rain', 'wind'] as Kind[]) {
+        for (const per of ['day', 'cday'] as Period[]) {
+          const url = this.gridUrl(kind, d, per);
+          if (this.colorCache.has(url)) continue;
+          try {
+            const raster = await this.loadRaster(url);
+            this.colorizeRaster(kind, url, raster);
+          } catch { /* the active overlay reports its own load error */ }
+        }
+      }
+    }
   }
 
   /** The gridded value under a point, in the map's own units, or null outside

@@ -36,9 +36,12 @@
       <div class="control-group">
         <div class="control-label">Day</div>
         <div class="buttons" role="group" aria-label="Day">
+          <button type="button" class="play-btn" [class.active]="playing" [disabled]="daysLoading && !playing"
+            [attr.aria-label]="playing ? 'Pause day animation' : 'Play through each day'"
+            (click)="togglePlay()">{{ playing ? '⏸' : '▶' }}</button>
           <button type="button" *ngFor="let d of DAYS; let i = index"
             [class.active]="dayIdx === i" [disabled]="daysLoading"
-            (click)="setDay(i)">{{ dayLabel(d) }}</button>
+            (click)="selectDay(i)">{{ dayLabel(d) }}</button>
         </div>
       </div>
 

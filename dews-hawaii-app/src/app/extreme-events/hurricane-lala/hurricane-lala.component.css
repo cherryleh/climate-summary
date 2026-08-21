@@ -76,6 +76,11 @@
 .buttons button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .buttons button:disabled { opacity: .5; cursor: progress; }
 
+.play-btn {
+  width: 34px; padding: 9px 0 !important; text-align: center; line-height: 1;
+  font-size: 0.8rem !important;
+}
+
 .status { font-size: 12px; color: var(--muted); min-height: 1.2em; text-align: center; }
 .status.err { color: #dc2626; font-weight: 600; }
 
