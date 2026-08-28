@@ -46,7 +46,7 @@
       </div>
 
       <div class="control-group">
-        <div class="control-label">Region</div>
+        <div class="control-label">County</div>
         <div class="buttons" role="group" aria-label="Map extent">
           <button type="button" *ngFor="let e of extents; let i = index"
             [class.active]="activeExtentIdx === i" [title]="'Zoom to ' + e.name"
@@ -187,6 +187,9 @@
           </div>
         </div>
       </div>
+      <p class="mapcredit">
+        &copy; <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a>, HERE, Garmin, USGS, &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors &middot; data: <a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener">HCDP</a>
+      </p>
 
 
       <div class="chartwrap">
@@ -218,7 +221,7 @@
               (click)="windGifIdx = i">{{ r.name }}</button>
           </div>
           <div class="highlight-media wind-gif-media">
-            <img [src]="windGifSrc" [alt]="'Hourly wind speed animation — ' + windGifRegions[windGifIdx].name">
+            <img [src]="windGifSrc" [alt]="'Hourly wind speed animation — ' + windGifRegions[windGifIdx].name" loading="lazy">
           </div>
         </div>
         <div class="highlight-eyebrow">Highlight</div>
@@ -246,14 +249,18 @@
         Hawaiʻi Island. Mesonet gauges for 19:30–20:30 HST, 15 Aug 2026, over the radar-derived hourly rainfall field. Both are inches per hour on one log-spaced radar ramp. Click a gauge to plot its whole day with that hour banded; hover the map for the radar value.
       </div>
       <div class="highlight-media">
-        <app-wettest-hour></app-wettest-hour>
+        @defer (on viewport) {
+          <app-wettest-hour></app-wettest-hour>
+        } @placeholder {
+          <div class="highlight-media-placeholder"></div>
+        }
       </div>
     </div>
   </section>
   <section class="storm-highlights">
     <div class="highlight-card highlight-card--forecast">
       <div class="highlight-media forecast-media">
-        <img src="data/hurricane-lala/nws_forecast.PNG" alt="NWS forecast for Hurricane Lala">
+        <img src="data/hurricane-lala/nws_forecast.PNG" alt="NWS forecast for Hurricane Lala" loading="lazy">
       </div>
       <div class="forecast-text">
         <div class="highlight-eyebrow">Highlight</div>

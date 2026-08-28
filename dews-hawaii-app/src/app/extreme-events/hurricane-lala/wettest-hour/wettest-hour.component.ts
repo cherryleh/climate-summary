@@ -56,7 +56,9 @@ export class WettestHourComponent implements AfterViewInit, OnDestroy {
   private readonly SOFT = 0.05;
   readonly TICKS = [0, 0.05, 0.12, 0.3, 0.6, 1.2, 2.2, 4];
 
-  private readonly TILE_URL = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+  // CARTO's basemap tiles now require an API key; Esri's Light Gray Canvas
+  // is the free, keyless equivalent of "light_all".
+  private readonly TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
   // low -> high: pale green through green, yellow, orange and red to purple and magenta
   private readonly RAD_STOPS = ['#cdefb0', '#6ece4a', '#1f9c2a', '#f2f043', '#f9a72b', '#ef4423', '#c01111', '#8e2f9e', '#ef7ff0'];
@@ -281,7 +283,7 @@ export class WettestHourComponent implements AfterViewInit, OnDestroy {
       maxBounds: this.BOUNDS, maxBoundsViscosity: 1.0
     });
     L.control.zoom({ position: 'bottomleft' }).addTo(m);
-    L.tileLayer(this.TILE_URL, { maxZoom: 19, subdomains: 'abcd' } as any).addTo(m);
+    L.tileLayer(this.TILE_URL, { maxZoom: 16 } as any).addTo(m);
     m.fitBounds(this.BOUNDS, { animate: false });
     m.setMinZoom(m.getBoundsZoom(this.BOUNDS));
     this.map = m;

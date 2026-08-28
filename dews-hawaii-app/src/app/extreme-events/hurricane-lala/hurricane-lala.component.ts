@@ -89,10 +89,11 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
     wind: { dir: 'data/hurricane-lala/wind', stem: 'wind_max', unit: v => v * this.MPH_PER_MS }
   };
 
-  // Voyager over the plain "light_all" style — same CARTO tile set, but its
-  // ocean fill reads as a clear blue instead of near-white, which reads
-  // better behind these storm maps.
-  private readonly TILE_URL = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  // CARTO's basemap tiles now require an API key, so we use Esri's free,
+  // keyless World Street Map instead. World Physical Map was tried first,
+  // but its tiles only go up to native zoom 8, so it went blank once a
+  // county view zoomed in past that; Street Map has tiles up to zoom 19+.
+  private readonly TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
 
   // Transcribed from extents_hi_counties.csv. Statewide is the union of the
   // four counties, matching the bounds of the HCDP statewide rasters exactly.
@@ -224,7 +225,9 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
       this.bootProgress(0.8);
       await Promise.all((['rain', 'wind'] as Kind[]).map(k => this.ensureGridLoaded(k)));
       this.bootProgress(1, true);
-      this.preloadAllGrids();            // fire-and-forget: warms every day's TIFs so Play never stalls
+      // deferred to idle time so this background warm-up doesn't compete for
+      // bandwidth with whatever the user does right after the cover lifts
+      this.scheduleIdle(() => this.preloadAllGrids());
     } catch (e: any) {
       this.setStatus(e.message, true);
       this.bootProgress(1, true);        // never leave the cover stuck over an error
@@ -270,6 +273,12 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
   }
 
   // ---------------------------------------------------------------- helpers
+  private scheduleIdle(fn: () => void) {
+    const w = window as any;
+    if (typeof w.requestIdleCallback === 'function') w.requestIdleCallback(fn, { timeout: 3000 });
+    else setTimeout(fn, 1000);
+  }
+
   private setStatus(msg: string, isErr = false) {
     this.statusMsg = msg;
     this.statusErr = isErr;
@@ -526,15 +535,15 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
   }
 
   private buildMaps() {
-    const attr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, ' +
-      '&copy; <a href="https://carto.com/attributions">CARTO</a> &middot; data: ' +
-      '<a href="https://www.hawaii.edu/climate-data-portal/">HCDP</a>';
-
     for (const kind of ['rain', 'wind'] as Kind[]) {
       const el = kind === 'rain' ? this.mapRainEl.nativeElement : this.mapWindEl.nativeElement;
       const m = L.map(el, {
         zoomControl: false,                    // added below, in the bottom corner
-        attributionControl: kind === 'wind',
+        // Credit lives as plain text under the map (see template) rather
+        // than a Leaflet control — an on-map attribution box auto-sizes to
+        // its text and keeps colliding with the zoom/logo overlays in the
+        // corners as the credit text changes with the basemap.
+        attributionControl: false,
         // No zoom animation. The two maps mirror each other, and an animated
         // zoom reports its old level while running, so the partner echoed that
         // stale value back and cancelled the zoom outright — +/- did nothing.
@@ -544,11 +553,11 @@ export class HurricaneLalaComponent implements AfterViewInit, OnDestroy {
         maxBounds: this.extents[0].bounds.pad(0.03),
         maxBoundsViscosity: 1.0
       }).setView([20.7, -157.3], 6);
-      L.tileLayer(this.TILE_URL, { attribution: attr, subdomains: 'abcd', maxZoom: 18, zIndex: 1 } as any).addTo(m);
+      L.tileLayer(this.TILE_URL, { maxZoom: 16, zIndex: 1 } as any).addTo(m);
       this.layers[kind] = L.layerGroup().addTo(m);
       this.maps[kind] = m;
 
-      // both maps get their own zoom buttons, low-left, clear of the attribution
+      // both maps get their own zoom buttons, low-left
       L.control.zoom({ position: 'bottomleft' }).addTo(m);
 
       m.on('mousemove', (ev: L.LeafletMouseEvent) => this.updateReadout(kind, ev.latlng));
