@@ -71,8 +71,9 @@ export class LowellFocusComponent implements AfterViewInit, OnDestroy {
   private readonly WINDOW_START = Date.parse('2026-09-07T00:00:00-10:00');
   readonly WINDOW_LABEL = 'since Sep 7, 12:00 AM HST';
 
-  // Esri's free, keyless Light Gray Canvas basemap
-  private readonly TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+  // Same basemap as hurricane-lala: Esri's free, keyless World Street Map
+  // (World Physical Map's tiles only go up to native zoom 8).
+  private readonly TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
 
   // Station IDs are 4-digit codes; the first two digits are a county code.
   readonly ISLANDS: IslandConfig[] = [

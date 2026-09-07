@@ -17,7 +17,7 @@
   width: 100%; text-align: center; padding: 28px 20px 6px;
 }
 .app-header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); }
-.app-header .subtitle { margin: 6px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
+.app-header .subtitle { max-width: 1150px; margin: 6px auto 0; font-size: 0.95rem; color: var(--text-secondary); }
 
 .cta-context { margin: 18px 0 0; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 

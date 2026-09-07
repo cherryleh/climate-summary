@@ -49,8 +49,9 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
   private readonly WINDOW_START = Date.parse('2026-09-07T00:00:00-10:00');
   readonly WINDOW_LABEL = 'since Sep 7, 12:00 AM HST';
 
-  // Esri's free, keyless Light Gray Canvas basemap
-  private readonly TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+  // Same basemap as hurricane-lala: Esri's free, keyless World Street Map
+  // (World Physical Map's tiles only go up to native zoom 8).
+  private readonly TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
   private readonly STATEWIDE_BOUNDS = L.latLngBounds([18.849, -159.816], [22.269, -154.668]);
 
   // Fixed island/county extents (not derived from station positions, which
@@ -63,8 +64,9 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
   };
 
   // Station IDs are 4-digit codes; the first two digits are a county code.
+  // '01' Maui, '03' Lānaʻi, '04' Molokaʻi — all part of Maui County.
   private readonly COUNTY_PREFIXES: Record<string, County> = {
-    '02': 'hawaii', '01': 'maui', '04': 'maui', '05': 'honolulu', '06': 'kauai'
+    '02': 'hawaii', '01': 'maui', '03': 'maui', '04': 'maui', '05': 'honolulu', '06': 'kauai'
   };
   readonly COUNTIES: { key: CountyFilter; label: string }[] = [
     { key: 'all', label: 'Statewide' },
