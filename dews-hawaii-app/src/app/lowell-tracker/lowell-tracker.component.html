@@ -36,11 +36,11 @@
       <div class="empty" *ngIf="!hasSelection">Click a station on the map to plot its rainfall and wind {{ WINDOW_LABEL }}.</div>
 
       <ng-container *ngIf="hasSelection">
+        <div class="stats-heading">Summary &middot; {{ WINDOW_LABEL }}</div>
         <div class="stats">
           <div><span class="stat-label">Total rainfall</span><b>{{ selectedRainTotal.toFixed(2) }} in</b></div>
           <div><span class="stat-label">Max sustained wind</span><b>{{ selectedMaxWind.toFixed(1) }} mph</b></div>
           <div><span class="stat-label">Max gust</span><b>{{ selectedMaxGust.toFixed(1) }} mph</b></div>
-          <div><span class="stat-label">Last report</span><b>{{ selectedLastReport }}</b></div>
         </div>
 
         <h3 class="chart-title">Rainfall ({{ WINDOW_LABEL }})</h3>

@@ -91,7 +91,6 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
   selectedRainTotal = 0;
   selectedMaxWind = 0;
   selectedMaxGust = 0;
-  selectedLastReport = '—';
 
   rainUpdateFlag = false;
   windUpdateFlag = false;
@@ -211,20 +210,6 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
     return points.reduce((m, p) => Math.max(m, p[1]), 0);
   }
 
-  /** Most recent timestamp reported by a station, across all three variables. */
-  private lastReportTime(id: string): number | null {
-    const s = this.seriesByStation.get(id);
-    if (!s) return null;
-    const last = (points: [number, number][]) => points.length ? points[points.length - 1][0] : -Infinity;
-    const t = Math.max(last(s.rain), last(s.wind), last(s.gust));
-    return isFinite(t) ? t : null;
-  }
-
-  private readonly reportTimeFmt = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Pacific/Honolulu', month: 'short', day: 'numeric',
-    hour: 'numeric', minute: '2-digit', hour12: true
-  });
-
   // -------------------------------------------------------------------- the map
   private initMap() {
     // The data can resolve before the browser has laid out the map container
@@ -283,14 +268,11 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
     const bounds = this.selectedCounty === 'all' ? this.STATEWIDE_BOUNDS : this.COUNTY_BOUNDS[this.selectedCounty];
     this.map.fitBounds(bounds, { animate: true, padding: [12, 12] });
 
-    if (!this.selectedId || !visibleIds.has(this.selectedId)) {
-      if (visible.length) this.select(visible[0].id);
-      else {
-        this.selectedId = null;
-        this.selectedName = 'No station selected';
-        this.selectedMeta = '';
-        this.hasSelection = false;
-      }
+    if (this.selectedId && !visibleIds.has(this.selectedId)) {
+      this.selectedId = null;
+      this.selectedName = 'No station selected';
+      this.selectedMeta = '';
+      this.hasSelection = false;
     }
   }
 
@@ -319,8 +301,6 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
     this.selectedRainTotal = this.totalRain(id);
     this.selectedMaxWind = this.maxOf(s?.wind ?? []);
     this.selectedMaxGust = this.maxOf(s?.gust ?? []);
-    const lastT = this.lastReportTime(id);
-    this.selectedLastReport = lastT != null ? this.reportTimeFmt.format(lastT) : '—';
 
     let running = 0;
     const rainData: [number, number][] = (s?.rain ?? []).map(([t, v]) => {
@@ -351,9 +331,6 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
       await this.loadLatest();
       this.keepActiveStations();
       this.initMap();
-
-      const ranked = [...this.stations].sort((a, b) => this.totalRain(b.id) - this.totalRain(a.id));
-      if (ranked.length) this.select(ranked[0].id);
 
       this.statusMsg = `${this.stations.length} of ${total} Hawaiʻi Mesonet stations active · ${this.WINDOW_LABEL}`;
     } catch (e: any) {
