@@ -51,13 +51,13 @@ interface IslandConfig {
 }
 
 @Component({
-  selector: 'app-lowell-compare',
+  selector: 'app-lowell-focus',
   standalone: true,
   imports: [CommonModule, RouterLink, HighchartsChartModule],
-  templateUrl: './lowell-compare.component.html',
-  styleUrl: './lowell-compare.component.css'
+  templateUrl: './lowell-focus.component.html',
+  styleUrl: './lowell-focus.component.css'
 })
-export class LowellCompareComponent implements AfterViewInit, OnDestroy {
+export class LowellFocusComponent implements AfterViewInit, OnDestroy {
   Highcharts: typeof Highcharts = Highcharts;
 
   // ------------------------------------------------------------ config
