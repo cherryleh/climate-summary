@@ -1,6 +1,5 @@
 import { Component, ElementRef, AfterViewInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import * as L from 'leaflet';
@@ -32,7 +31,7 @@ interface StationSeries {
 @Component({
   selector: 'app-lowell-tracker',
   standalone: true,
-  imports: [CommonModule, RouterLink, HighchartsChartModule],
+  imports: [CommonModule, HighchartsChartModule],
   templateUrl: './lowell-tracker.component.html',
   styleUrl: './lowell-tracker.component.css'
 })
