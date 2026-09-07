@@ -8,6 +8,7 @@ import { StormViewerComponent } from './storm-viewer/storm-viewer.component';
 import { StormViewerMarch20262Component } from './storm-viewer-march2026-2/storm-viewer-march2026-2.component';
 import { TutorialComponent } from './tutorial/tutorial.component';
 import { HurricaneLalaComponent } from './extreme-events/hurricane-lala/hurricane-lala.component';
+import { LowellTrackerComponent } from './lowell-tracker/lowell-tracker.component';
 
 export const routes: Routes = [
   {path: '', component: ClimateDashboardV2Component},
@@ -20,5 +21,6 @@ export const routes: Routes = [
   { path: 'storm-viewer', component: StormViewerComponent},
   { path: 'storm-viewer-march2026-2', component: StormViewerMarch20262Component},
   { path: 'tutorial', component: TutorialComponent },
-  { path: 'hurricane-lala', component: HurricaneLalaComponent }
+  { path: 'hurricane-lala', component: HurricaneLalaComponent },
+  { path: 'lowell-tracker', component: LowellTrackerComponent }
 ];

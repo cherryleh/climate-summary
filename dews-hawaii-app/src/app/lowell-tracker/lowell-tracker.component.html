@@ -1,0 +1,66 @@
+<header class="app-header">
+  <h1>Hurricane Lowell Tracker</h1>
+  <p class="subtitle">Click any Hawaiʻi Mesonet station on the map to see its rainfall and wind {{ WINDOW_LABEL }}.</p>
+</header>
+
+<div class="status" [class.err]="statusErr">{{ statusMsg }}</div>
+
+<main>
+  <section class="panel map-panel">
+    <div class="county-filter">
+      <button
+        *ngFor="let c of COUNTIES"
+        type="button"
+        class="county-btn"
+        [class.active]="selectedCounty === c.key"
+        (click)="selectCounty(c.key)">
+        {{ c.label }}
+      </button>
+    </div>
+    <div class="map-wrap">
+      <div class="map" #map></div>
+    </div>
+    <p class="sourcenote">
+      Stations: <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet/" target="_blank" rel="noopener">Hawaiʻi Mesonet</a>
+      via the <a href="https://hcdp.github.io/hcdp_api_docs/" target="_blank" rel="noopener">HCDP API</a>. Only stations that reported data {{ WINDOW_LABEL }} are shown.
+    </p>
+  </section>
+
+  <div class="col-right">
+    <section class="panel chartwrap">
+      <div class="charthead">
+        <span class="who">{{ selectedName }}</span>
+        <span class="stat">{{ selectedMeta }}</span>
+      </div>
+
+      <div class="empty" *ngIf="!hasSelection">Click a station on the map to plot its rainfall and wind {{ WINDOW_LABEL }}.</div>
+
+      <ng-container *ngIf="hasSelection">
+        <div class="stats">
+          <div><span class="stat-label">Total rainfall</span><b>{{ selectedRainTotal.toFixed(2) }} in</b></div>
+          <div><span class="stat-label">Max sustained wind</span><b>{{ selectedMaxWind.toFixed(1) }} mph</b></div>
+          <div><span class="stat-label">Max gust</span><b>{{ selectedMaxGust.toFixed(1) }} mph</b></div>
+          <div><span class="stat-label">Last report</span><b>{{ selectedLastReport }}</b></div>
+        </div>
+
+        <h3 class="chart-title">Rainfall ({{ WINDOW_LABEL }})</h3>
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [options]="rainChartOptions"
+          [(update)]="rainUpdateFlag"
+          [oneToOne]="true"
+          style="width:100%; height:260px; display:block;">
+        </highcharts-chart>
+
+        <h3 class="chart-title">Wind speed &amp; gust ({{ WINDOW_LABEL }})</h3>
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [options]="windChartOptions"
+          [(update)]="windUpdateFlag"
+          [oneToOne]="true"
+          style="width:100%; height:260px; display:block;">
+        </highcharts-chart>
+      </ng-container>
+    </section>
+  </div>
+</main>

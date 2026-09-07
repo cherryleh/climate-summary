@@ -24,12 +24,16 @@
       <div class="control-group">
         <div class="control-label">Mode</div>
         <div class="toggle-wrap">
-          <span>Day</span>
+          <span class="mode-label" tabindex="0">Day
+            <span class="info-tooltip" role="tooltip">Daily maps show the sum total of rainfall and the average wind speed over the 24-hour period for the selected day.</span>
+          </span>
           <label class="switch">
             <input type="checkbox" [checked]="mode === 'cum'" (change)="onModeToggle($event)">
             <span class="slider"></span>
           </label>
-          <span>Cumulative</span>
+          <span class="mode-label" tabindex="0">Cumulative
+            <span class="info-tooltip" role="tooltip">Cumulative maps show the total rainfall (summed) and average wind speed, from Aug 14 through the selected day.</span>
+          </span>
         </div>
       </div>
 
@@ -93,6 +97,7 @@
             <label><input type="checkbox" [checked]="gridOn.rain" (change)="onGridToggle('rain', $event)"> Grid</label>
             <label><input type="checkbox" [checked]="stationsOn.rain" (change)="onStationsToggle('rain', $event)"> Stations</label>
           </div>
+          <button type="button" class="reset-btn" title="Reset map to statewide view" (click)="zoomTo(0)">Reset Zoom</button>
           <div class="readout" *ngIf="readoutRain.show">
             <i [style.background]="readoutRain.color"></i>
             <b>{{ readoutRain.value }}</b>
@@ -168,6 +173,7 @@
             <label><input type="checkbox" [checked]="gridOn.wind" (change)="onGridToggle('wind', $event)"> Grid</label>
             <label><input type="checkbox" [checked]="stationsOn.wind" (change)="onStationsToggle('wind', $event)"> Stations</label>
           </div>
+          <button type="button" class="reset-btn" title="Reset map to statewide view" (click)="zoomTo(0)">Reset Zoom</button>
           <div class="readout" *ngIf="readoutWind.show">
             <i [style.background]="readoutWind.color"></i>
             <b>{{ readoutWind.value }}</b>

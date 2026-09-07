@@ -58,6 +58,18 @@
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
 }
 .toggle-wrap span { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+.mode-label {
+  position: relative; cursor: help;
+  text-decoration: underline dotted; text-underline-offset: 3px;
+}
+.mode-label .info-tooltip {
+  left: 50%; right: auto; width: max(160px, min(220px, 60vw));
+  transform: translateX(-50%) translateY(4px);
+  color: #fff; font-weight: 400; text-decoration: none;
+}
+.mode-label:hover .info-tooltip, .mode-label:focus-visible .info-tooltip {
+  opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
+}
 .switch { position: relative; display: inline-block; width: 46px; height: 25px; flex: 0 0 auto; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .switch .slider { position: absolute; inset: 0; cursor: pointer; background: #cbd5e1; border-radius: 999px; transition: background .2s ease; }
@@ -159,6 +171,14 @@ main {
   color: var(--text-secondary); box-shadow: 0 1px 4px rgba(15,23,42,.14);
   white-space: nowrap;
 }
+
+.reset-btn {
+  font: inherit; background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font-size: 11.5px; font-weight: 600; color: var(--text-secondary);
+  box-shadow: 0 1px 4px rgba(15,23,42,.14); cursor: pointer; white-space: nowrap;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.reset-btn:hover { background: var(--accent-soft); border-color: var(--accent-soft-border); color: var(--accent-hover); }
 
 .layertoggle {
   background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
