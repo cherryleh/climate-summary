@@ -1,6 +1,5 @@
 import { Component, ElementRef, AfterViewInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import * as L from 'leaflet';
@@ -53,7 +52,7 @@ interface IslandConfig {
 @Component({
   selector: 'app-lowell-focus',
   standalone: true,
-  imports: [CommonModule, RouterLink, HighchartsChartModule],
+  imports: [CommonModule, HighchartsChartModule],
   templateUrl: './lowell-focus.component.html',
   styleUrl: './lowell-focus.component.css'
 })
