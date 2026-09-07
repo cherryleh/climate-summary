@@ -1,0 +1,79 @@
+:host {
+  --surface-1: #ffffff;
+  --plane: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --accent: #2563eb;
+
+  display: block;
+  min-height: 100vh;
+  background: var(--plane); color: var(--text-primary);
+  font: 14px/1.45 "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.app-header {
+  width: 100%; text-align: center; padding: 28px 20px 6px;
+}
+.app-header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); }
+.app-header .subtitle { margin: 6px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
+
+.mode-toggle { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+.mode-btn {
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 999px;
+  padding: 7px 16px; cursor: pointer;
+}
+.mode-btn:hover { border-color: var(--accent); }
+.mode-btn.active { background: var(--text-primary); border-color: var(--text-primary); color: #fff; }
+
+.status { font-size: 12px; color: var(--muted); min-height: 1.2em; text-align: center; padding: 8px 18px 0; }
+.status.err { color: #dc2626; }
+
+main {
+  display: grid; gap: 14px; padding: 14px; align-items: start;
+  max-width: 1080px; margin: 0 auto;
+  grid-template-columns: minmax(280px, 420px) minmax(320px, 1fr);
+}
+@media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+
+.col-right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.panel {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+}
+
+.map-panel { padding: 14px; position: sticky; top: 14px; }
+@media (max-width: 860px) { .map-panel { position: static; } }
+.map-wrap { position: relative; }
+.map { width: 100%; height: 320px; border-radius: 8px; background: var(--plane); }
+.leaflet-container { background: var(--plane); font: inherit; }
+.sourcenote { margin: 8px 0 0; font-size: 11.5px; color: var(--text-secondary); }
+
+/* Leaflet injects marker icons as raw DOM, outside Angular's template — plain
+   scoped selectors above never see them, so this needs ::ng-deep. */
+::ng-deep .station-pin {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #fff; box-shadow: 0 1px 4px rgba(15,23,42,.35);
+  transition: transform .15s ease;
+  cursor: pointer;
+}
+::ng-deep .station-pin-wrap.is-active .station-pin {
+  transform: scale(1.35); background: var(--text-primary);
+}
+
+.chart-card { padding: 14px; border: 1px solid var(--border); transition: border-color .2s ease, box-shadow .2s ease; }
+.chart-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(37,99,235,.18); }
+.chart-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding-bottom: 6px; }
+.chart-head .badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 11px; font-weight: 700;
+  flex: 0 0 auto;
+}
+.chart-head .who { font-size: 14px; font-weight: 700; }
+.chart-head .stat { margin-left: auto; font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }

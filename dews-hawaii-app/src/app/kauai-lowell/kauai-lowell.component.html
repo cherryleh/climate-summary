@@ -1,0 +1,50 @@
+<header class="app-header">
+  <h1>Kauaʻi Station Watch</h1>
+  <p class="subtitle">
+    {{ mode === 'rain' ? 'Accumulated rainfall' : 'Wind speed & gust' }} at every reporting Hawaiʻi Mesonet station on Kauaʻi, {{ WINDOW_LABEL }}. All graphs share the same y-axis scale.
+  </p>
+  <div class="mode-toggle">
+    <button
+      *ngFor="let m of MODES"
+      type="button"
+      class="mode-btn"
+      [class.active]="mode === m.key"
+      (click)="setMode(m.key)">
+      {{ m.label }}
+    </button>
+  </div>
+</header>
+
+
+<main>
+  <section class="panel map-panel">
+    <div class="map-wrap">
+      <div class="map" #map></div>
+    </div>
+    <p class="sourcenote">Numbered pins match the numbered graphs below — click a pin to jump to its station.</p>
+  </section>
+
+  <div class="col-right">
+    <section
+      class="panel chart-card"
+      *ngFor="let c of charts"
+      [id]="'station-' + c.id"
+      [class.active]="highlightedId === c.id"
+      (mouseenter)="highlight(c.id)"
+      (mouseleave)="highlight(null)">
+      <div class="chart-head">
+        <span class="badge">{{ c.index }}</span>
+        <span class="who">{{ c.name }}</span>
+        <span class="stat" *ngIf="mode === 'rain'">{{ c.id }} &middot; {{ c.rainTotal.toFixed(2) }} in total</span>
+        <span class="stat" *ngIf="mode === 'wind'">{{ c.id }} &middot; {{ c.windMax.toFixed(1) }} mph max &middot; {{ c.gustMax.toFixed(1) }} mph gust</span>
+      </div>
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="c.options"
+        [(update)]="c.updateFlag"
+        [oneToOne]="true"
+        style="width:100%; height:220px; display:block;">
+      </highcharts-chart>
+    </section>
+  </div>
+</main>

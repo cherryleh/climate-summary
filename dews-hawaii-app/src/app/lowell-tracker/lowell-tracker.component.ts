@@ -1,5 +1,6 @@
 import { Component, ElementRef, AfterViewInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import * as L from 'leaflet';
@@ -31,7 +32,7 @@ interface StationSeries {
 @Component({
   selector: 'app-lowell-tracker',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [CommonModule, RouterLink, HighchartsChartModule],
   templateUrl: './lowell-tracker.component.html',
   styleUrl: './lowell-tracker.component.css'
 })
@@ -115,7 +116,11 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
     credits: { enabled: false },
     xAxis: { type: 'datetime', title: { text: undefined } },
     yAxis: { title: { text: 'Wind (mph)' }, min: 0 },
-    tooltip: { xDateFormat: '%b %e, %I:%M %p', shared: true },
+    tooltip: {
+      xDateFormat: '%b %e, %I:%M %p',
+      shared: true,
+      pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} mph</b><br/>'
+    },
     legend: { enabled: true },
     plotOptions: {
       series: { marker: { enabled: false }, turboThreshold: 0, lineWidth: 1.5, animation: false }
@@ -132,6 +137,7 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
   private seriesByStation = new Map<string, StationSeries>();
   private markers = new Map<string, L.CircleMarker>();
   private map: L.Map | null = null;
+  private mapResizeObserver: ResizeObserver | null = null;
 
   constructor(private http: HttpClient, private zone: NgZone) {}
 
@@ -140,6 +146,7 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.mapResizeObserver?.disconnect();
     this.map?.remove();
   }
 
@@ -225,6 +232,14 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
     m.fitBounds(this.STATEWIDE_BOUNDS, { animate: false });
     this.map = m;
     this.drawMarkers();
+
+    // Leaflet reads its container's size once at construction. The rAF this
+    // runs on is a best effort, not a guarantee — a slow font load, dev-server
+    // HMR, or a backgrounded tab delaying that frame can still leave it with
+    // a stale (often zero) size, so tiles come in blank or at the wrong zoom.
+    // A ResizeObserver catches that whenever the container's real size lands.
+    this.mapResizeObserver = new ResizeObserver(() => m.invalidateSize());
+    this.mapResizeObserver.observe(this.mapEl.nativeElement);
   }
 
   private drawMarkers() {
