@@ -19,8 +19,10 @@
 .app-header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); }
 .app-header .subtitle { margin: 6px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
 
+.cta-context { margin: 18px 0 0; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+
 .cta-btn {
-  display: inline-block; margin-top: 14px; padding: 10px 20px;
+  display: inline-block; margin-top: 8px; padding: 10px 20px;
   background: var(--accent); color: #fff; font-size: 14px; font-weight: 700;
   text-decoration: none; border-radius: 999px; box-shadow: 0 2px 8px rgba(37,99,235,.35);
   transition: background .15s ease, transform .15s ease;

@@ -16,6 +16,9 @@
 .app-header {
   width: 100%; text-align: center; padding: 28px 20px 6px;
 }
+.back-link { display: inline-block; margin-bottom: 10px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.back-link:hover { text-decoration: underline; }
+
 .app-header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); }
 .app-header .subtitle { margin: 6px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
 

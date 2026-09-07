@@ -1,8 +1,19 @@
 <header class="app-header">
-  <h1>Kauaʻi Station Watch</h1>
+  <a routerLink="/lowell-tracker" class="back-link">&larr; Back to Hurricane Lowell Tracker</a>
+  <h1>{{ islandLabel }} Station Watch</h1>
   <p class="subtitle">
-    {{ mode === 'rain' ? 'Accumulated rainfall' : 'Wind speed & gust' }} at every reporting Hawaiʻi Mesonet station on Kauaʻi, {{ WINDOW_LABEL }}. All graphs share the same y-axis scale.
+    {{ mode === 'rain' ? 'Accumulated rainfall' : 'Wind speed & gust' }} at every reporting Hawaiʻi Mesonet station on {{ islandLabel }}, {{ WINDOW_LABEL }}. All graphs share the same y-axis scale.
   </p>
+  <div class="mode-toggle">
+    <button
+      *ngFor="let isl of ISLANDS"
+      type="button"
+      class="mode-btn"
+      [class.active]="island === isl.key"
+      (click)="selectIsland(isl.key)">
+      {{ isl.label }}
+    </button>
+  </div>
   <div class="mode-toggle">
     <button
       *ngFor="let m of MODES"
@@ -21,7 +32,7 @@
     <div class="map-wrap">
       <div class="map" #map></div>
     </div>
-    <p class="sourcenote">Numbered pins match the numbered graphs below — click a pin to jump to its station.</p>
+    <p class="sourcenote">Numbered pins match the numbered {{ islandLabel }} graphs below — click a pin to jump to its station.</p>
   </section>
 
   <div class="col-right">

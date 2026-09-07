@@ -1,5 +1,6 @@
 import { Component, ElementRef, AfterViewInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import * as L from 'leaflet';
@@ -12,6 +13,20 @@ Highcharts.setOptions({
 });
 
 type Mode = 'rain' | 'wind';
+type Island = 'kauai' | 'honolulu';
+
+interface StationSeries {
+  rain: [number, number][];   // [time, 5-min amount, in]
+  wind: [number, number][];   // [time, avg speed, mph]
+  gust: [number, number][];   // [time, max gust, mph]
+}
+
+interface RawStation {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+}
 
 interface StationChart {
   id: string;
@@ -28,14 +43,21 @@ interface StationChart {
   updateFlag: boolean;
 }
 
+interface IslandConfig {
+  key: Island;
+  label: string;
+  prefix: string;   // station ID prefix for this island's county
+  bounds: L.LatLngBounds;
+}
+
 @Component({
-  selector: 'app-kauai-lowell',
+  selector: 'app-lowell-compare',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
-  templateUrl: './kauai-lowell.component.html',
-  styleUrl: './kauai-lowell.component.css'
+  imports: [CommonModule, RouterLink, HighchartsChartModule],
+  templateUrl: './lowell-compare.component.html',
+  styleUrl: './lowell-compare.component.css'
 })
-export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
+export class LowellCompareComponent implements AfterViewInit, OnDestroy {
   Highcharts: typeof Highcharts = Highcharts;
 
   // ------------------------------------------------------------ config
@@ -48,12 +70,15 @@ export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
   private readonly MPH_PER_MS = 2.236936;
   private readonly WINDOW_START = Date.parse('2026-09-07T00:00:00-10:00');
   readonly WINDOW_LABEL = 'since Sep 7, 12:00 AM HST';
-  // Station IDs are 4-digit codes; '06' is the Kauaʻi County prefix.
-  private readonly KAUAI_PREFIX = '06';
 
   // Esri's free, keyless Light Gray Canvas basemap
   private readonly TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-  private readonly KAUAI_BOUNDS = L.latLngBounds([21.819, -159.816], [22.269, -159.25125]);
+
+  // Station IDs are 4-digit codes; the first two digits are a county code.
+  readonly ISLANDS: IslandConfig[] = [
+    { key: 'kauai', label: 'Kauaʻi', prefix: '06', bounds: L.latLngBounds([21.819, -159.816], [22.269, -159.25125]) },
+    { key: 'honolulu', label: 'Oʻahu', prefix: '05', bounds: L.latLngBounds([21.18, -158.322], [21.7425, -157.602]) }
+  ];
 
   readonly MODES: { key: Mode; label: string }[] = [
     { key: 'rain', label: 'Rainfall' },
@@ -70,8 +95,15 @@ export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
   charts: StationChart[] = [];
   highlightedId: string | null = null;
   mode: Mode = 'rain';
+  island: Island = 'kauai';
+
+  get islandLabel(): string {
+    return this.ISLANDS.find(i => i.key === this.island)!.label;
+  }
 
   // ------------------------------------------------------------- internal state
+  private allStations: RawStation[] = [];
+  private seriesByStation = new Map<string, StationSeries>();
   private map: L.Map | null = null;
   private markers = new Map<string, L.Marker>();
   private mapResizeObserver: ResizeObserver | null = null;
@@ -140,7 +172,7 @@ export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
     };
   }
 
-  // ---------------------------------------------------------------- mode toggle
+  // ---------------------------------------------------------------- mode / island toggles
   setMode(mode: Mode) {
     if (this.mode === mode) return;
     this.mode = mode;
@@ -148,6 +180,14 @@ export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
       c.options = mode === 'rain' ? c.rainOptions : c.windOptions;
       c.updateFlag = true;
     }
+  }
+
+  selectIsland(island: Island) {
+    if (this.island === island) return;
+    this.island = island;
+    this.highlight(null);
+    this.buildCharts();
+    this.rebuildMarkers();
   }
 
   // -------------------------------------------------------------------- the map
@@ -161,8 +201,19 @@ export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
     if (!this.mapEl) return;
     const m = L.map(this.mapEl.nativeElement, { zoomControl: true, zoomSnap: 0 });
     L.tileLayer(this.TILE_URL, { maxZoom: 16, attribution: 'Esri &mdash; Sources: Esri' } as any).addTo(m);
-    m.fitBounds(this.KAUAI_BOUNDS, { animate: false, padding: [12, 12] });
     this.map = m;
+    this.rebuildMarkers();
+
+    // A stale initial size (slow font load, HMR, a backgrounded tab) would
+    // otherwise leave tiles blank or mis-zoomed with no later correction.
+    this.mapResizeObserver = new ResizeObserver(() => m.invalidateSize());
+    this.mapResizeObserver.observe(this.mapEl.nativeElement);
+  }
+
+  private rebuildMarkers() {
+    if (!this.map) return;
+    for (const mk of this.markers.values()) this.map.removeLayer(mk);
+    this.markers.clear();
 
     for (const c of this.charts) {
       const icon = L.divIcon({
@@ -171,16 +222,14 @@ export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
         iconSize: [26, 26],
         iconAnchor: [13, 13]
       });
-      const mk = L.marker([c.lat, c.lng], { icon }).addTo(m);
+      const mk = L.marker([c.lat, c.lng], { icon }).addTo(this.map);
       mk.bindTooltip(`<b>${c.index}. ${c.name}</b> (${c.id})`, { direction: 'top' });
       mk.on('click', () => this.zone.run(() => this.jumpTo(c.id)));
       this.markers.set(c.id, mk);
     }
 
-    // A stale initial size (slow font load, HMR, a backgrounded tab) would
-    // otherwise leave tiles blank or mis-zoomed with no later correction.
-    this.mapResizeObserver = new ResizeObserver(() => m.invalidateSize());
-    this.mapResizeObserver.observe(this.mapEl.nativeElement);
+    const bounds = this.ISLANDS.find(i => i.key === this.island)!.bounds;
+    this.map.fitBounds(bounds, { animate: false, padding: [12, 12] });
   }
 
   // ---------------------------------------------------------------- map <-> chart linking
@@ -197,12 +246,62 @@ export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  // ------------------------------------------------------------------ chart building
+  /** Rebuilds `charts` for the currently selected island from the already-fetched
+   *  statewide station/series data — no network round trip on an island switch. */
+  private buildCharts() {
+    const prefix = this.ISLANDS.find(i => i.key === this.island)!.prefix;
+    const islandStations = this.allStations.filter(s => s.id.startsWith(prefix));
+
+    let rainGlobalMax = 0;
+    let windGlobalMax = 0;
+    const accByStation = new Map<string, [number, number][]>();
+    for (const st of islandStations) {
+      const s = this.seriesByStation.get(st.id);
+      if (!s || (!s.rain.length && !s.wind.length && !s.gust.length)) continue;
+      let running = 0;
+      const acc: [number, number][] = s.rain.map(([t, v]) => {
+        running += v;
+        return [t, +running.toFixed(3)];
+      });
+      accByStation.set(st.id, acc);
+      rainGlobalMax = Math.max(rainGlobalMax, running);
+      for (const [, v] of s.wind) windGlobalMax = Math.max(windGlobalMax, v);
+      for (const [, v] of s.gust) windGlobalMax = Math.max(windGlobalMax, v);
+    }
+
+    const rainSharedMax = this.niceTop(rainGlobalMax);
+    const windSharedMax = this.niceTop(windGlobalMax);
+    let i = 0;
+    this.charts = islandStations
+      .filter(st => accByStation.has(st.id))
+      .map(st => {
+        const acc = accByStation.get(st.id)!;
+        const s = this.seriesByStation.get(st.id)!;
+        const windMax = s.wind.reduce((m, [, v]) => Math.max(m, v), 0);
+        const gustMax = s.gust.reduce((m, [, v]) => Math.max(m, v), 0);
+        i++;
+        const rainOptions = this.buildRainOptions(acc, rainSharedMax);
+        const windOptions = this.buildWindOptions(s.wind, s.gust, windSharedMax);
+        return {
+          id: st.id, name: st.name, lat: st.lat, lng: st.lng, index: i,
+          rainTotal: acc.length ? acc[acc.length - 1][1] : 0,
+          windMax, gustMax,
+          rainOptions, windOptions,
+          options: this.mode === 'rain' ? rainOptions : windOptions,
+          updateFlag: false
+        };
+      });
+
+    this.statusMsg = `${this.charts.length} ${this.islandLabel} Mesonet stations · ${this.WINDOW_LABEL}`;
+  }
+
   // ------------------------------------------------------------------ start-up
   private async boot() {
     try {
       const stationRows = await this.apiGet<any[]>('stations', { location: this.LOC });
-      const kauaiStations = stationRows
-        .filter(s => String(s.station_id).startsWith(this.KAUAI_PREFIX) && s.lat && s.lng)
+      this.allStations = stationRows
+        .filter(s => s.lat && s.lng)
         .map(s => ({
           id: String(s.station_id),
           name: s.full_name || s.name || s.station_id,
@@ -218,70 +317,28 @@ export class KauaiLowellComponent implements AfterViewInit, OnDestroy {
         limit: 1000000
       });
 
-      interface Series { rain: [number, number][]; wind: [number, number][]; gust: [number, number][]; }
-      const seriesByStation = new Map<string, Series>();
       for (const r of rows) {
         if (r.flag !== 0 || r.value == null || r.value === '') continue;
         const raw = +r.value;
         if (!isFinite(raw)) continue;
-        let s = seriesByStation.get(r.station_id);
-        if (!s) { s = { rain: [], wind: [], gust: [] }; seriesByStation.set(r.station_id, s); }
+        let s = this.seriesByStation.get(r.station_id);
+        if (!s) { s = { rain: [], wind: [], gust: [] }; this.seriesByStation.set(r.station_id, s); }
         const t = Date.parse(r.timestamp);
         if (r.variable === this.RAINV) s.rain.push([t, raw / this.MM_PER_IN]);
         else if (r.variable === this.WINDV) s.wind.push([t, raw * this.MPH_PER_MS]);
         else if (r.variable === this.GUSTV) s.gust.push([t, raw * this.MPH_PER_MS]);
       }
-      for (const s of seriesByStation.values()) {
+      for (const s of this.seriesByStation.values()) {
         s.rain.sort((a, b) => a[0] - b[0]);
         s.wind.sort((a, b) => a[0] - b[0]);
         s.gust.sort((a, b) => a[0] - b[0]);
       }
 
-      let rainGlobalMax = 0;
-      let windGlobalMax = 0;
-      const accByStation = new Map<string, [number, number][]>();
-      for (const st of kauaiStations) {
-        const s = seriesByStation.get(st.id);
-        if (!s || (!s.rain.length && !s.wind.length && !s.gust.length)) continue;
-        let running = 0;
-        const acc: [number, number][] = s.rain.map(([t, v]) => {
-          running += v;
-          return [t, +running.toFixed(3)];
-        });
-        accByStation.set(st.id, acc);
-        rainGlobalMax = Math.max(rainGlobalMax, running);
-        for (const [, v] of s.wind) windGlobalMax = Math.max(windGlobalMax, v);
-        for (const [, v] of s.gust) windGlobalMax = Math.max(windGlobalMax, v);
-      }
-
-      const rainSharedMax = this.niceTop(rainGlobalMax);
-      const windSharedMax = this.niceTop(windGlobalMax);
-      let i = 0;
-      this.charts = kauaiStations
-        .filter(st => accByStation.has(st.id))
-        .map(st => {
-          const acc = accByStation.get(st.id)!;
-          const s = seriesByStation.get(st.id)!;
-          const windMax = s.wind.reduce((m, [, v]) => Math.max(m, v), 0);
-          const gustMax = s.gust.reduce((m, [, v]) => Math.max(m, v), 0);
-          i++;
-          const rainOptions = this.buildRainOptions(acc, rainSharedMax);
-          return {
-            id: st.id, name: st.name, lat: st.lat, lng: st.lng, index: i,
-            rainTotal: acc.length ? acc[acc.length - 1][1] : 0,
-            windMax, gustMax,
-            rainOptions,
-            windOptions: this.buildWindOptions(s.wind, s.gust, windSharedMax),
-            options: rainOptions,
-            updateFlag: false
-          };
-        });
-
+      this.buildCharts();
       this.initMap();
-      this.statusMsg = `${this.charts.length} Kauaʻi Mesonet stations · ${this.WINDOW_LABEL}`;
     } catch (e: any) {
       this.statusErr = true;
-      this.statusMsg = e?.message || 'Failed to load Kauaʻi rainfall data.';
+      this.statusMsg = e?.message || 'Failed to load Hawaiʻi Mesonet data.';
     } finally {
       this.loading = false;
     }
