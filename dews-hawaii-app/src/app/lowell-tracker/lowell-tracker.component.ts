@@ -98,6 +98,19 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
   rainUpdateFlag = false;
   windUpdateFlag = false;
 
+  // Direct chart references, captured once on creation. Switching stations
+  // rebuilds `*ngOptions` and flips the update flag, which is normally
+  // enough to make highcharts-angular redraw — but for one station (Lāwaʻi,
+  // 0621) the wind chart was reported to sometimes keep showing the
+  // previously-selected station's trace. Rather than trust the declarative
+  // [options]/[(update)] binding's internal timing, updateCharts() also
+  // calls chart.update() on these refs directly, which is synchronous and
+  // unambiguous regardless of whatever caused the stale redraw.
+  private rainChartRef?: Highcharts.Chart;
+  private windChartRef?: Highcharts.Chart;
+  rainChartCallback: Highcharts.ChartCallbackFunction = (chart) => { this.rainChartRef = chart; };
+  windChartCallback: Highcharts.ChartCallbackFunction = (chart) => { this.windChartRef = chart; };
+
   rainChartOptions: Highcharts.Options = {
     chart: { height: 260, zooming: { type: 'x' } },
     title: { text: undefined },
@@ -336,14 +349,24 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
     };
     this.rainUpdateFlag = true;
 
+    const windData = s?.wind ?? [];
+    const gustData = s?.gust ?? [];
     this.windChartOptions = {
       ...this.windChartOptions,
       series: [
-        { type: 'line', name: 'Sustained', data: s?.wind ?? [], color: '#d03b3b' },
-        { type: 'line', name: 'Gust', data: s?.gust ?? [], color: '#fb7744' }
+        { type: 'line', name: 'Sustained', data: windData, color: '#d03b3b' },
+        { type: 'line', name: 'Gust', data: gustData, color: '#fb7744' }
       ]
     };
     this.windUpdateFlag = true;
+
+    // Belt-and-suspenders: call setData directly on the live chart refs
+    // instead of trusting the declarative [options]/[(update)] binding alone.
+    if (this.rainChartRef?.series[0]) this.rainChartRef.series[0].setData(rainData, true, false, false);
+    if (this.windChartRef?.series[0] && this.windChartRef.series[1]) {
+      this.windChartRef.series[0].setData(windData, false, false, false);
+      this.windChartRef.series[1].setData(gustData, true, false, false);
+    }
   }
 
   private progress(frac: number) {
