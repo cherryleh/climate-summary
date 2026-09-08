@@ -1,7 +1,7 @@
 import { Component, ElementRef, AfterViewInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout, retry } from 'rxjs';
 import * as L from 'leaflet';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -90,6 +90,7 @@ export class LowellFocusComponent implements AfterViewInit, OnDestroy {
 
   // ------------------------------------------------------------- bound state
   loading = true;
+  loadPct = 0;
   statusMsg = '';
   statusErr = false;
   charts: StationChart[] = [];
@@ -120,9 +121,15 @@ export class LowellFocusComponent implements AfterViewInit, OnDestroy {
   }
 
   // --------------------------------------------------------------- API layer
+  /** A bounded timeout plus a couple of retries means a slow or flaky mesonet
+   *  response surfaces as an error (or quietly recovers) instead of leaving
+   *  the loading screen stuck with nothing ever rendering. */
   private async apiGet<T>(path: string, params: Record<string, any>): Promise<T> {
     const headers = new HttpHeaders({ Authorization: `Bearer ${environment.apiToken}` });
-    return firstValueFrom(this.http.get<T>(`${this.API}/${path}`, { headers, params }));
+    return firstValueFrom(this.http.get<T>(`${this.API}/${path}`, { headers, params }).pipe(
+      timeout(30000),
+      retry({ count: 2, delay: 1500 })
+    ));
   }
 
   /** Rounds a value up to a "nice" axis maximum, same convention used across the app. */
@@ -296,8 +303,21 @@ export class LowellFocusComponent implements AfterViewInit, OnDestroy {
     this.statusMsg = `${this.charts.length} ${this.islandLabel} Mesonet stations · ${this.WINDOW_LABEL}`;
   }
 
+  private progress(frac: number) {
+    this.loadPct = Math.round(Math.max(0, Math.min(1, frac)) * 100);
+  }
+
+  /** Re-runs start-up after a failed load — bound to the retry button. */
+  retry() {
+    this.loading = true;
+    this.statusErr = false;
+    this.progress(0);
+    this.boot();
+  }
+
   // ------------------------------------------------------------------ start-up
   private async boot() {
+    this.progress(0.05);
     try {
       const stationRows = await this.apiGet<any[]>('stations', { location: this.LOC });
       this.allStations = stationRows
@@ -307,6 +327,7 @@ export class LowellFocusComponent implements AfterViewInit, OnDestroy {
           name: s.full_name || s.name || s.station_id,
           lat: +s.lat, lng: +s.lng
         }));
+      this.progress(0.35);
 
       const rows = await this.apiGet<any[]>('measurements', {
         location: this.LOC,
@@ -316,6 +337,7 @@ export class LowellFocusComponent implements AfterViewInit, OnDestroy {
         row_mode: 'json',
         limit: 1000000
       });
+      this.progress(0.8);
 
       for (const r of rows) {
         if (r.flag !== 0 || r.value == null || r.value === '') continue;
@@ -336,9 +358,11 @@ export class LowellFocusComponent implements AfterViewInit, OnDestroy {
 
       this.buildCharts();
       this.initMap();
+      this.progress(1);
     } catch (e: any) {
       this.statusErr = true;
       this.statusMsg = e?.message || 'Failed to load Hawaiʻi Mesonet data.';
+      this.progress(1);
     } finally {
       this.loading = false;
     }

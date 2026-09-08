@@ -26,6 +26,18 @@
   </div>
 </header>
 
+<div class="boot" *ngIf="loading">
+  <div class="bootcard">
+    <div class="boottitle">Loading Hawaiʻi Mesonet data&hellip;</div>
+    <div class="bootbar"><i [style.width.%]="loadPct"></i></div>
+    <div class="bootpct">{{ loadPct }}%</div>
+  </div>
+</div>
+
+<div class="error-banner" *ngIf="statusErr && !loading">
+  <span>{{ statusMsg }}</span>
+  <button type="button" class="retry-btn" (click)="retry()">Retry</button>
+</div>
 
 <main>
   <section class="panel map-panel">
