@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hurricane Lowell Wind and Rainfall</title>
+<title>Hurricane Lowell</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -153,6 +153,8 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
 .findbar button:hover { background: var(--plane); }
 .findbar button:disabled { opacity: .5; cursor: default; }
 .findbar .zoomicon { flex: none; color: var(--muted); }
+.findbar-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 1px 2px; }
 /* the wind / gust marker: an SVG oval with the value inside and an arrow for direction */
 .wicon { background: none; border: 0; }
 .wicon svg { display: block; overflow: visible; }
@@ -168,8 +170,9 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
 .wk .kicker { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
               color: var(--muted); margin-bottom: 6px; }
 .wk h2 { margin: 0 0 12px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
-.wk .grid { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(420px, 1.9fr); gap: 22px; }
-@media (max-width: 1050px) { .wk .grid { grid-template-columns: 1fr; } }
+.wk .grid { display: flow-root; }
+.wk .app { float: right; width: 65%; min-width: 420px; margin: 0 0 18px 22px; }
+@media (max-width: 1050px) { .wk .app { float: none; width: auto; min-width: 0; margin: 0 0 18px; } }
 .wk .prose p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-align: justify;
                hyphens: auto; }
 .wk .prose p:last-child { margin-bottom: 0; }
@@ -355,7 +358,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
 <div id="boot">
   <div class="bootcard">
     <img class="bootlogo" src="logo.png" alt="HCDP">
-    <div class="boottitle">Hurricane Lowell Wind and Rainfall</div>
+    <div class="boottitle">Hurricane Lowell</div>
     <div class="bootbar"><i id="bootfill"></i></div>
     <div class="bootpct" id="bootpct">0%</div>
   </div>
@@ -363,7 +366,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
 
 <header>
   <img class="logo" src="logo.png" alt="HCDP Logo">
-  <h1>Hurricane Lowell Wind and Rainfall</h1>
+  <h1>Hurricane Lowell</h1>
 </header>
 
 <div class="tip" id="tip"></div>
@@ -374,34 +377,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
     <div class="card">
       <h2>Mapping Hurricane Lowell's Winds, Hour by Hour</h2>
       <div class="grid">
-        <div class="prose">
-          <p>When Hurricane Lowell reached the islands on September 7, its winds did not treat every place
-            the same. Some areas took dangerous gusts while others a few miles away stayed almost calm. So
-            how do we know what the wind was doing in all the places where nobody was measuring it?</p>
-          <p>We start with real measurements. Every hour, dozens of weather stations across Hawaiʻi,
-            including the Hawaiʻi Mesonet, record the wind's speed and direction. But stations can't be
-            everywhere, so a computer model combines each hour's readings with the shape of the land.
-            Hawaiʻi's extreme landscape can speed winds up as they squeeze over ridges and through valleys,
-            and can even change the direction the wind blows. The model uses this to fill in a wind
-            estimate for every spot on the island, one map for each hour. Played in order, like a
-            flip-book, the maps tell the story of the whole storm.</p>
-          <p>This is an experimental process that the Hawaiʻi Climate Data Portal (HCDP) is still
-            developing and testing. The maps are not cross-validated, and the model can push winds over
-            exposed ridgelines well above anything a station recorded, so treat the highest values as an
-            upper bound rather than a measurement. The goal is a big one: to vastly improve our
-            understanding of how wind moves across our islands, during hurricanes like Lowell and on
-            ordinary trade-wind days, so scientists, land managers and communities can see the wind,
-            not just feel it.</p>
-          <p>Looking at the sequence from September 7 into the morning of the 8th, notice that the strongest winds are found along
-            ridgelines, as expected, and that they build through the afternoon and evening as Lowell
-            closed in. What might be surprising is how strong the winds can be on the leeward slopes.
-            As air is forced over a ridge and descends the other side, it can accelerate downslope, much
-            like water speeding up as it flows downhill, and mountain-wave effects can produce localized
-            areas of exceptionally strong wind well down the leeward side. Hover the map to read the
-            modeled wind at any point, and switch on the stations to compare the model with what was
-            actually measured.</p>
-        </div>
-        <div>
+        <div class="app">
           <div class="counties" id="wkCounties"></div>
           <div class="fig">
             <div class="ft" id="wkTitle">Near-surface wind speed</div>
@@ -417,7 +393,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
                 <div class="readout" id="wkRead">Hover the map for the wind at any grid cell</div>
                 <div class="stakey" id="wkStaKey">
                   <div class="row"><svg width="30" height="14" viewBox="0 0 30 14"><rect x="1" y="1" width="28" height="12" rx="6" fill="#9a9a9a" stroke="#666"/><path d="M8,3.5 L10.6,10 L8,8.4 L5.4,10 Z" fill="#fff"/><text x="19" y="10.5" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">21</text></svg><span>Hawaiʻi Mesonet station</span></div>
-                  <div class="row"><svg width="30" height="14" viewBox="0 0 30 14"><rect x="1" y="1" width="28" height="12" rx="2" fill="#9a9a9a" stroke="#666"/><path d="M8,3.5 L10.6,10 L8,8.4 L5.4,10 Z" fill="#fff"/><text x="19" y="10.5" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">21</text></svg><span>Other network station</span></div>
+                  <div class="row"><svg width="30" height="14" viewBox="0 0 30 14"><rect x="1" y="1" width="28" height="12" rx="2" fill="#9a9a9a" stroke="#666"/><path d="M8,3.5 L10.6,10 L8,8.4 L5.4,10 Z" fill="#fff"/><text x="19" y="10.5" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">21</text></svg><span>Other station</span></div>
                   <div class="row note">arrow points downwind &middot; number is mph</div>
                 </div>
               </div>
@@ -442,7 +418,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
                 <button class="btn" id="wkPrev" title="Back one hour">&#9664;</button>
                 <input type="range" id="wkSlider" min="0" max="23" value="0" step="1" aria-label="Hour">
                 <button class="btn" id="wkNext" title="Forward one hour">&#9654;</button>
-                <span class="hour" id="wkHour">00:00</span>
+                <span class="hour" id="wkHour">12:00 AM</span>
                 <select class="speed" id="wkSpeed" aria-label="Playback speed">
                   <option value="900">slow</option>
                   <option value="500" selected>normal</option>
@@ -460,6 +436,14 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
               </div>
             </div>
           </div>
+        </div>
+        <div class="prose">
+          <p>From the afternoon of September 7 into the morning of September 8, Hurricane Lowell passed close by Niʻihau and Kauaʻi as a Category 2 storm. Its brush with the islands brought powerful winds, heavy rains, and high seas. Kauaʻi is an island with very steep terrain, and the wind that blew across the mountain ridges and valleys was likely to have been stronger than the wind measured at any of the island’s weather stations, which are all located at lower elevations.</p>
+          <p>This set of experimental maps provides estimates of the wind speeds everywhere across the island. To make these maps, all available measurements from every wind station on the island are fed into a computer model along with topographic information to represent the interaction between air flow and the mountainous contours of the island. The computer model simulates how wind speeds up, slows down, and changes direction as it flows over mountains and through vegetation. The result is one map per hour showing the wind speed and direction averaged over that hour at every point on the island. Average hourly wind speed is always significantly lower than the highest wind speed during the hour. Wind speed varies constantly, with strong gusts and periods of lower wind speeds. </p>
+          <p>Hover the map to read the modeled wind at any point, step through the hours with the slider, and switch on the stations to compare the model with what was actually measured.
+          Viewing the maps, a few things stand out. The strongest readings came from stations along the coast, at the Līhuʻe and Port Allen airports, while the strongest modeled winds are up on the ridgelines, as expected. The wind speeds built steadily through the afternoon and evening as Lowell closed in, roughly doubling between 4:00 and 9:00 PM, and stayed near its peak until midnight. It then eased through the early morning hours and was down to typical trade wind strength by late morning on September 8.</p>
+          <p>The peak hour was 11:00 pm on September 7. In that hour, Līhuʻe airport recorded an average wind speed of 56 mph, the highest measured hourly wind speed of the storm on Kauaʻi. In the same hour, the model wind speed was above 60 mph over about a third of the island and small patches along the highest ridges had winds above 85 mph.  Estimated wind speed reached as high as 133 mph on the high ground between Mount Kāhili and the southwest side of Waiʻaleʻale, far inland above Kalāheo and Poʻipū.</p>
+          <p>Keep in mind that the modeled wind speeds are just estimates. The model has not been independently cross-checked for this storm. Use the viewer here to flip between wind on Oahu and Kauai, and click any station or grid on the map to see a time series of sustained winds for that location.</p>
         </div>
       </div>
     </div>
@@ -485,7 +469,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
                   <div class="vals"><div><span>min</span><b id="rkMin">—</b></div><div><span>average</span><b id="rkMean">—</b></div><div><span>max</span><b id="rkMax">—</b></div></div></div>
                 <div class="stakey" id="rkStaKey">
                   <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Hawaiʻi Mesonet station</div>
-                  <div><svg width="14" height="14"><rect x="1.5" y="1.5" width="11" height="11" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Other network station</div>
+                  <div><svg width="14" height="14"><rect x="1.5" y="1.5" width="11" height="11" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Other station</div>
                   <div style="opacity:.8;font-size:10px">colour is the day's total</div>
                 </div>
                 <div class="readout" id="rkRead">Hover the map for the rainfall at any grid cell</div>
@@ -496,7 +480,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
               </div>
               <div class="xax" id="rkXax"></div>
             </div>
-            <p class="fnote">Daily total from 00:00 to 24:00 HST. Color scale fixed at 0&ndash;30 inches, pseudo-log spaced,
+            <p class="fnote">Daily total from midnight to midnight HST. Color scale fixed at 0&ndash;30 inches, pseudo-log spaced,
               for all three days; stations use the same scale, circles for Hawaiʻi Mesonet stations and squares for other
               networks. CRS: WGS 84 (EPSG:4326). HCDP statewide daily rainfall map, 250 m grid, from station observations
               &middot; experimental.</p>
@@ -515,19 +499,10 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
           </div>
         </div>
         <div class="prose">
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Vestibulum ante ipsum primis in
-            faucibus orci luctus et ultrices posuere cubilia curae; Integer tincidunt, nisl at euismod luctus, urna
-            sapien iaculis nibh, non lacinia lorem nulla non ante. Praesent sit amet ligula nec justo dignissim
-            fermentum.</p>
-          <p>Curabitur et magna a ligula tempus vehicula. Suspendisse potenti. Aliquam erat volutpat. Donec in
-            mauris eget augue efficitur volutpat. Morbi ac dictum lorem, ac faucibus lacus. Etiam eu arcu vel odio
-            finibus laoreet at et sapien. Vivamus varius ex at tortor dapibus, in porttitor odio tempus.</p>
-          <p>Sed non risus sed erat blandit fringilla. Cras dapibus, ipsum vitae varius luctus, augue turpis
-            sollicitudin lacus, vitae posuere nisl velit non nibh. Duis at nisi a metus laoreet fringilla. Nam
-            feugiat, sem in tristique laoreet, felis mi commodo purus, a molestie ligula neque quis quam.</p>
-          <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris
-            at elit ac velit vulputate porta. Proin volutpat, libero sit amet suscipit fermentum, sapien risus
-            malesuada nibh, sed ullamcorper dolor nibh a nisl.</p>
+          <p>Rain from Lowell arrived a day ahead of the wind. On September 6, the storm's outer bands brushed the western islands while the center was still far to the southeast. Windward Oʻahu and the north side of East Maui caught the most, with the Kamananui gauge in the Koʻolau mountains measuring more than 9 inches and the West Wailuaiki gauge near Keʻanae more than 8 inches. Kauaʻi had a comparatively quiet day, with under 5 inches on Mount Waiʻaleʻale, one of the rainiest places on Earth.</p>
+          <p>As Lowell passed close to the island on September 7, almost the whole island received more than 2 inches of rain, and nearly half the island received more than 5 inches. The highest rainfall total was received at the summit of Waiʻaleʻale, where the gauge recorded just over 23 inches in 24 hours. A number that stands out is from the Hawaiʻi Mesonet station at Lower Limahuli on the north shore near Hāʻena, which received just over 15 inches on the 7th and more than 17 inches across the three days, the largest total of any Mesonet station in the storm. The Kilohana gauge above Hanalei also had more than 15 inches. The other islands, by then well clear of the storm, saw little more than an inch or two. </p>
+          <p>By September 8, the rain was easing but not over. Kauaʻi still picked up more than 8 inches on Waiʻaleʻale and around 5 on the ridges above Waimea, while the rest of the state returned to scattered showers. Over the three days, the mountain gauge on Waiʻaleʻale totaled almost 36 inches, and the map suggests the wettest spots in the interior received more than 3 feet of rain.</p>
+          <p>Use the buttons to zoom to each island and to switch between the three days. Hover the map to read the rainfall estimate at any point, and compare it with the stations, drawn as circles for the Hawaiʻi Mesonet and squares for stations from other networks. The map is filled in from those station readings, so it is most trustworthy near a station and most uncertain in areas at a distance from the nearest stations.</p>
         </div>
       </div>
     </div>
@@ -538,23 +513,16 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
       <h2>Kauaʻi Coastal Impacts Storm Surf</h2>
       <div class="grid">
         <div class="prose">
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Vestibulum ante ipsum primis in
-            faucibus orci luctus et ultrices posuere cubilia curae; Integer tincidunt, nisl at euismod luctus, urna
-            sapien iaculis nibh, non lacinia lorem nulla non ante. Praesent sit amet ligula nec justo dignissim
-            fermentum.</p>
-          <p>Curabitur et magna a ligula tempus vehicula. Suspendisse potenti. Aliquam erat volutpat. Donec in
-            mauris eget augue efficitur volutpat. Morbi ac dictum lorem, ac faucibus lacus. Etiam eu arcu vel odio
-            finibus laoreet at et sapien. Vivamus varius ex at tortor dapibus, in porttitor odio tempus.</p>
-          <p>Sed non risus sed erat blandit fringilla. Cras dapibus, ipsum vitae varius luctus, augue turpis
-            sollicitudin lacus, vitae posuere nisl velit non nibh. Duis at nisi a metus laoreet fringilla. Nam
-            feugiat, sem in tristique laoreet, felis mi commodo purus, a molestie ligula neque quis quam.</p>
-          <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris
-            at elit ac velit vulputate porta. Proin volutpat, libero sit amet suscipit fermentum, sapien risus
-            malesuada nibh, sed ullamcorper dolor nibh a nisl.</p>
+          <p>Lowell's center never touched land. It passed about 40 miles west of Niʻihau late on the night of September 7, by then a Category 2 hurricane after peaking as a Category 5 far out at sea. A huge swell built out of the south and southwest through the day and peaked that night, with breaking waves of 20 to 30 feet on Kauaʻi’s south and west-facing shores and a storm surge of several feet. No local buoy exists for the southwestern shores of  Kauaʻi, however from the University of Hawaii PacIOOS’ Simulating WAves Nearshore (SWAN) model, shown here put wave heights near 38 feet in the open ocean just off the southwest coast around midnight.</p>
+          <p>The surge and surf flooded the low-lying grounds of the Sheraton resort at Poʻipū and damaged homes along the shore, buried the highway fronting Kekaha Beach under rock and pieces of broken seawall, and tore up the small boat harbor at Port Allen. Roads on the west side and north shore were left impassable by sand, boulders, and debris. The high surf warnings stayed up into September 8 as the swell slowly eased.</p>
+          <p>Visit University of Hawaii PacIOOS page for more information on historical and current ocean waves and conditions: https://www.pacioos.hawaii.edu/ </p>
         </div>
         <figure>
           <img src="wave_lowell.png" alt="Storm surf on the Kauaʻi coast during Hurricane Lowell">
-          <figcaption>Data accessed from <a href="https://www.pacioos.hawaii.edu/" target="_blank" rel="noopener">PacIOOS</a> (https://www.pacioos.hawaii.edu/)</figcaption>
+          <figcaption>Data accessed from <a href="https://www.pacioos.hawaii.edu/waves/model-kauai" target="_blank" rel="noopener">PacIOOS</a> (https://www.pacioos.hawaii.edu/)
+
+          Cheung, K.F. 2010, updated 2025. Simulating WAves Nearshore (SWAN) Regional Wave Model: Kauai. September 7th 2026. Distributed by the Pacific Islands Ocean Observing System (PacIOOS). http://pacioos.org/metadata/swan_kauai.html. Accessed September 9th 2026.
+</figcaption>
         </figure>
       </div>
     </div>
@@ -563,13 +531,9 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
     <div class="phead">
       <div class="kicker">Hawaiʻi Mesonet</div>
       <h2>Wind Gusts and Rainfall, Every 15 Minutes</h2>
-      <p>This map replays the storm from the Hawaiʻi Mesonet's weather stations. Each step shows the
-        hour that just ended. <b>Gusts</b> shows the strongest gust each station felt in that hour, in
-        mph, as a pill pointing the way the wind was blowing; the bigger and redder the pill, the
-        stronger the gust. <b>Rain</b> shows how much fell in that hour, in inches per hour. Click any
-        station to see its whole storm in the chart below the map. The background is the GOES-West
-        weather satellite's infrared view, refreshed every 15 minutes, with the coldest, tallest cloud
-        tops in bright white.</p>
+      <p>Watch Hurricane Lowell unfold as the Hawaiʻi Mesonet saw it. Press play and the map steps forward 15 minutes at a time, with each step showing what the weather stations recorded over the hour that had just ended. Choose Gusts to see the strongest burst of wind each station felt in that hour, shown as a small “pill” that points the way the wind was blowing. The bigger and redder the pill, the harder it blew. Choose Rain to see how much rain fell in that hour, the redder the pill, the more rain the station received. The background image shows the view from the GOES-West weather satellite, also refreshed every 15 minutes: the brightest white marks the tallest, coldest storm clouds, so you can watch the rain bands sweep over the islands as the stations light up beneath them. <br><br>
+      Click any station to see its whole storm charted below the map, drag the slider to any moment, or use the two buttons in the upper left corner of the map to jump straight to the station with the highest wind speed or rainfall of the storm or of the hour on screen. Hover over a station for its name and reading.
+</p>
       <div id="status" role="status"></div>
     </div>
     <div id="gate" class="hidden">
@@ -737,9 +701,11 @@ const zoomBtn = label => ZOOM_ICON + '<span class="zoomlabel">' + label + '</spa
 const frameTime = i => FIRST + i * STEP_MS;
 const fmtClock = ms => new Date(ms).toLocaleString('en-US', {
   timeZone: 'Pacific/Honolulu', month: 'short', day: 'numeric',
-  hour: '2-digit', minute: '2-digit', hour12: false });
+  hour: 'numeric', minute: '2-digit', hour12: true });
 const fmtHM = ms => new Date(ms).toLocaleString('en-US', {
-  timeZone: 'Pacific/Honolulu', hour: '2-digit', minute: '2-digit', hour12: false });
+  timeZone: 'Pacific/Honolulu', hour: 'numeric', minute: '2-digit', hour12: true });
+/** 0..23 -> '12:00 AM' .. '11:00 PM' */
+const fmtHour12 = h => (h % 12 || 12) + ':00 ' + (h < 12 ? 'AM' : 'PM');
 
 /* --------------------------------------------------------------- the scale */
 function magScale(v, kind) {
@@ -960,6 +926,7 @@ function initMap() {
   find.onAdd = () => {
     const box = L.DomUtil.create('div', 'findbar');
     box.innerHTML =
+      '<div class="findbar-label">Zoom to</div>' +
       '<button id="findall" title="Zoom to the highest station-hour anywhere in the period, ' +
       'and jump the animation to it">' + zoomBtn('Highest overall') + '</button>' +
       '<button id="findnow" title="Zoom to the highest station in the hour currently shown">' +
@@ -1699,9 +1666,9 @@ function wkRender() {
   const fr = WIND.frames[WK.frame];
   if (!fr) return;
   const hh = String(fr.hour).padStart(2, '0') + ':00', dt = wkDate(fr.date);
-  $('#wkHour').textContent = dt.short + ' ' + hh;
+  $('#wkHour').textContent = dt.short + ' ' + fmtHour12(fr.hour);
   $('#wkSlider').value = WK.frame;
-  $('#wkWhen').textContent = dt.long + ', ' + hh + ' HST';
+  $('#wkWhen').textContent = dt.long + ', ' + fmtHour12(fr.hour) + ' HST';
   // the satellite frame for this hour, if the GOES set covers it
   if (WK.sat && SAT) {
     const g = SAT.byTime.get(Date.parse(fr.date + 'T' + hh + ':00-10:00'));
@@ -1872,6 +1839,7 @@ async function initWind() {
   find.onAdd = () => {
     const box = L.DomUtil.create('div', 'findbar');
     box.innerHTML =
+      '<div class="findbar-label">Zoom to</div>' +
       '<button id="wkPeakAll" title="Jump to the hour with the strongest modeled wind in this view, and zoom to it">' + zoomBtn('Peak wind hour') + '</button>' +
       '<button id="wkPeakSta" title="Zoom to the station with the strongest observed wind this hour">' + zoomBtn('Peak station this hour') + '</button>';
     L.DomEvent.disableClickPropagation(box);
@@ -2026,7 +1994,7 @@ function rkRender() {
   const day = RAIN.days[RK.day], cells = RK.cells[RK.day];
   if (!day) return;
   const dt = wkDate(day.date);
-  $('#rkWhen').textContent = dt.long + ', 00:00 to 24:00 HST';
+  $('#rkWhen').textContent = dt.long + ', midnight to midnight HST';
   $('#rkTitle').textContent = 'Daily rainfall — ' + RK_TITLES[RK.zoom];
   document.querySelectorAll('#rkDays button').forEach(b => b.classList.toggle('on', +b.dataset.day === RK.day));
   if (cells && RK.overlay) RK.overlay.setUrl(cells.url);
@@ -2112,7 +2080,8 @@ async function initRain() {
   const find = L.control({ position: 'topleft' });
   find.onAdd = () => {
     const box = L.DomUtil.create('div', 'findbar');
-    box.innerHTML = '<button id="rkPeakCell" title="Zoom to the wettest grid cell in this view on this day">' + zoomBtn('Wettest grid cell') + '</button>' +
+    box.innerHTML = '<div class="findbar-label">Zoom to</div>' +
+                    '<button id="rkPeakCell" title="Zoom to the wettest grid cell in this view on this day">' + zoomBtn('Wettest grid cell') + '</button>' +
                     '<button id="rkPeakSta" title="Zoom to the wettest station in this view on this day">' + zoomBtn('Wettest station') + '</button>';
     L.DomEvent.disableClickPropagation(box);
     return box;
