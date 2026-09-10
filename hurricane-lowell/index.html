@@ -1,0 +1,2252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hurricane Lowell Wind and Rainfall</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --surface-1: #ffffff;
+  --plane: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --muted: #64748b;
+  --grid: #e2e8f0;
+  --axis: #cbd5e1;
+  --border: #e2e8f0;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #eff6ff;
+  --accent-soft-border: #93c5fd;
+  --hl: #d03b3b;            /* the highlighted hour on the time plot */
+  /* the same spectral ramp the companion map uses for rainfall: low -> high */
+  --rate-1:#ff0000; --rate-2:#ff8000; --rate-3:#ffff00; --rate-4:#00ff00;
+  --rate-5:#00ffff; --rate-6:#0000ff; --rate-7:#8b00ff;
+  /* and its wind ramp, which runs the other way: calm violet -> strong red */
+  --wind-1:#8b00ff; --wind-2:#0000ff; --wind-3:#00ffff; --wind-4:#00ff00;
+  --wind-5:#ffff00; --wind-6:#ff8000; --wind-7:#ff0000;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--plane); color: var(--text-primary);
+  font: 14px/1.45 "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+header {
+  width: 100%; text-align: center; padding: 28px 20px 6px; background: var(--plane);
+}
+header .logo { display: inline-block; max-height: 70px; width: auto; object-fit: contain; margin-bottom: 10px; }
+h1 { font-size: 1.7rem; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
+h1 small { display: block; font-weight: 400; color: var(--text-secondary); font-size: 12px; }
+
+.panel {
+  width: min(1240px, 92%); margin: 14px auto; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+.panel .phead { padding: 22px 26px 14px; }
+.panel .phead .kicker { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+                        color: var(--muted); margin-bottom: 6px; }
+.panel .phead h2 { margin: 0 0 10px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+.panel .phead p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-secondary); }
+.panel .phead #status { padding: 8px 0 0; }
+#map { height: min(62vh, 620px); background: var(--plane); border-bottom: 1px solid var(--border); }
+#map.sat { background: #0b1220; }          /* the ground beyond the satellite frame's edge */
+
+/* ---- transport controls ---- */
+.transport {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-bottom: 1px solid var(--border);
+}
+.btn {
+  font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--plane); color: var(--text-primary);
+  min-width: 38px;
+}
+.btn:hover { background: var(--surface-1); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; min-width: 74px; }
+.btn:disabled { opacity: .45; cursor: default; }
+
+#slider { flex: 1; min-width: 0; accent-color: var(--accent); }
+
+.clock { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.clock .now { font-size: 15px; font-weight: 600; }
+.clock .win { display: block; font-size: 11px; color: var(--muted); }
+
+.speed { font: inherit; font-size: 12px; padding: 5px 7px; border-radius: 7px;
+         border: 1px solid var(--border); background: var(--plane); color: var(--text-secondary); }
+
+/* the rain / wind switch */
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+       flex: none; }
+.seg button {
+  font: inherit; font-size: 12px; padding: 6px 12px; border: 0; cursor: pointer;
+  background: var(--plane); color: var(--text-secondary);
+}
+.seg button + button { border-left: 1px solid var(--border); }
+.seg button:hover { background: var(--surface-1); }
+.seg button.on { background: var(--text-primary); color: var(--surface-1); font-weight: 600; }
+
+/* ---- legend ---- */
+.legend { display: flex; align-items: center; gap: 10px; padding: 10px 14px 4px;
+          font-size: 11px; color: var(--muted); }
+.legend .unit { white-space: nowrap; }
+.legend .ramp { flex: 1; min-width: 0; }
+.legend .rampbar { height: 9px; border-radius: 2px; }
+.legend .rampticks { position: relative; height: 13px; }
+.legend .rampticks span { position: absolute; top: 1px; font-size: 10px; white-space: nowrap;
+                          font-variant-numeric: tabular-nums; }
+.footnote { margin: 0; padding: 0 14px 12px; font-size: 11px; color: var(--muted); }
+
+.tally { padding: 0 14px 12px; font-size: 12px; color: var(--text-secondary);
+         font-variant-numeric: tabular-nums; }
+.tally b { color: var(--text-primary); }
+
+.hourbox { border-top: 1px solid var(--border); padding: 10px 14px 14px; }
+.hourhead { display: flex; align-items: baseline; gap: 10px; min-height: 26px; }
+.hourhead .grow { flex: 1; }
+.hourhead .btn { padding: 4px 10px; font-size: 12px; }
+.hourhead .who { font-size: 13px; font-weight: 600; }
+.hourhead .stat { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
+                cursor: crosshair; }
+.empty { height: 196px; display: grid; place-items: center; color: var(--muted);
+         font-size: 12px; text-align: center; padding: 0 20px; }
+.tip {
+  position: absolute; pointer-events: none; z-index: 1200; background: var(--surface-1);
+  border: 1px solid var(--border); border-radius: 7px; padding: 6px 9px; font-size: 12px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.18); white-space: nowrap; opacity: 0;
+  transition: opacity .1s; font-variant-numeric: tabular-nums; left: 0; top: 0;
+}
+
+/* ---- token gate + first-load cover ---- */
+#gate { max-width: 470px; margin: 0 26px 20px; background: var(--plane);
+        border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; }
+#gate h2 { margin: 0 0 6px; font-size: 15px; }
+#gate p { color: var(--text-secondary); font-size: 13px; margin: 0 0 14px; }
+#gate input { width: 100%; font: inherit; padding: 8px 10px; border-radius: 7px;
+              border: 1px solid var(--axis); background: var(--plane); color: var(--text-primary); }
+#gate button { margin-top: 10px; font: inherit; padding: 7px 16px; border-radius: 7px;
+               border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+#gate .pick {
+  display: block; padding: 14px; border: 1px dashed var(--axis); border-radius: 9px;
+  background: var(--plane); font-size: 13px; cursor: pointer; color: var(--text-primary);
+}
+#gate .pick input { display: block; margin-top: 9px; font: inherit; font-size: 12px; }
+#gate .or { margin: 12px 0 6px; font-size: 12px; color: var(--muted); text-align: center; }
+#gate .fine { margin: 12px 0 0; font-size: 11px; color: var(--muted); }
+#status { font-size: 12px; color: var(--text-secondary); min-height: 1.2em; padding: 0 18px 10px; }
+#status.err { color: #d03b3b; }
+
+.leaflet-container { background: var(--plane); font: inherit; }
+.findbar { display: flex; flex-direction: column; gap: 4px; margin: 10px 0 0 10px; }
+.findbar button {
+  font: inherit; font-size: 12px; padding: 6px 10px; border-radius: 7px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
+  box-shadow: 0 1px 4px rgba(0,0,0,.12); text-align: left; white-space: nowrap;
+  display: flex; align-items: center; gap: 5px;
+}
+.findbar button:hover { background: var(--plane); }
+.findbar button:disabled { opacity: .5; cursor: default; }
+.findbar .zoomicon { flex: none; color: var(--muted); }
+/* the wind / gust marker: an SVG oval with the value inside and an arrow for direction */
+.wicon { background: none; border: 0; }
+.wicon svg { display: block; overflow: visible; }
+.wicon text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-weight: 700;
+              font-variant-numeric: tabular-nums; pointer-events: none; }
+.hidden { display: none !important; }
+
+
+/* ---- the WindNinja highlight, styled after the HCDP Hurricane Lala page ---- */
+.wk { width: min(1240px, 92%); margin: 0 auto 24px; }
+.wk .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 24px;
+            overflow: hidden; padding: 22px 26px 24px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); }
+.wk .kicker { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+              color: var(--muted); margin-bottom: 6px; }
+.wk h2 { margin: 0 0 12px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+.wk .grid { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(420px, 1.9fr); gap: 22px; }
+@media (max-width: 1050px) { .wk .grid { grid-template-columns: 1fr; } }
+.wk .prose p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-align: justify;
+               hyphens: auto; }
+.wk .prose p:last-child { margin-bottom: 0; }
+.wk .counties { display: flex; gap: 8px; justify-content: center; margin: 0 0 12px; }
+.wk .counties button { font: inherit; font-size: 14px; font-weight: 600; padding: 9px 16px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.wk .counties button:hover { background: var(--accent-soft); border-color: var(--accent-soft-border); color: var(--accent-hover); }
+.wk .counties button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.wk .counties button:disabled { opacity: .45; cursor: default; }
+/* the figure: title, date, axes, map, legend, footnote — like a printed map */
+.wk .fig { border: 1px solid var(--border); border-radius: 10px; background: #fff; padding: 10px 10px 8px; }
+.wk .fig .ft { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.wk .fig .fw { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+.wk .figgrid { display: grid; grid-template-columns: 34px 1fr 62px; grid-template-rows: 1fr 18px; gap: 0 4px; }
+.wk .yax, .wk .xax { position: relative; font-size: 10px; color: #444; font-variant-numeric: tabular-nums; }
+.wk .yax span { position: absolute; right: 2px; transform: translateY(-50%); white-space: nowrap; }
+.wk .xax { grid-column: 2; }
+.wk .xax span { position: absolute; top: 3px; transform: translateX(-50%); white-space: nowrap; }
+.wk .mapwrap { position: relative; border: 1px solid #b9bcc4; }
+#kamap { height: min(64vh, 640px); background: #f2f4f6; cursor: crosshair; }
+#kamap.sat { background: #0b1220; }          /* the ground beyond the satellite frame's edge */
+#kamap .warrows { pointer-events: none; }
+#kamap .leaflet-control-scale-line { background: rgba(255,255,255,.75); border-color: #333; color: #222; font-size: 11px; }
+.wk .badge { position: absolute; right: 10px; top: 8px; z-index: 800; display: flex; align-items: center; gap: 10px;
+             pointer-events: none; }
+.wk .hcdp { height: 28px; width: auto; display: block; filter: drop-shadow(0 0 2px rgba(255,255,255,.9)); }
+/* the same logo on the gust map, as a Leaflet control so it sits with the map's own furniture */
+.logo-ctl { pointer-events: none; }
+.logo-ctl img { height: 30px; width: auto; display: block; filter: drop-shadow(0 0 2px rgba(255,255,255,.9)); }
+.wk .north { width: 30px; height: 40px; }
+.wk .legend { grid-column: 3; align-self: center; font-size: 10px; color: #222; display: flex; flex-direction: column;
+              align-items: flex-start; gap: 5px; padding-left: 2px; }
+.wk .legend .title { font-weight: 600; line-height: 1.2; }
+.wk .legend .lb { display: flex; gap: 5px; }
+.wk .legend .bar { width: 12px; height: 250px; border: 1px solid #555; }
+.wk .legend .ticks { position: relative; height: 250px; width: 30px; font-variant-numeric: tabular-nums; }
+.wk .legend .ticks span { position: absolute; left: 0; transform: translateY(-50%); }
+.wk .gridstat { position: absolute; right: 10px; top: 46px; z-index: 800; background: rgba(255,255,255,.92);
+                border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px 6px; font-size: 11px; }
+.wk .gridstat .cap { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.wk .gridstat .vals { display: flex; gap: 12px; margin-top: 1px; }
+.wk .gridstat .vals span { font-size: 9.5px; color: var(--muted); display: block; }
+.wk .gridstat .vals b { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+#kamap .findbar button { font-size: 11px; padding: 5px 8px; }
+#kamap .leaflet-top.leaflet-left { display: flex; flex-direction: row; align-items: flex-start; }
+#kamap .leaflet-top.leaflet-left .findbar { margin-left: 8px; }
+.wk .readout { position: absolute; right: 10px; bottom: 26px; z-index: 800; background: rgba(255,255,255,.9);
+               border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; font-size: 12px;
+               font-variant-numeric: tabular-nums; color: var(--text-secondary); max-width: 230px; }
+.wk .readout b { color: var(--text-primary); font-size: 14px; }
+.wk .fnote { margin: 8px 0 0; font-size: 10.5px; color: #666; line-height: 1.35; }
+.wk .stakey { position: absolute; left: 10px; bottom: 34px; z-index: 800; background: rgba(255,255,255,.9);
+              border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; font-size: 11px; color: #444;
+              pointer-events: none; }
+.wk .stakey .row { display: flex; align-items: center; gap: 7px; line-height: 1.5; }
+.wk .stakey .row.note { font-size: 10px; color: #777; margin-top: 2px; }
+.wk .stakey svg { flex: none; }
+.townlab { background: none; border: 0; pointer-events: none; }
+.townlab svg { overflow: visible; }
+/* controls under the figure */
+.wk .controls { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 14px 22px;
+                padding: 14px 0 6px; }
+.wk .group { display: flex; flex-direction: column; gap: 5px; }
+.wk .group > label.cap { font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+                         color: var(--muted); text-align: center; }
+.wk .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; border: 1px solid var(--border);
+            border-radius: 999px; background: var(--plane); }
+.wk .pill .btn { border-radius: 999px; padding: 5px 11px; }
+.wk .pill input[type=range] { width: 220px; accent-color: var(--accent); }
+.wk .pill .hour { min-width: 96px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.wk .pill label.chk { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 0 4px;
+                      cursor: pointer; white-space: nowrap; }
+.wk .pill label.chk input { accent-color: var(--accent); }
+.wk .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 20px; padding: 6px 0 0; }
+.wk .stat { border: 1px solid var(--border); border-radius: 9px; padding: 6px 10px; background: var(--plane); }
+.wk .stat .cap { font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.wk .stat .vals { display: flex; gap: 18px; margin-top: 2px; }
+.wk .stat .vals span { font-size: 10px; color: var(--muted); display: block; }
+.wk .stat .vals b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.wk .none { padding: 30px 16px; color: var(--muted); font-size: 12px; }
+
+/* ---- the rainfall highlight: same card, map on the left ---- */
+.rk { width: min(1240px, 92%); margin: 0 auto 24px; }
+.rk .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 24px;
+            overflow: hidden; padding: 22px 26px 24px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); }
+.rk h2 { margin: 0 0 12px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+.rk .grid { display: grid; grid-template-columns: minmax(420px, 1.9fr) minmax(280px, 1fr); gap: 22px; }
+@media (max-width: 1050px) { .rk .grid { grid-template-columns: 1fr; } }
+.rk .prose p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-align: justify; hyphens: auto; }
+.rk .prose p:last-child { margin-bottom: 0; }
+.rk .btnrow { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 10px; }
+.rk .btnrow button { font: inherit; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.rk .btnrow button:hover { background: var(--accent-soft); border-color: var(--accent-soft-border); color: var(--accent-hover); }
+.rk .btnrow button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.rk .btnrow .cap { align-self: center; font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+                   color: var(--muted); margin-right: 4px; }
+.rk .fig { border: 1px solid var(--border); border-radius: 10px; background: #fff; padding: 10px 10px 8px; }
+.rk .fig .ft { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.rk .fig .fw { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+.rk .figgrid { display: grid; grid-template-columns: 34px 1fr 62px; grid-template-rows: 1fr 18px; gap: 0 4px; }
+.rk .yax, .rk .xax { position: relative; font-size: 10px; color: #444; font-variant-numeric: tabular-nums; }
+.rk .yax span { position: absolute; right: 2px; transform: translateY(-50%); white-space: nowrap; }
+.rk .xax { grid-column: 2; }
+.rk .xax span { position: absolute; top: 3px; transform: translateX(-50%); white-space: nowrap; }
+.rk .mapwrap { position: relative; border: 1px solid #b9bcc4; }
+#rkmap { height: 520px; background: #f2f4f6; cursor: crosshair; }
+#rkmap .leaflet-control-scale-line { background: rgba(255,255,255,.75); border-color: #333; color: #222; font-size: 11px; }
+#rkmap .findbar button { font-size: 11px; padding: 5px 8px; }
+#rkmap .leaflet-top.leaflet-left { display: flex; flex-direction: row; align-items: flex-start; }
+#rkmap .leaflet-top.leaflet-left .findbar { margin-left: 8px; }
+.rk .badge { position: absolute; right: 10px; top: 8px; z-index: 800; display: flex; align-items: center; gap: 10px;
+             pointer-events: none; }
+.rk .badge img { height: 28px; width: auto; display: block; filter: drop-shadow(0 0 2px rgba(255,255,255,.9)); }
+.rk .north { width: 30px; height: 40px; }
+.rk .gridstat { position: absolute; right: 10px; top: 46px; z-index: 800; background: rgba(255,255,255,.92);
+                border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px 6px; font-size: 11px; }
+.rk .gridstat .cap { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.rk .gridstat .vals { display: flex; gap: 12px; margin-top: 1px; }
+.rk .gridstat .vals span { font-size: 9.5px; color: var(--muted); display: block; }
+.rk .gridstat .vals b { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rk .legend { grid-column: 3; align-self: center; font-size: 10px; color: #222; display: flex; flex-direction: column;
+              align-items: flex-start; gap: 5px; padding-left: 2px; }
+.rk .legend .title { font-weight: 600; line-height: 1.2; }
+.rk .legend .lb { display: flex; gap: 5px; }
+.rk .legend .bar { width: 12px; height: 250px; border: 1px solid #555; }
+.rk .legend .ticks { position: relative; height: 250px; width: 30px; font-variant-numeric: tabular-nums; }
+.rk .legend .ticks span { position: absolute; left: 0; transform: translateY(-50%); }
+.rk .readout { position: absolute; right: 10px; bottom: 26px; z-index: 800; background: rgba(255,255,255,.9);
+               border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; font-size: 12px;
+               font-variant-numeric: tabular-nums; color: var(--text-secondary); max-width: 230px; }
+.rk .readout b { color: var(--text-primary); font-size: 14px; }
+.rk .stakey { position: absolute; left: 10px; bottom: 26px; z-index: 800; background: rgba(90,90,90,.88); color: #fff;
+              border-radius: 8px; padding: 6px 9px; font-size: 11px; line-height: 1.5; }
+.rk .stakey svg { vertical-align: middle; margin-right: 5px; }
+.rk .fnote { margin: 8px 0 0; font-size: 10.5px; color: #666; line-height: 1.35; }
+.rk .stations-sq { background: none; border: 0; }
+.rk .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 20px; padding: 10px 0 0; }
+.rk .stat { border: 1px solid var(--border); border-radius: 9px; padding: 6px 10px; background: var(--plane); }
+.rk .stat .cap { font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.rk .stat .vals { display: flex; gap: 18px; margin-top: 2px; }
+.rk .stat .vals span { font-size: 10px; color: var(--muted); display: block; }
+.rk .stat .vals b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rk .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; border: 1px solid var(--border);
+            border-radius: 999px; background: var(--plane); }
+.rk .pill .btn { border-radius: 999px; padding: 5px 11px; }
+.rk .pill label.chk { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 0 4px; cursor: pointer; }
+.rk .pill label.chk input { accent-color: var(--accent); }
+.rk .none { padding: 30px 16px; color: var(--muted); font-size: 12px; }
+
+
+/* ---- the storm surf highlight: text left, photo right ---- */
+.sk { width: min(1240px, 92%); margin: 0 auto 24px; }
+.sk .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 24px;
+            overflow: hidden; padding: 22px 26px 24px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); }
+.sk h2 { margin: 0 0 12px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+.sk .grid { display: grid; grid-template-columns: minmax(280px, 1.1fr) minmax(320px, 1fr); gap: 26px; align-items: start; }
+@media (max-width: 1050px) { .sk .grid { grid-template-columns: 1fr; } }
+.sk .prose p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-align: justify; hyphens: auto; }
+.sk .prose p:last-child { margin-bottom: 0; }
+.sk figure { margin: 0; }
+.sk figure img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); }
+.sk figcaption { margin-top: 8px; font-size: 11px; color: #666; line-height: 1.35; }
+
+#boot { position: fixed; inset: 0; z-index: 2000; background: var(--plane);
+        display: grid; place-items: center; transition: opacity .35s ease; }
+.bootcard {
+  width: min(300px, 70vw); text-align: center; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 20px; padding: 26px; box-shadow: 0 10px 30px rgba(15,23,42,.08);
+}
+.bootlogo { display: block; max-width: 160px; height: auto; margin: 0 auto 16px; }
+.boottitle { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
+.bootbar { height: 6px; border-radius: 3px; background: var(--grid); overflow: hidden; }
+.bootbar i { display: block; height: 100%; width: 0%; border-radius: 3px;
+             background: var(--accent); transition: width .3s ease; }
+.bootpct { margin-top: 7px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="bootcard">
+    <img class="bootlogo" src="logo.png" alt="HCDP">
+    <div class="boottitle">Hurricane Lowell Wind and Rainfall</div>
+    <div class="bootbar"><i id="bootfill"></i></div>
+    <div class="bootpct" id="bootpct">0%</div>
+  </div>
+</div>
+
+<header>
+  <img class="logo" src="logo.png" alt="HCDP Logo">
+  <h1>Hurricane Lowell Wind and Rainfall</h1>
+</header>
+
+<div class="tip" id="tip"></div>
+
+<main id="app" class="hidden">
+
+  <section class="wk" id="wk">
+    <div class="card">
+      <h2>Mapping Hurricane Lowell's Winds, Hour by Hour</h2>
+      <div class="grid">
+        <div class="prose">
+          <p>When Hurricane Lowell reached the islands on September 7, its winds did not treat every place
+            the same. Some areas took dangerous gusts while others a few miles away stayed almost calm. So
+            how do we know what the wind was doing in all the places where nobody was measuring it?</p>
+          <p>We start with real measurements. Every hour, dozens of weather stations across Hawaiʻi,
+            including the Hawaiʻi Mesonet, record the wind's speed and direction. But stations can't be
+            everywhere, so a computer model combines each hour's readings with the shape of the land.
+            Hawaiʻi's extreme landscape can speed winds up as they squeeze over ridges and through valleys,
+            and can even change the direction the wind blows. The model uses this to fill in a wind
+            estimate for every spot on the island, one map for each hour. Played in order, like a
+            flip-book, the maps tell the story of the whole storm.</p>
+          <p>This is an experimental process that the Hawaiʻi Climate Data Portal (HCDP) is still
+            developing and testing. The maps are not cross-validated, and the model can push winds over
+            exposed ridgelines well above anything a station recorded, so treat the highest values as an
+            upper bound rather than a measurement. The goal is a big one: to vastly improve our
+            understanding of how wind moves across our islands, during hurricanes like Lowell and on
+            ordinary trade-wind days, so scientists, land managers and communities can see the wind,
+            not just feel it.</p>
+          <p>Looking at the sequence from September 7 into the morning of the 8th, notice that the strongest winds are found along
+            ridgelines, as expected, and that they build through the afternoon and evening as Lowell
+            closed in. What might be surprising is how strong the winds can be on the leeward slopes.
+            As air is forced over a ridge and descends the other side, it can accelerate downslope, much
+            like water speeding up as it flows downhill, and mountain-wave effects can produce localized
+            areas of exceptionally strong wind well down the leeward side. Hover the map to read the
+            modeled wind at any point, and switch on the stations to compare the model with what was
+            actually measured.</p>
+        </div>
+        <div>
+          <div class="counties" id="wkCounties"></div>
+          <div class="fig">
+            <div class="ft" id="wkTitle">Near-surface wind speed</div>
+            <div class="fw" id="wkWhen">—</div>
+            <div class="figgrid">
+              <div class="yax" id="wkYax"></div>
+              <div class="mapwrap">
+                <div id="kamap"></div>
+                <div class="badge"><img class="hcdp" src="logo.png" alt="HCDP">
+                  <svg class="north" viewBox="0 0 30 40"><path d="M15 2 L26 30 L15 24 L4 30 Z" fill="#111"/><path d="M15 2 L15 24 L4 30 Z" fill="#555"/><text x="15" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#111">N</text></svg></div>
+                <div class="gridstat"><div class="cap">Map grid, this hour (mph)</div>
+                  <div class="vals"><div><span>min</span><b id="wkMin">—</b></div><div><span>average</span><b id="wkMean">—</b></div><div><span>max</span><b id="wkMax">—</b></div></div></div>
+                <div class="readout" id="wkRead">Hover the map for the wind at any grid cell</div>
+                <div class="stakey" id="wkStaKey">
+                  <div class="row"><svg width="30" height="14" viewBox="0 0 30 14"><rect x="1" y="1" width="28" height="12" rx="6" fill="#9a9a9a" stroke="#666"/><path d="M8,3.5 L10.6,10 L8,8.4 L5.4,10 Z" fill="#fff"/><text x="19" y="10.5" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">21</text></svg><span>Hawaiʻi Mesonet station</span></div>
+                  <div class="row"><svg width="30" height="14" viewBox="0 0 30 14"><rect x="1" y="1" width="28" height="12" rx="2" fill="#9a9a9a" stroke="#666"/><path d="M8,3.5 L10.6,10 L8,8.4 L5.4,10 Z" fill="#fff"/><text x="19" y="10.5" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">21</text></svg><span>Other network station</span></div>
+                  <div class="row note">arrow points downwind &middot; number is mph</div>
+                </div>
+              </div>
+              <div class="legend">
+                <div class="title">Wind<br>Speed<br>(mph)</div>
+                <div class="lb"><div class="bar" id="wkBar"></div><div class="ticks" id="wkTicks"></div></div>
+              </div>
+              <div class="xax" id="wkXax"></div>
+            </div>
+            <p class="fnote">Arrows show wind direction (pointing downwind), length &prop; speed. Color scale fixed
+              at 0&ndash;85 mph for all hours, pseudo-log spaced on the same ramp as the gust map below; anything
+              over 85 mph is shown in fuchsia. Station markers use the same scale: pills are Hawaiʻi Mesonet
+              stations, rectangles other networks. CRS: WGS 84 (EPSG:4326).
+              WindNinja 250 m grid from that hour's station observations, 10 m height &middot; HCDP,
+              experimental.</p>
+          </div>
+          <div class="controls">
+            <div class="group">
+              <label class="cap">Day and hour (HST)</label>
+              <div class="pill">
+                <button class="btn primary" id="wkPlay" aria-pressed="false">Play</button>
+                <button class="btn" id="wkPrev" title="Back one hour">&#9664;</button>
+                <input type="range" id="wkSlider" min="0" max="23" value="0" step="1" aria-label="Hour">
+                <button class="btn" id="wkNext" title="Forward one hour">&#9654;</button>
+                <span class="hour" id="wkHour">00:00</span>
+                <select class="speed" id="wkSpeed" aria-label="Playback speed">
+                  <option value="900">slow</option>
+                  <option value="500" selected>normal</option>
+                  <option value="220">fast</option>
+                </select>
+              </div>
+            </div>
+            <div class="group">
+              <label class="cap">Layers</label>
+              <div class="pill">
+                <label class="chk"><input type="checkbox" id="wkTowns" checked> Towns</label>
+                <label class="chk"><input type="checkbox" id="wkArrows" checked> Arrows</label>
+                <label class="chk" title="Pills are Hawaiʻi Mesonet stations, rectangles other networks"><input type="checkbox" id="wkStations" checked> Stations</label>
+                <button class="btn" id="wkReset">Reset zoom</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rk" id="rk">
+    <div class="card">
+      <h2>How Much Rain Fell, Day by Day</h2>
+      <div class="grid">
+        <div>
+          <div class="btnrow"><span class="cap">Zoom</span><span id="rkCounties"></span></div>
+          <div class="btnrow"><span class="cap">Day</span><span id="rkDays"></span></div>
+          <div class="fig">
+            <div class="ft" id="rkTitle">Daily rainfall</div>
+            <div class="fw" id="rkWhen">—</div>
+            <div class="figgrid">
+              <div class="yax" id="rkYax"></div>
+              <div class="mapwrap">
+                <div id="rkmap"></div>
+                <div class="badge"><img src="logo.png" alt="HCDP">
+                  <svg class="north" viewBox="0 0 30 40"><path d="M15 2 L26 30 L15 24 L4 30 Z" fill="#111"/><path d="M15 2 L15 24 L4 30 Z" fill="#555"/><text x="15" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#111">N</text></svg></div>
+                <div class="gridstat"><div class="cap">Map grid, this day (in)</div>
+                  <div class="vals"><div><span>min</span><b id="rkMin">—</b></div><div><span>average</span><b id="rkMean">—</b></div><div><span>max</span><b id="rkMax">—</b></div></div></div>
+                <div class="stakey" id="rkStaKey">
+                  <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Hawaiʻi Mesonet station</div>
+                  <div><svg width="14" height="14"><rect x="1.5" y="1.5" width="11" height="11" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Other network station</div>
+                  <div style="opacity:.8;font-size:10px">colour is the day's total</div>
+                </div>
+                <div class="readout" id="rkRead">Hover the map for the rainfall at any grid cell</div>
+              </div>
+              <div class="legend">
+                <div class="title">Rainfall<br>(inches)</div>
+                <div class="lb"><div class="bar" id="rkBar"></div><div class="ticks" id="rkTicks"></div></div>
+              </div>
+              <div class="xax" id="rkXax"></div>
+            </div>
+            <p class="fnote">Daily total from 00:00 to 24:00 HST. Color scale fixed at 0&ndash;30 inches, pseudo-log spaced,
+              for all three days; stations use the same scale, circles for Hawaiʻi Mesonet stations and squares for other
+              networks. CRS: WGS 84 (EPSG:4326). HCDP statewide daily rainfall map, 250 m grid, from station observations
+              &middot; experimental.</p>
+          </div>
+          <div class="btnrow" style="margin-top:10px">
+            <div class="pill">
+              <label class="chk"><input type="checkbox" id="rkStations" checked> Stations</label>
+              <button class="btn" id="rkReset">Reset zoom</button>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="cap">Stations, this day (in)</div>
+              <div class="vals"><div><span>reporting</span><b id="rkSta">—</b></div><div><span>wettest</span><b id="rkStaMax">—</b></div><div><span>at</span><b id="rkStaAt">—</b></div></div></div>
+            <div class="stat"><div class="cap">Three days, Sep 6&ndash;8 (in)</div>
+              <div class="vals"><div><span>wettest grid cell</span><b id="rkAllMax">—</b></div><div><span>on</span><b id="rkAllAt">—</b></div></div></div>
+          </div>
+        </div>
+        <div class="prose">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Vestibulum ante ipsum primis in
+            faucibus orci luctus et ultrices posuere cubilia curae; Integer tincidunt, nisl at euismod luctus, urna
+            sapien iaculis nibh, non lacinia lorem nulla non ante. Praesent sit amet ligula nec justo dignissim
+            fermentum.</p>
+          <p>Curabitur et magna a ligula tempus vehicula. Suspendisse potenti. Aliquam erat volutpat. Donec in
+            mauris eget augue efficitur volutpat. Morbi ac dictum lorem, ac faucibus lacus. Etiam eu arcu vel odio
+            finibus laoreet at et sapien. Vivamus varius ex at tortor dapibus, in porttitor odio tempus.</p>
+          <p>Sed non risus sed erat blandit fringilla. Cras dapibus, ipsum vitae varius luctus, augue turpis
+            sollicitudin lacus, vitae posuere nisl velit non nibh. Duis at nisi a metus laoreet fringilla. Nam
+            feugiat, sem in tristique laoreet, felis mi commodo purus, a molestie ligula neque quis quam.</p>
+          <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris
+            at elit ac velit vulputate porta. Proin volutpat, libero sit amet suscipit fermentum, sapien risus
+            malesuada nibh, sed ullamcorper dolor nibh a nisl.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sk" id="sk">
+    <div class="card">
+      <h2>Kauaʻi Coastal Impacts Storm Surf</h2>
+      <div class="grid">
+        <div class="prose">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Vestibulum ante ipsum primis in
+            faucibus orci luctus et ultrices posuere cubilia curae; Integer tincidunt, nisl at euismod luctus, urna
+            sapien iaculis nibh, non lacinia lorem nulla non ante. Praesent sit amet ligula nec justo dignissim
+            fermentum.</p>
+          <p>Curabitur et magna a ligula tempus vehicula. Suspendisse potenti. Aliquam erat volutpat. Donec in
+            mauris eget augue efficitur volutpat. Morbi ac dictum lorem, ac faucibus lacus. Etiam eu arcu vel odio
+            finibus laoreet at et sapien. Vivamus varius ex at tortor dapibus, in porttitor odio tempus.</p>
+          <p>Sed non risus sed erat blandit fringilla. Cras dapibus, ipsum vitae varius luctus, augue turpis
+            sollicitudin lacus, vitae posuere nisl velit non nibh. Duis at nisi a metus laoreet fringilla. Nam
+            feugiat, sem in tristique laoreet, felis mi commodo purus, a molestie ligula neque quis quam.</p>
+          <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris
+            at elit ac velit vulputate porta. Proin volutpat, libero sit amet suscipit fermentum, sapien risus
+            malesuada nibh, sed ullamcorper dolor nibh a nisl.</p>
+        </div>
+        <figure>
+          <img src="wave_lowell.png" alt="Storm surf on the Kauaʻi coast during Hurricane Lowell">
+          <figcaption>Data accessed from <a href="https://www.pacioos.hawaii.edu/" target="_blank" rel="noopener">PacIOOS</a> (https://www.pacioos.hawaii.edu/)</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="phead">
+      <div class="kicker">Hawaiʻi Mesonet</div>
+      <h2>Wind Gusts and Rainfall, Every 15 Minutes</h2>
+      <p>This map replays the storm from the Hawaiʻi Mesonet's weather stations. Each step shows the
+        hour that just ended. <b>Gusts</b> shows the strongest gust each station felt in that hour, in
+        mph, as a pill pointing the way the wind was blowing; the bigger and redder the pill, the
+        stronger the gust. <b>Rain</b> shows how much fell in that hour, in inches per hour. Click any
+        station to see its whole storm in the chart below the map. The background is the GOES-West
+        weather satellite's infrared view, refreshed every 15 minutes, with the coldest, tallest cloud
+        tops in bright white.</p>
+      <div id="status" role="status"></div>
+    </div>
+    <div id="gate" class="hidden">
+      <h2>HCDP API token</h2>
+      <p>This section replays the Hawaiʻi Mesonet's own observations straight from the HCDP API, and needs an HCDP API token to do so. The sections above work without one. Point the page at your token file, or paste the token.</p>
+      <label class="pick" for="tokfile">Choose token file &mdash; <code>hi_meso_token.txt</code>
+        <input id="tokfile" type="file" accept=".txt,text/plain"></label>
+      <p class="or">or paste it directly</p>
+      <input id="tokin" type="password" placeholder="HCDP API token" autocomplete="off">
+      <button id="tokgo">Load</button>
+      <p class="fine">The token stays in this tab's <code>sessionStorage</code> for the session and
+         is never written to disk or sent anywhere but the HCDP API.</p>
+    </div>
+    <div id="map"></div>
+
+    <div class="transport">
+      <div class="seg" id="mode" role="group" aria-label="Variable">
+        <button data-mode="rain" class="on" aria-pressed="true">Rain</button>
+        <button data-mode="gust" aria-pressed="false">Gusts</button>
+      </div>
+      <button class="btn primary" id="play" aria-pressed="false">Play</button>
+      <button class="btn" id="prev" title="Back 15 minutes">&#9664;</button>
+      <button class="btn" id="next" title="Forward 15 minutes">&#9654;</button>
+      <input type="range" id="slider" min="0" value="0" step="1" aria-label="Time">
+      <span class="clock">
+        <span class="now" id="clocknow">—</span>
+        <span class="win" id="clockwin"></span>
+      </span>
+      <select class="speed" id="speed" aria-label="Playback speed">
+        <option value="600">slow</option>
+        <option value="320" selected>normal</option>
+        <option value="140">fast</option>
+      </select>
+    </div>
+
+    <div class="legend" id="legend"></div>
+    <p class="footnote" id="footnote"></p>
+    <div class="tally" id="tally"></div>
+
+    <div class="hourbox">
+      <div class="hourhead">
+        <span class="who" id="hourwho">No station selected</span>
+        <span class="stat" id="hourstat"></span>
+        <span class="grow"></span>
+        <button class="btn" id="maxhour" disabled>Max hour</button>
+      </div>
+      <div class="empty" id="hourempty"></div>
+      <svg class="hourchart hidden" id="hourchart" role="img"></svg>
+    </div>
+  </section>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- the GOES manifest and the coastline as scripts as well as JSON, so a page opened
+     straight from the file system (where fetch is blocked) still gets its base map -->
+<script src="data/goes/frames.js"></script>
+<script src="data/coastline_hawaii.js"></script>
+<script src="data/wind_ka/manifest.js"></script>
+<script src="data/wind_oa/manifest.js"></script>
+<script src="data/rain/manifest.js"></script>
+<script>
+/* ------------------------------------------------------------------ config */
+const API   = 'https://api.hcdp.ikewai.org/mesonet/db';
+const LOC   = 'hawaii';
+const RAINV = 'RF_1_Tot300s';         // 5-minute rainfall total, mm
+const GUSTV = 'WG_1_Max';             // 5-minute maximum gust, m/s
+const DIRV  = 'WDrs_1_Avg';           // 5-minute vector-average wind direction, degrees from
+
+const MM_PER_IN  = 25.4;
+const MPH_PER_MS = 2.236936;
+const SLOT_MS   = 5 * 60 * 1000;      // the API's native cadence
+const STEP_MS   = 15 * 60 * 1000;     // one animation frame
+const WINDOW_MS = 60 * 60 * 1000;     // the trailing window each frame covers
+const WIN_SLOTS = WINDOW_MS / SLOT_MS; // 12 five-minute samples make an hour
+
+// first frame, last frame, and the earliest sample any frame needs
+const FIRST = Date.parse('2026-09-07T00:00:00-10:00');
+const LAST  = Date.parse('2026-09-08T12:00:00-10:00');   // noon on 8 Sep
+const T0    = FIRST - WINDOW_MS;      // 6 Sep 23:00 HST — the first frame's window start
+
+const N_SLOTS  = Math.round((LAST - T0) / SLOT_MS) + 1;
+const N_FRAMES = Math.round((LAST - FIRST) / STEP_MS) + 1;
+
+// Statewide, from extents_hi_counties.csv (the union of the four counties), pushed
+// 200 miles (3.09° at this latitude) further west so Lowell's approach is in view when
+// the page opens. The map is not fenced — pan and zoom are unrestricted.
+const EXTENT_BOX = [-162.906, -154.668, 18.849, 22.269];   // west, east, south, north
+
+// The two things the map can show. All run on a FIXED domain with pseudo-log
+// spacing, the same shape of scale the companion map uses, so a colour means the
+// same magnitude in every frame. Rain: 0–4 in/hr with an aggressive bend, since
+// most station-hours are dry. Wind: 0–60 mph with a gentler bend, since hourly
+// means are not nearly so skewed. Gusts: 0–80 mph, since this period's strongest
+// gust reached 74 mph. Tick values are t cut into 7 equal steps and snapped to
+// round numbers. `agg` is how the trailing hour is reduced to one number.
+const KINDS = {
+  rain: {
+    agg: 'sum', superlative: 'heaviest', hourWord: 'hourly rate',
+    domain: 4, soft: 0.05, ticks: [0, 0.05, 0.12, 0.3, 0.6, 1.2, 2.2, 4],
+    ramp: '--rate-', legend: 'inches / hour (log)',
+    fmt: v => v.toFixed(2) + ' in/hr',
+    footnote: 'Fixed 0–4 in/hr scale, pseudo-log spaced. Each frame is the total that fell ' +
+              'over the previous 60 minutes. A station is drawn only when it reported during ' +
+              'that hour; a station that reported no rain sits at the bottom of the scale.',
+    empty: 'Click a station to plot its rainfall accumulated from 00:00 HST 7 Sep. Hover the ' +
+           'line for the running total and the rate at that moment, and click it to move the ' +
+           'map to that hour.'
+  },
+  gust: {
+    agg: 'max', superlative: 'gustiest', hourWord: 'hourly peak gust',
+    sampleWord: '5-minute peak gust', chartName: '5-minute peak gust',
+    domain: 80, soft: 10, ticks: [0, 4, 9, 15, 25, 38, 55, 80],
+    ramp: '--wind-', legend: 'mph, hourly peak gust (log)',
+    fmt: v => v.toFixed(1) + ' mph',
+    footnote: 'Fixed 0–80 mph scale, pseudo-log spaced. Each frame is the strongest of the ' +
+              '5-minute peak gusts over the previous 60 minutes, pulled at native resolution ' +
+              'and reduced here. The arrow points the way the wind was blowing in the ' +
+              '5 minutes that held the gust; hover for the compass point it came from. A ' +
+              'station is drawn only when it reported during that hour.',
+    empty: 'Click a station to plot its 5-minute peak gust from 00:00 HST 7 Sep. Hover the ' +
+           'line for the gust at that moment, and click it to move the map to that hour.'
+  }
+};
+
+/* ------------------------------------------------------------------- state */
+let TOKEN = null;
+let stations = [];                 // [{id,name,lat,lng}]
+let mode = 'rain';                 // which KINDS entry the map is showing
+// per kind: rates = station id -> Float32Array(N_FRAMES), NaN = not reporting that hour
+//           raw   = station id -> 5-minute samples on the slot grid, null = no reading
+const DATA = { rain: { rates: new Map(), raw: new Map() },
+               gust: { rates: new Map(), raw: new Map() } };
+let rates = DATA.rain.rates;       // the current mode's, swapped by setMode()
+let raw = DATA.rain.raw;
+// hourly wind direction per frame, degrees FROM, for the gust mode:
+// station id -> Float32Array(N_FRAMES), NaN where unknown
+const DIRS = { gust: new Map() };
+let selected = null;               // station id whose record is charted
+let frame = 0;
+let timer = null;
+let map = null;
+const markers = new Map();         // rain: circle markers, station id -> L.circleMarker
+const wmarkers = new Map();        // wind and gusts: pill icons, id -> L.marker
+// the GOES base map, built by fetch_goes_frames.py: frames keyed by animation time,
+// each already fetched into an object URL so playback never touches the network.
+// null means the frames could not be loaded and the map falls back to CARTO tiles.
+const SAT_DIR = 'data/goes/';
+let SAT = null;                    // { bounds, byTime: Map(ms -> {url, utc}), count }
+let satOverlay = null, satUrl = null;
+let coastGeo = null;               // data/coastline_hawaii.geojson, drawn in yellow
+
+const $ = s => document.querySelector(s);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const setStatus = (m, err) => { const e = $('#status'); e.textContent = m || ''; e.classList.toggle('err', !!err); };
+
+// A small crosshair glyph that marks every findbar button as a "jump/zoom to"
+// action, so the label itself can stay short — the full "zoom to ..." phrasing
+// still lives in the button's title tooltip for hover/screen-reader users.
+const ZOOM_ICON = '<svg class="zoomicon" width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">' +
+  '<circle cx="8" cy="8" r="5.4" stroke="currentColor" stroke-width="1.4"/>' +
+  '<path d="M8 0v3M8 13v3M0 8h3M13 8h3" stroke="currentColor" stroke-width="1.4"/></svg>';
+/** Builds a findbar button's inner markup: icon + a label span the caller can update later. */
+const zoomBtn = label => ZOOM_ICON + '<span class="zoomlabel">' + label + '</span>';
+
+const frameTime = i => FIRST + i * STEP_MS;
+const fmtClock = ms => new Date(ms).toLocaleString('en-US', {
+  timeZone: 'Pacific/Honolulu', month: 'short', day: 'numeric',
+  hour: '2-digit', minute: '2-digit', hour12: false });
+const fmtHM = ms => new Date(ms).toLocaleString('en-US', {
+  timeZone: 'Pacific/Honolulu', hour: '2-digit', minute: '2-digit', hour12: false });
+
+/* --------------------------------------------------------------- the scale */
+function magScale(v, kind) {
+  const { domain, soft } = KINDS[kind || mode];
+  return Math.min(1, Math.log1p(Math.max(0, v) / soft) / Math.log1p(domain / soft));
+}
+const _stops = {};
+function rampStops(kind) {
+  kind = kind || mode;
+  if (_stops[kind]) return _stops[kind];
+  const out = [];
+  // a KINDS entry names its ramp; 'wind' is the bare violet-to-red ramp the
+  // WindNinja panel shares, no longer a mode of this map
+  const prefix = KINDS[kind] ? KINDS[kind].ramp : '--' + kind + '-';
+  for (let i = 1; i <= 7; i++) {
+    const h = css(prefix + i).replace('#', '');
+    out.push([parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]);
+  }
+  return (_stops[kind] = out);
+}
+/** Continuous colour: linear sRGB blend between the seven stops, so the legend
+ *  gradient and the markers agree by construction. */
+function rampRGB(t, kind) {
+  const st = rampStops(kind || mode);
+  const x = Math.max(0, Math.min(1, t)) * (st.length - 1);
+  const i = Math.min(st.length - 2, Math.floor(x));
+  const f = x - i, a = st[i], b = st[i + 1];
+  return [Math.round(a[0] + (b[0] - a[0]) * f),
+          Math.round(a[1] + (b[1] - a[1]) * f),
+          Math.round(a[2] + (b[2] - a[2]) * f)];
+}
+function rampAt(t) { return 'rgb(' + rampRGB(t).join(',') + ')'; }
+
+/** 16-point compass name for a direction in degrees. */
+function compass(deg) {
+  const pts = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return pts[Math.round(((deg % 360) + 360) % 360 / 22.5) % 16];
+}
+
+/* ----------------------------------------------------------------- the API */
+async function api(path, params) {
+  const res = await fetch(API + '/' + path + '?' + new URLSearchParams(params), {
+    headers: { Authorization: 'Bearer ' + TOKEN }
+  });
+  if (!res.ok) throw new Error(path + ' → HTTP ' + res.status + ' ' + res.statusText);
+  return res.json();
+}
+
+async function loadStations() {
+  const rows = await api('stations', { location: LOC });
+  stations = rows.filter(s => s.lat && s.lng).map(s => ({
+    id: s.station_id, name: s.full_name || s.name || s.station_id,
+    skn: s.skn || null, lat: +s.lat, lng: +s.lng
+  }));
+}
+
+/** One request covers the whole animation: 5-minute rainfall, wind speed and gust
+ *  for every station from the first frame's window start to the last frame. The API
+ *  only serves its native 5-minute cadence, so the hourly figures are built here. */
+const KIND_OF = { [RAINV]: 'rain', [GUSTV]: 'gust', [DIRV]: 'dir' };
+async function loadData() {
+  const rows = await api('measurements', {
+    location: LOC, var_ids: RAINV + ',' + GUSTV + ',' + DIRV,
+    start_date: new Date(T0).toISOString(),
+    end_date: new Date(LAST).toISOString(),
+    row_mode: 'json', limit: 2000000
+  });
+
+  // bucket onto the 5-minute grid, in inches, mph and degrees; null means no reading
+  const grids = { rain: new Map(), gust: new Map(), dir: new Map() };
+  for (const r of rows) {
+    if (r.flag !== 0 || r.value == null || r.value === '') continue;
+    const v = +r.value;
+    if (!isFinite(v)) continue;
+    const kind = KIND_OF[r.variable];
+    if (!kind) continue;
+    const i = Math.round((Date.parse(r.timestamp) - T0) / SLOT_MS);
+    if (i < 0 || i >= N_SLOTS) continue;
+    let a = grids[kind].get(r.station_id);
+    if (!a) grids[kind].set(r.station_id, a = new Array(N_SLOTS).fill(null));
+    a[i] = kind === 'rain' ? v / MM_PER_IN : (kind === 'dir' ? v : v * MPH_PER_MS);
+  }
+
+  // each frame covers the trailing hour: rain is the hour's total and gust the hour's
+  // maximum, over whatever 5-minute samples the station reported
+  for (const kind in KINDS) {
+    const grid = grids[kind], agg = KINDS[kind].agg;
+    DATA[kind].raw = grid;                    // kept for the per-station chart
+    const out = DATA[kind].rates = new Map();
+    for (const [sid, a] of grid) {
+      const fr = new Float32Array(N_FRAMES);
+      for (let f = 0; f < N_FRAMES; f++) {
+        const end = Math.round((frameTime(f) - T0) / SLOT_MS);
+        let sum = 0, max = -Infinity, seen = 0;
+        for (let k = end - WIN_SLOTS + 1; k <= end; k++) {
+          const v = a[k];
+          if (v == null) continue;
+          sum += v; seen++;
+          if (v > max) max = v;
+        }
+        fr[f] = !seen ? NaN : (agg === 'sum' ? sum : (agg === 'mean' ? sum / seen : max));
+      }
+      out.set(sid, fr);
+    }
+  }
+  // Direction for each frame: the direction in the 5 minutes that held the hour's
+  // strongest gust, falling back to the gust-weighted vector mean of the hour.
+  DIRS.gust = new Map();
+  for (const [sid, gu] of grids.gust) {
+    const dg = grids.dir.get(sid);
+    if (!dg) continue;
+    const gd = new Float32Array(N_FRAMES).fill(NaN);
+    for (let f = 0; f < N_FRAMES; f++) {
+      const end = Math.round((frameTime(f) - T0) / SLOT_MS);
+      let ux = 0, uy = 0, gmax = -Infinity, gdir = NaN;
+      for (let k = end - WIN_SLOTS + 1; k <= end; k++) {
+        const d = dg[k], g = gu[k];
+        if (d == null || g == null) continue;
+        const r = d * Math.PI / 180;
+        ux += g * Math.sin(r); uy += g * Math.cos(r);
+        if (g > gmax) { gmax = g; gdir = d; }
+      }
+      if (isFinite(gdir)) gd[f] = gdir;
+      else if (ux || uy) { const a = Math.atan2(ux, uy) * 180 / Math.PI; gd[f] = a < 0 ? a + 360 : a; }
+    }
+    DIRS.gust.set(sid, gd);
+  }
+
+  rates = DATA[mode].rates; raw = DATA[mode].raw;
+  return rows.length;
+}
+
+/** The GOES frames and the coastline. Every frame is pulled into memory up front
+ *  (about 7 MB) so stepping through time is instant. Served over http the frames
+ *  become object URLs; from a file:// page, where fetch is blocked, the manifest
+ *  comes from frames.js and the images are warmed into the browser cache instead. */
+async function loadBasemap(from, to) {
+  try {
+    let m = window.GOES_MANIFEST || null;
+    if (!m) {
+      const r = await fetch(SAT_DIR + 'frames.json');
+      if (!r.ok) throw new Error('frames.json → HTTP ' + r.status);
+      m = await r.json();
+    }
+    const files = [...new Set(m.frames.filter(f => f.file).map(f => f.file))];
+    const urls = new Map();
+    let done = 0;
+    const local = location.protocol === 'file:';
+    await Promise.all(files.map(async f => {
+      if (local) {
+        const img = new Image();
+        img.src = SAT_DIR + f;
+        await img.decode().catch(() => {});      // warms the cache; a miss just shows late
+        urls.set(f, SAT_DIR + f);
+      } else {
+        const b = await (await fetch(SAT_DIR + f)).blob();
+        urls.set(f, URL.createObjectURL(b));
+      }
+      bootProgress(from + (to - from) * (++done / files.length));
+    }));
+    const byTime = new Map();
+    for (const f of m.frames) {
+      if (f.file) byTime.set(Date.parse(f.t), { url: urls.get(f.file), utc: Date.parse(f.image_utc) });
+    }
+    SAT = { bounds: m.bounds, byTime: byTime, count: files.length,
+            product: m.product || 'GOES-West imagery',
+            credit: m.credit_html || ('GOES-West ' + (m.product || 'imagery').replace(/,.*$/, '') +
+              ' &copy; <a href="https://www.star.nesdis.noaa.gov/goes/">NOAA/NESDIS/STAR</a>') };
+  } catch (e) {
+    console.warn('GOES frames unavailable, using the tile basemap:', e.message);
+    SAT = null;
+  }
+  if (window.HI_COASTLINE) { coastGeo = window.HI_COASTLINE; return; }
+  try {
+    const r = await fetch('data/coastline_hawaii.geojson');
+    if (r.ok) coastGeo = await r.json();
+  } catch (e) { /* no coastline layer */ }
+}
+
+/* ------------------------------------------------------------------- map */
+function initMap() {
+  const [w, e, so, no] = EXTENT_BOX;
+  const bounds = L.latLngBounds([[so, w], [no, e]]);
+  map = L.map('map', { zoomControl: false, zoomAnimation: false, minZoom: 5, maxZoom: 13 })
+          .fitBounds(bounds, { animate: false });
+  if (SAT) {
+    $('#map').classList.add('sat');
+    const first = SAT.byTime.get(FIRST) || SAT.byTime.values().next().value;
+    satOverlay = L.imageOverlay(first.url, SAT.bounds, { pane: 'tilePane', interactive: false })
+                  .addTo(map);
+    satUrl = first.url;
+    map.attributionControl.addAttribution(SAT.credit +
+      ' &middot; coastline: State of Hawaiʻi &middot; stations: Hawaiʻi Mesonet');
+  } else {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, ' +
+                   '&copy; <a href="https://carto.com/attributions">CARTO</a> &middot; ' +
+                   'stations: Hawaiʻi Mesonet',
+      subdomains: 'abcd', maxZoom: 18
+    }).addTo(map);
+  }
+  if (coastGeo) {
+    L.geoJSON(coastGeo, { interactive: false,
+      style: { color: '#ffe14d', weight: 1.2, opacity: 0.95, fill: false } }).addTo(map);
+  }
+  L.control.zoom({ position: 'bottomleft' }).addTo(map);
+  const logo = L.control({ position: 'topright' });
+  logo.onAdd = () => {
+    const box = L.DomUtil.create('div', 'logo-ctl');
+    box.innerHTML = '<img src="logo.png" alt="HCDP">';
+    return box;
+  };
+  logo.addTo(map);
+
+  // jump straight to the heaviest rain or strongest wind, either anywhere in the
+  // period or right now
+  const find = L.control({ position: 'topleft' });
+  find.onAdd = () => {
+    const box = L.DomUtil.create('div', 'findbar');
+    box.innerHTML =
+      '<button id="findall" title="Zoom to the highest station-hour anywhere in the period, ' +
+      'and jump the animation to it">' + zoomBtn('Highest overall') + '</button>' +
+      '<button id="findnow" title="Zoom to the highest station in the hour currently shown">' +
+      zoomBtn('Highest this hour') + '</button>';
+    L.DomEvent.disableClickPropagation(box);
+    return box;
+  };
+  find.addTo(map);
+
+  for (const st of stations) {
+    const pick = () => { selected = st.id; render(); };
+    if (DATA.rain.rates.has(st.id)) {
+      const mk = L.circleMarker([st.lat, st.lng], {
+        radius: 6, fillOpacity: 0.95, color: css('--surface-1'), weight: 2
+      });
+      mk.on('click', pick);
+      markers.set(st.id, mk);
+    }
+    if (DATA.gust.rates.has(st.id)) {
+      // the icon itself is rebuilt every frame by render()
+      const wm = L.marker([st.lat, st.lng], { icon: windIcon(0, NaN, 0, false), keyboard: false });
+      wm.on('click', pick);
+      wmarkers.set(st.id, wm);
+    }
+  }
+}
+
+/* The wind / gust marker: a compact pill in the ramp colour, with an arrowhead
+ * glyph pointing the way the wind is blowing (the API gives the direction it
+ * comes FROM, so the glyph is turned half a circle) and the mph beside it. The
+ * whole pill scales with the magnitude, about 0.8x at calm to 1.8x at the top
+ * of the scale, so a strong station reads from across the room. */
+function windIcon(v, dir, s, picked, opts) {
+  opts = opts || {};
+  const k = 0.8 + s;                              // scale factor
+  const h = 18 * k, fs = 11 * k, pad = 5 * k, glyph = 9 * k, gap = 3 * k;
+  const label = isFinite(v) ? v.toFixed(0) : '';
+  const tw = label.length * fs * 0.62;            // digits are about 0.62 em wide
+  const w = pad + glyph + gap + tw + pad;
+  const [r, g, b] = opts.rgb || rampRGB(s);
+  const radius = opts.shape === 'rect' ? 2.5 : h / 2;   // pill, or a rectangle for other networks
+  const dark = (0.299 * r + 0.587 * g + 0.114 * b) > 150;   // black ink on light fills
+  const ink = dark ? '#000' : '#fff';
+  const fill = 'rgb(' + r + ',' + g + ',' + b + ')';
+  const ring = picked ? 'stroke="#000" stroke-width="2.5"'
+                      : 'stroke="rgba(255,255,255,.85)" stroke-width="1"';
+  const m = 3;                                    // margin so the ring is not clipped
+  const W = w + 2 * m, H = h + 2 * m;
+  const cx = m + pad + glyph / 2, cy = m + h / 2;   // the glyph's centre
+  const f1 = n => (+n).toFixed(1);
+  let arrow = '';
+  if (isFinite(dir)) {
+    const a = glyph / 2;
+    // an arrowhead pointing up, then turned to where the wind is going
+    const d = 'M0,' + f1(-a) + 'L' + f1(a * 0.8) + ',' + f1(a) + 'L0,' + f1(a * 0.45) +
+              'L' + f1(-a * 0.8) + ',' + f1(a) + 'Z';
+    arrow = '<path d="' + d + '" fill="' + ink + '" transform="translate(' + f1(cx) + ' ' +
+            f1(cy) + ') rotate(' + f1((dir + 180) % 360) + ')"/>';
+  }
+  const html = '<svg width="' + f1(W) + '" height="' + f1(H) + '" viewBox="0 0 ' + f1(W) + ' ' + f1(H) + '">' +
+    '<rect x="' + m + '" y="' + m + '" width="' + f1(w) + '" height="' + f1(h) + '" rx="' + f1(radius) +
+    '" fill="' + fill + '" ' + ring + '/>' + arrow +
+    '<text x="' + f1(m + pad + glyph + gap + tw / 2) + '" y="' + f1(cy + fs * 0.36) +
+    '" text-anchor="middle" font-size="' + f1(fs) + '" fill="' + ink + '">' + label + '</text></svg>';
+  return L.divIcon({ className: 'wicon', html: html, iconSize: [W, H],
+                     iconAnchor: [W / 2, H / 2], tooltipAnchor: [0, -H / 2] });
+}
+
+/* ---------------------------------------------------------------- rendering */
+function render() {
+  const K = KINDS[mode];
+  const t = frameTime(frame);
+  $('#clocknow').textContent = fmtClock(t) + ' HST';
+  $('#clockwin').textContent = fmtHM(t - WINDOW_MS) + '–' + fmtHM(t) + ' window';
+  $('#slider').value = frame;
+  if (satOverlay) {
+    const f = SAT.byTime.get(t);
+    if (f && f.url !== satUrl) { satOverlay.setUrl(f.url); satUrl = f.url; }
+    $('#clockwin').textContent += f ? ' · GOES ' + fmtHM(f.utc) : ' · no GOES frame';
+  }
+
+  const vector = mode === 'gust';                    // gusts carry a direction
+  const dirs = vector ? DIRS[mode] : null;
+  let reporting = 0, top = null, peak = -1;
+  for (const st of stations) {
+    const mk = markers.get(st.id), wm = wmarkers.get(st.id);
+    const drop = m => { if (m && map.hasLayer(m)) map.removeLayer(m); };
+    const arr = rates.get(st.id);
+    const v = arr ? arr[frame] : NaN;
+    const use = vector ? wm : mk;
+    if (!isFinite(v) || !use) {                      // nothing reported this hour
+      drop(mk); drop(wm);
+      continue;
+    }
+    drop(vector ? mk : wm);                          // the other mode's marker
+    if (!map.hasLayer(use)) use.addTo(map);
+    reporting++;
+    if (v > peak) { peak = v; top = st; }
+    const s = magScale(v);
+    const picked = st.id === selected;
+    if (vector) {
+      const d = dirs.get(st.id);
+      const dir = d ? d[frame] : NaN;
+      wm.setIcon(windIcon(v, dir, s, picked));
+      // strongest on top, selection above all; Leaflet orders markers by latitude
+      // otherwise, so the offset has to dominate
+      wm.setZIndexOffset(picked ? 100000 : Math.round(s * 50000));
+      wm.bindTooltip('<b>' + st.name + '</b> (' + st.id + ')<br>' + K.fmt(v) +
+        (isFinite(dir) ? ' from ' + Math.round(dir) + '° (' + compass(dir) + ')' : '') +
+        '<br><span style="color:#777">Hawaiʻi Mesonet' + (st.skn ? ' · SKN ' + st.skn : '') + '</span>',
+        { direction: 'top' });
+    } else {
+      // a heavy hour should read from across the room, so radius runs 4 -> 26 px
+      mk.setRadius(4 + s * 22);
+      mk.setStyle({
+        fillColor: rampAt(s),
+        color: picked ? '#000' : css('--surface-1'),   // black ring marks the selection
+        weight: picked ? 3 : (v > 0 ? 2 : 1)
+      });
+      mk.bindTooltip('<b>' + st.name + '</b> (' + st.id + ')<br>' + K.fmt(v) +
+                     '<br><span style="color:#777">Hawaiʻi Mesonet' + (st.skn ? ' · SKN ' + st.skn : '') + '</span>',
+                     { direction: 'top', offset: [0, -4] });
+    }
+  }
+
+  if (!vector) {
+    // biggest to the back, so a light station is never swallowed by a heavy neighbour
+    [...markers.entries()]
+      .filter(([sid]) => rates.has(sid) && isFinite(rates.get(sid)[frame]))
+      .sort((a, b) => rates.get(b[0])[frame] - rates.get(a[0])[frame])
+      .forEach(([, mk]) => { if (map.hasLayer(mk)) mk.bringToFront(); });
+    const sel = markers.get(selected);
+    if (sel && map.hasLayer(sel)) sel.bringToFront();
+  }
+
+  drawSeries();
+
+  $('#tally').innerHTML = reporting
+    ? '<b>' + reporting + '</b> stations reporting &middot; ' +
+      K.superlative + ' <b>' + K.fmt(peak) + '</b> at ' +
+      top.name + ' (' + top.id + ')'
+    : 'no stations reporting this hour';
+}
+
+/* ------------------------------------------ the selected station's whole record */
+/* Across the entire span at native 5-minute resolution, from 00:00 HST 7 Sep —
+ * the animation's own start. Rain plots the running accumulation; hovering reads
+ * out the total and the instantaneous rate, that 5-minute catch scaled to an
+ * hour. Gusts plot the 5-minute peak gust itself. */
+const SERIES_N = Math.round((LAST - FIRST) / SLOT_MS) + 1;   // 5-minute points, inclusive
+const seriesTime = k => FIRST + k * SLOT_MS;
+
+function stationSeries(sid) {
+  const arr = raw.get(sid);
+  const vals = new Array(SERIES_N).fill(null);   // what the line plots
+  const rate = new Array(SERIES_N).fill(null);   // null where the station did not report
+  let run = 0;
+  for (let k = 0; k < SERIES_N; k++) {
+    const v = arr[Math.round((seriesTime(k) - T0) / SLOT_MS)];
+    if (mode === 'rain') {
+      if (k > 0 && v != null) { run += v; rate[k] = v * 12; }   // 5 min -> per hour
+      vals[k] = run;
+    } else {
+      vals[k] = v; rate[k] = v;
+    }
+  }
+  return { vals: vals, rate: rate };
+}
+
+/** The single highest station-hour anywhere in the period, in the current mode. */
+function peakOverall() {
+  let best = -1, at = null;
+  for (const [sid, arr] of rates) {
+    for (let f = 0; f < N_FRAMES; f++) {
+      const v = arr[f];
+      if (isFinite(v) && v > best) { best = v; at = { sid: sid, frame: f, rate: v }; }
+    }
+  }
+  return at;
+}
+
+/** The highest station in one frame. */
+function peakAtFrame(f) {
+  let best = -1, at = null;
+  for (const [sid, arr] of rates) {
+    const v = arr[f];
+    if (isFinite(v) && v > best) { best = v; at = { sid: sid, frame: f, rate: v }; }
+  }
+  return at;
+}
+
+/** Centre on a station, select it, and show that moment. */
+function revealPeak(p) {
+  if (!p) return;
+  const st = stations.find(s => s.id === p.sid);
+  if (!st) return;
+  selected = p.sid;
+  goto(p.frame);                      // render() redraws markers, ring and chart
+  map.setView([st.lat, st.lng], Math.max(map.getZoom(), 10), { animate: false });
+}
+
+/** The frame with this station's highest trailing-hour value over the whole period. */
+function maxHourFrame(sid) {
+  const arr = rates.get(sid);
+  if (!arr) return null;
+  let best = -1, at = null;
+  for (let f = 0; f < N_FRAMES; f++) {
+    const v = arr[f];
+    if (isFinite(v) && v > best) { best = v; at = f; }
+  }
+  return at;
+}
+
+function drawSeries() {
+  const K = KINDS[mode];
+  const svg = $('#hourchart'), empty = $('#hourempty');
+  empty.textContent = K.empty;
+  if (!selected || !raw.has(selected)) {
+    svg.classList.add('hidden'); empty.classList.remove('hidden');
+    $('#hourwho').textContent = selected ? (stations.find(s => s.id === selected) || {}).name +
+      ' (' + selected + ') — no ' + mode + ' record in this period' : 'No station selected';
+    $('#hourstat').textContent = '';
+    $('#maxhour').disabled = true;
+    $('#maxhour').textContent = 'Max hour';
+    return;
+  }
+  const st = stations.find(s => s.id === selected);
+  const { vals, rate } = stationSeries(selected);
+  const seen = vals.filter(v => v != null);
+  const hi = seen.length ? Math.max(...seen) : 0;
+
+  $('#hourwho').textContent = st.name + ' (' + st.id + ')';
+  if (mode === 'rain') {
+    $('#hourstat').textContent = vals[SERIES_N - 1].toFixed(2) + ' in total since ' +
+      fmtClock(FIRST) + ' HST';
+  } else {
+    const at = vals.indexOf(hi);
+    $('#hourstat').textContent = hi.toFixed(1) + ' mph strongest gust, ' +
+      fmtClock(seriesTime(at)) + ' HST';
+  }
+  const pk = maxHourFrame(selected);
+  const btn = $('#maxhour');
+  btn.disabled = pk == null;
+  btn.textContent = pk == null ? 'Max hour' : 'Max hour · ' + K.fmt(rates.get(selected)[pk]);
+
+  svg.classList.remove('hidden'); empty.classList.add('hidden');
+
+  const W = svg.clientWidth || 700, H = svg.clientHeight || 180;
+  const P = { l: 48, r: 12, t: 42, b: 22 };   // headroom for the two label lines
+  const iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const top = niceTop(Math.max(mode === 'rain' ? 0.1 : 1, hi));
+  const x = k => P.l + (k / (SERIES_N - 1)) * iw;
+  const y = v => P.t + ih - (v / top) * ih;
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, a) => { const n = document.createElementNS(NS, tag);
+                           for (const k in a) n.setAttribute(k, a[k]); return n; };
+
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.setAttribute('aria-label', (mode === 'rain' ? 'Rainfall accumulated at '
+    : K.chartName + ' at ') + st.name + ' since 7 Sep 00:00');
+  svg.innerHTML = '';
+
+  const dp = top < 1 ? 2 : (top < 10 ? 1 : 0);
+  for (let i = 0; i <= 4; i++) {
+    const v = top * i / 4, yy = y(v);
+    svg.appendChild(el('line', { x1: P.l, x2: W - P.r, y1: yy, y2: yy,
+      stroke: i ? css('--grid') : css('--axis'), 'stroke-width': 1 }));
+    const lab = el('text', { x: P.l - 7, y: yy + 3.5, 'text-anchor': 'end',
+      fill: css('--muted'), 'font-size': 10.5 });
+    lab.textContent = v.toFixed(dp);
+    svg.appendChild(lab);
+  }
+  // a gridline every 3 hours across the 36-hour span, with a firmer rule at midnight;
+  // labels only every 6 hours so the dated midnight labels have room
+  for (let k = 0; k < SERIES_N; k += 36) {
+    const t = seriesTime(k), xx = x(k);
+    // HST is UTC-10, so shift back to read the local hour off a UTC getter
+    const midnight = new Date(t - 10 * 3600 * 1000).getUTCHours() === 0;   // 00:00 HST
+    if (k > 0) svg.appendChild(el('line', { x1: xx, x2: xx, y1: P.t, y2: P.t + ih,
+      stroke: midnight ? css('--axis') : css('--grid'), 'stroke-width': 1 }));
+    if (k % 72) continue;
+    const lab = el('text', { x: xx, y: H - 6, 'text-anchor': k === 0 ? 'start' : (k === SERIES_N - 1 ? 'end' : 'middle'),
+      fill: css('--muted'), 'font-size': 10.5 });
+    lab.textContent = midnight ? fmtClock(t) : fmtHM(t);
+    svg.appendChild(lab);
+  }
+
+  // the line, broken wherever the station has no reading (gusts only; the rain
+  // accumulation is defined everywhere)
+  const colour = css('--accent');
+  const segs = [];
+  let cur = null;
+  vals.forEach((v, k) => {
+    if (v == null) { if (cur) { segs.push(cur); cur = null; } return; }
+    (cur || (cur = [])).push(k);
+  });
+  if (cur) segs.push(cur);
+  for (const s of segs) {
+    if (s.length < 2) continue;
+    svg.appendChild(el('path', {
+      d: 'M' + x(s[0]) + ',' + y(0) + s.map(k => 'L' + x(k) + ',' + y(vals[k])).join('') +
+         'L' + x(s[s.length - 1]) + ',' + y(0) + 'Z',
+      fill: colour, 'fill-opacity': 0.14
+    }));
+    svg.appendChild(el('path', {
+      d: 'M' + s.map(k => x(k) + ',' + y(vals[k])).join('L'),
+      fill: 'none', stroke: colour, 'stroke-width': 2,
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round'
+    }));
+  }
+
+  // The hour the map is currently showing, highlighted as a band: this is exactly
+  // the window whose figure drives the marker's colour and size.
+  const nowK  = Math.round((frameTime(frame) - FIRST) / SLOT_MS);
+  const fromK = Math.max(0, nowK - WIN_SLOTS);
+  const bx = x(fromK), bw = Math.max(2, x(nowK) - x(fromK));
+  const hl = css('--hl');
+  svg.appendChild(el('rect', { x: bx, y: P.t, width: bw, height: ih,
+    fill: hl, 'fill-opacity': 0.13 }));
+  svg.appendChild(el('line', { x1: bx, x2: bx, y1: P.t, y2: P.t + ih,
+    stroke: hl, 'stroke-width': 1, 'stroke-opacity': 0.55 }));
+  svg.appendChild(el('line', { x1: x(nowK), x2: x(nowK), y1: P.t, y2: P.t + ih,
+    stroke: hl, 'stroke-width': 1.5 }));
+
+  // The hourly figure comes from the same series the map is drawn from, not from
+  // this chart: for the first hour the chart cannot see back past 7 Sep 00:00,
+  // while the map's window legitimately reaches into 6 Sep.
+  const hourly = rates.get(selected)[frame];
+  // the band is only 1/36th of the width, so its label sits above it
+  const mid = (bx + x(nowK)) / 2;
+  const near = 108;
+  const anchor = mid < P.l + near ? 'start' : (mid > W - P.r - near ? 'end' : 'middle');
+  const lx = anchor === 'start' ? P.l : (anchor === 'end' ? W - P.r : mid);
+  const peak = maxHourFrame(selected);
+  const onPeak = peak != null && frame === peak;
+  const lab = el('text', { x: lx, y: P.t - 24, 'text-anchor': anchor,
+    fill: onPeak ? hl : css('--text-secondary'), 'font-size': 11, 'font-weight': 600 });
+  lab.textContent = (onPeak ? 'MAX ' : '') + K.hourWord + ' ' +
+                    (isFinite(hourly) ? K.fmt(hourly) : 'no data') + '  ·  ' +
+                    fmtHM(frameTime(frame) - WINDOW_MS) + '–' + fmtHM(frameTime(frame)) +
+                    (onPeak ? '  ·  ' + (mode === 'rain' ? 'biggest' : K.superlative) +
+                              ' hour of this period' : '');
+  svg.appendChild(lab);
+
+  // second line: what the plotted line itself reads at the right-hand edge of the band,
+  // i.e. the same numbers the hover tip gives, for the moment the map is showing
+  const nowRate = rate[nowK];
+  const sub = el('text', { x: lx, y: P.t - 9, 'text-anchor': anchor,
+    fill: css('--muted'), 'font-size': 10.5 });
+  sub.textContent = mode === 'rain'
+    ? vals[nowK].toFixed(2) + ' in accumulated  ·  ' +
+      (nowRate == null ? 'no reading' : nowRate.toFixed(2) + ' in/hr instantaneous')
+    : (nowRate == null ? 'no reading' : nowRate.toFixed(1) + ' mph ' + K.sampleWord) +
+      ' at ' + fmtHM(frameTime(frame));
+  svg.appendChild(sub);
+
+  if (vals[nowK] != null)
+    svg.appendChild(el('circle', { cx: x(nowK), cy: y(vals[nowK]), r: 3.5, fill: colour,
+      stroke: css('--surface-1'), 'stroke-width': 2 }));
+
+  // hover: the reading at that moment
+  const cross = el('line', { y1: P.t, y2: P.t + ih, stroke: css('--axis'),
+                             'stroke-width': 1, opacity: 0 });
+  const dot = el('circle', { r: 4, fill: colour, stroke: css('--surface-1'),
+                             'stroke-width': 2, opacity: 0 });
+  svg.appendChild(cross); svg.appendChild(dot);
+  const hit = el('rect', { x: P.l, y: P.t, width: iw, height: ih, fill: 'transparent',
+                           style: 'cursor:pointer' });
+  svg.appendChild(hit);
+  // series index under the pointer, clamped to the plot
+  const kAt = ev => {
+    const r = svg.getBoundingClientRect();
+    return Math.max(0, Math.min(SERIES_N - 1,
+      Math.round((((ev.clientX - r.left) * (W / r.width)) - P.l) / iw * (SERIES_N - 1))));
+  };
+  hit.addEventListener('click', ev => {
+    // the map steps every 15 minutes, the chart every 5, so snap to the nearest frame
+    setPlaying(false);          // jumping while playing would immediately drift off it
+    goto(Math.round(kAt(ev) * SLOT_MS / STEP_MS));
+  });
+  const tip = $('#tip');
+  hit.addEventListener('pointermove', ev => {
+    const k = kAt(ev);
+    cross.setAttribute('x1', x(k)); cross.setAttribute('x2', x(k)); cross.setAttribute('opacity', 1);
+    if (vals[k] != null) {
+      dot.setAttribute('cx', x(k)); dot.setAttribute('cy', y(vals[k])); dot.setAttribute('opacity', 1);
+    } else dot.setAttribute('opacity', 0);
+    const rt = rate[k];
+    tip.innerHTML = '<b>' + fmtClock(seriesTime(k)) + ' HST</b>' + (mode === 'rain'
+      ? ' &middot; ' + vals[k].toFixed(2) + ' in accumulated' +
+        ' &middot; ' + (rt == null ? 'no reading' : rt.toFixed(2) + ' in/hr instantaneous')
+      : ' &middot; ' + (rt == null ? 'no reading' : rt.toFixed(1) + ' mph ' + K.sampleWord));
+    tip.style.opacity = 1;
+    tip.style.left = Math.min(ev.clientX + 14, innerWidth - tip.offsetWidth - 8) + 'px';
+    tip.style.top = (ev.clientY + scrollY - 38) + 'px';
+  });
+  hit.addEventListener('pointerleave', () => {
+    cross.setAttribute('opacity', 0); dot.setAttribute('opacity', 0); tip.style.opacity = 0;
+  });
+}
+
+function niceTop(v) {
+  if (!isFinite(v) || v <= 0) return 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 1.2, 1.6, 2, 2.4, 3.2, 4, 6, 8, 10]) if (v <= m * mag) return m * mag;
+  return 10 * mag;
+}
+
+function renderLegend() {
+  const K = KINDS[mode];
+  const stops = [];
+  for (let i = 1; i <= 7; i++) stops.push(css(K.ramp + i));
+  const labels = K.ticks.map(v => {
+    const pct = magScale(v) * 100;
+    const shift = pct <= 0.01 ? '0' : (pct >= 99.99 ? '-100%' : '-50%');
+    return '<span style="left:' + pct.toFixed(2) + '%;transform:translateX(' + shift + ')">' + v + '</span>';
+  }).join('');
+  $('#legend').innerHTML =
+    '<span class="unit">' + K.legend + '</span>' +
+    '<div class="ramp"><div class="rampbar" style="background:linear-gradient(to right,' +
+    stops.join(',') + ')"></div><div class="rampticks">' + labels + '</div></div>';
+  $('#footnote').textContent = K.footnote;
+}
+
+/* ---------------------------------------------------------------- transport */
+function goto(i) {
+  frame = Math.max(0, Math.min(N_FRAMES - 1, i));
+  render();
+}
+
+function tick() {
+  // loop back to the start rather than stopping dead at the end
+  goto(frame >= N_FRAMES - 1 ? 0 : frame + 1);
+}
+
+function setPlaying(on) {
+  if (timer) { clearInterval(timer); timer = null; }
+  if (on) timer = setInterval(tick, +$('#speed').value);
+  const b = $('#play');
+  b.textContent = on ? 'Pause' : 'Play';
+  b.setAttribute('aria-pressed', String(on));
+}
+const playing = () => timer !== null;
+
+/** Switch the map between rain and gusts. Time, zoom and the selected station stay put. */
+function setMode(m) {
+  if (!KINDS[m] || m === mode) return;
+  mode = m;
+  rates = DATA[m].rates; raw = DATA[m].raw;
+  document.querySelectorAll('#mode button').forEach(b => {
+    const on = b.dataset.mode === m;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+  renderLegend();
+  refreshFind();
+  render();
+}
+
+/** The "Highest overall" button depends on the mode, so it is rebuilt on each switch. */
+function refreshFind() {
+  const overall = peakOverall();
+  const allBtn = $('#findall');
+  if (!allBtn) return;
+  allBtn.disabled = !overall;
+  allBtn.querySelector('.zoomlabel').textContent = overall ? 'Highest overall · ' + KINDS[mode].fmt(overall.rate)
+                                                             : 'Highest overall';
+  allBtn.onclick = () => { setPlaying(false); revealPeak(overall); };   // it moves in time
+}
+
+function wireControls() {
+  $('#slider').max = N_FRAMES - 1;
+  $('#play').onclick = () => setPlaying(!playing());
+  $('#prev').onclick = () => { setPlaying(false); goto(frame - 1); };
+  $('#next').onclick = () => { setPlaying(false); goto(frame + 1); };
+  $('#slider').oninput = e => { setPlaying(false); goto(+e.target.value); };
+  refreshFind();
+  const nowBtn = $('#findnow');
+  if (nowBtn) nowBtn.onclick = () => revealPeak(peakAtFrame(frame));      // time stays put
+  document.querySelectorAll('#mode button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+  $('#maxhour').onclick = () => {
+    const f = maxHourFrame(selected);
+    if (f == null) return;
+    setPlaying(false);            // jumping while playing would immediately drift off it
+    goto(f);
+  };
+  $('#speed').onchange = () => { if (playing()) setPlaying(true); };   // restart at the new rate
+  addEventListener('resize', drawSeries);   // the chart is drawn at its pixel width
+  addEventListener('keydown', e => {
+    if (e.key === ' ') { e.preventDefault(); setPlaying(!playing()); }
+    else if (e.key === 'ArrowLeft') { setPlaying(false); goto(frame - 1); }
+    else if (e.key === 'ArrowRight') { setPlaying(false); goto(frame + 1); }
+    else if (e.key === 'r' || e.key === 'R') setMode('rain');
+    else if (e.key === 'g' || e.key === 'G') setMode('gust');
+  });
+}
+
+
+/* ============================================================ WindNinja highlight */
+/* One WindNinja run per hour per county, packed by build_wind_frames.py into
+ * lossless PNGs carried inline in each county's manifest.js: R = speed code,
+ * G = direction code, B = data mask. Decoding them through a canvas gives the
+ * page every cell's value, so hovering reads the wind. A view is one county or
+ * several drawn together; the GOES frame for the same hour sits underneath. */
+const WINDS = { OA: window.WIND_OA || null, KA: window.WIND_KA || null,
+                MN: window.WIND_MN || null, BI: window.WIND_BI || null };
+const WIND_TITLES = { BI: 'Island of Hawaiʻi', MN: 'Maui Nui', OA: 'Oʻahu', KA: 'Kauaʻi' };
+// the buttons, in order: each view lists the counties it draws
+const WK_VIEWS = [['KAOA', 'Kauai & Oahu', ['KA', 'OA']], ['KA', 'Kauai', ['KA']], ['OA', 'Oahu', ['OA']]];
+// how each view opens: which layers are on, and either a fit to the data or a
+// fixed view at the widest zoom with a given north-east corner
+const WK_VIEW_DEFAULTS = {
+  KAOA: { stations: false, arrows: false, towns: true, minZoomNE: [23.766, -156.56] },
+  default: { stations: true, arrows: true, towns: true }
+};
+let WIND = null;                                          // the first county of the view: frames, dates
+// towns drawn as labelled dots on each county's map
+// name, lat, lon, then where the label sits relative to the dot in screen pixels
+// (x right, y down), so each name is led out of the way of the station markers;
+// a sixth entry of false puts the name beside the dot with no leader line
+const WK_TOWNS = {
+  KA: [['Līhuʻe', 21.9811, -159.3711, 40, 16], ['Waimea', 21.9578, -159.6689, 6, 44],
+       ['Kekaha', 21.9697, -159.7119, -34, 30], ['Kapaʻa', 22.0753, -159.3190, 40, -10],
+       ['Hanalei', 22.2039, -159.5011, 12, -34], ['Kīlauea', 22.2119, -159.4128, 30, -30],
+       ['Poʻipū', 21.8781, -159.4644, 14, 32]],
+  OA: [['Honolulu', 21.3069, -157.8583, -30, 34], ['Haleʻiwa', 21.5928, -158.1036, -34, -26],
+       ['Wahiawā', 21.5028, -158.0236, 0, 13, false], ['Waiʻanae', 21.4447, -158.1858, -40, 10],
+       ['Kāneʻohe', 21.4181, -157.8036, 40, -4], ['Waimānalo', 21.3345, -157.7127, 40, 12],
+       ['Kahuku', 21.6803, -157.9528, 12, -34]]
+};
+
+/** A town as one icon: a dot at the place, a thin leader, and the name at the end
+ *  of it, all in screen pixels so the layout holds at every zoom. */
+function townIcon(name, dx, dy, line) {
+  const S = 220, c = S / 2;                       // a generous square, the dot at its centre
+  const lx = c + dx, ly = c + dy;
+  const anchor = dx > 8 ? 'start' : (dx < -8 ? 'end' : 'middle');
+  const tx = lx + (anchor === 'start' ? 3 : (anchor === 'end' ? -3 : 0));
+  const ty = ly + (Math.abs(dx) > 8 ? 4 : (dy < 0 ? -2 : 10));
+  const leader = line === false ? '' :
+    '<line x1="' + c + '" y1="' + c + '" x2="' + lx + '" y2="' + ly + '" stroke="#fff" stroke-width="3.5"/>' +
+    '<line x1="' + c + '" y1="' + c + '" x2="' + lx + '" y2="' + ly + '" stroke="#111" stroke-width="1.2"/>';
+  const html = '<svg width="' + S + '" height="' + S + '" viewBox="0 0 ' + S + ' ' + S + '">' + leader +
+    '<circle cx="' + c + '" cy="' + c + '" r="3.5" fill="#111" stroke="#fff" stroke-width="1.5"/>' +
+    '<text x="' + tx + '" y="' + ty + '" text-anchor="' + anchor + '" font-size="11.5" font-weight="700" ' +
+    'fill="#111" stroke="#fff" stroke-width="3" paint-order="stroke" font-family="system-ui,-apple-system,Segoe UI,sans-serif">' +
+    name + '</text></svg>';
+  return L.divIcon({ className: 'townlab', html: html, iconSize: [S, S], iconAnchor: [c, c] });
+}
+const WK = { view: null, members: [], frame: 0, timer: null, cells: {}, map: null, overlays: {}, sat: null,
+             satUrl: null, arrows: null, stations: null, stationMarkers: {}, coast: null, grat: null, towns: null,
+             peakFrame: 0 };
+
+/* The WindNinja maps use the same ramp and scale shape as the gust map below:
+ * the violet-to-red wind ramp on a fixed pseudo-log scale, here 0–85 mph, and
+ * a single extra colour, fuchsia, for anything over 85 mph so the extreme cells
+ * stand apart from the ramp. Ticks are t cut into 7 equal steps, snapped. */
+const WK_SCALE = { domain: 85, soft: 10, ticks: [0, 4, 9, 16, 26, 40, 59, 85],
+                   over: 85, overRGB: [255, 0, 255], overShare: 0.09 };   // the band's share of the legend bar
+const WK_TOP = WK_SCALE.domain;
+function wkT(mph) {                                        // pseudo-log position, 0..1
+  return Math.min(1, Math.log1p(Math.max(0, mph) / WK_SCALE.soft) / Math.log1p(WK_SCALE.domain / WK_SCALE.soft));
+}
+function wkRGB(mph) { return mph > WK_SCALE.over ? WK_SCALE.overRGB : rampRGB(wkT(mph), 'wind'); }
+
+/** Decode one frame of one county: values per cell plus a coloured PNG data URL. */
+function wkDecode(m, frame) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const W = m.width, H = m.height;
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(img, 0, 0);
+      const px = g.getImageData(0, 0, W, H).data;
+      const mph = new Float32Array(W * H), dir = new Float32Array(W * H), ok = new Uint8Array(W * H);
+      const out = g.createImageData(W, H), o = out.data;
+      for (let i = 0; i < W * H; i++) {
+        const k = i * 4;
+        if (px[k + 2] > 127) {
+          ok[i] = 1;
+          mph[i] = px[k] / m.speed_scale;
+          dir[i] = px[k + 1] / m.dir_scale;
+          const [r, gg, b] = wkRGB(mph[i]);
+          o[k] = r; o[k + 1] = gg; o[k + 2] = b; o[k + 3] = 245;
+        }
+      }
+      g.putImageData(out, 0, 0);
+      resolve({ mph: mph, dir: dir, ok: ok, url: c.toDataURL('image/png') });
+    };
+    img.src = frame.data;
+  });
+}
+
+/** The cells of one county at the current frame, or null. */
+function wkCells(cc) { return WK.cells[cc] && WK.cells[cc][WK.frame]; }
+
+/** Where a grid index falls: the centre of that cell. */
+function wkCellLatLng(m, i) {
+  const [[s, w], [n, e]] = m.bounds;
+  return L.latLng(n - (Math.floor(i / m.width) + 0.5) * (n - s) / m.height,
+                  w + ((i % m.width) + 0.5) * (e - w) / m.width);
+}
+
+/** The strongest grid cell in the view at frame f: {cc, i, mph} or null. */
+function wkPeakCell(f) {
+  let best = null;
+  for (const cc of WK.members) {
+    const cells = WK.cells[cc] && WK.cells[cc][f];
+    if (!cells) continue;
+    for (let i = 0; i < cells.ok.length; i++) {
+      if (cells.ok[i] && (!best || cells.mph[i] > best.mph)) best = { cc: cc, i: i, mph: cells.mph[i] };
+    }
+  }
+  return best;
+}
+
+/** The strongest station in the view at frame f: {cc, st} or null. */
+function wkPeakStation(f) {
+  let best = null;
+  for (const cc of WK.members) {
+    const fr = WINDS[cc].frames[f];
+    if (!fr) continue;
+    for (const st of fr.stations) if (!best || st.mph > best.st.mph) best = { cc: cc, st: st };
+  }
+  return best;
+}
+
+/** The grid index of latlng in county m's grid, or -1 when outside it. */
+function wkCellAt(m, latlng) {
+  const W = m.width, H = m.height, [[s, w], [n, e]] = m.bounds;
+  const col = Math.floor((latlng.lng - w) / (e - w) * W);
+  const row = Math.floor((n - latlng.lat) / (n - s) * H);
+  if (col < 0 || col >= W || row < 0 || row >= H) return -1;
+  return row * W + col;
+}
+
+/** The box around every county in the view, Leaflet style [[s,w],[n,e]]. */
+function wkUnionBounds() {
+  let s = 90, w = 180, n = -90, e = -180;
+  for (const cc of WK.members) {
+    const [[bs, bw], [bn, be]] = WINDS[cc].bounds;
+    s = Math.min(s, bs); w = Math.min(w, bw); n = Math.max(n, bn); e = Math.max(e, be);
+  }
+  return [[s, w], [n, e]];
+}
+
+/** Arrows drawn on a canvas in screen space, so their length stays readable at
+ *  any zoom: one arrow per block of cells, pointing downwind, length ∝ speed. */
+const WkArrows = L.Layer.extend({
+  onAdd: function (map) {
+    this._map = map;
+    this._c = L.DomUtil.create('canvas', 'warrows leaflet-zoom-hide');
+    map.getPanes().overlayPane.appendChild(this._c);
+    map.on('moveend zoomend resize', this.redraw, this);
+    this.redraw();
+  },
+  onRemove: function (map) {
+    L.DomUtil.remove(this._c);
+    map.off('moveend zoomend resize', this.redraw, this);
+  },
+  redraw: function () {
+    const map = this._map, c = this._c, size = map.getSize();
+    L.DomUtil.setPosition(c, map.containerPointToLayerPoint([0, 0]));
+    c.width = size.x; c.height = size.y;
+    if (!WIND || !$('#wkArrows').checked) return;
+    const g = c.getContext('2d');
+    const b = map.getBounds().pad(0.05);
+    g.lineWidth = 1.4; g.strokeStyle = '#111'; g.fillStyle = '#111'; g.lineCap = 'round';
+    for (const cc of WK.members) {
+      const m = WINDS[cc], f = wkCells(cc);
+      if (!f) continue;
+      const W = m.width, H = m.height, [[s, w], [n, e]] = m.bounds;
+      const dLon = (e - w) / W, dLat = (n - s) / H;
+      const p0 = map.latLngToContainerPoint([n, w]), p1 = map.latLngToContainerPoint([n, w + dLon]);
+      const cellPx = Math.max(0.01, p1.x - p0.x);
+      const step = Math.max(1, Math.round(17 / cellPx));   // arrows about 17 px apart
+      for (let r = Math.floor(step / 2); r < H; r += step) {
+        const lat = n - (r + 0.5) * dLat;
+        if (lat < b.getSouth() || lat > b.getNorth()) continue;
+        for (let col = Math.floor(step / 2); col < W; col += step) {
+          const i = r * W + col;
+          if (!f.ok[i]) continue;
+          const lon = w + (col + 0.5) * dLon;
+          if (lon < b.getWest() || lon > b.getEast()) continue;
+          const p = map.latLngToContainerPoint([lat, lon]);
+          const len = 4 + 17 * wkT(f.mph[i]);               // short enough not to collide at that spacing
+          const a = (f.dir[i] + 180) * Math.PI / 180;       // toward: from + 180
+          const dx = Math.sin(a), dy = -Math.cos(a);
+          const x0 = p.x - dx * len / 2, y0 = p.y - dy * len / 2;
+          const x1 = p.x + dx * len / 2, y1 = p.y + dy * len / 2;
+          g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+          const hs = 2.8 + len * 0.12;
+          g.beginPath();
+          g.moveTo(x1, y1);
+          g.lineTo(x1 - dx * hs - dy * hs * 0.55, y1 - dy * hs + dx * hs * 0.55);
+          g.lineTo(x1 - dx * hs + dy * hs * 0.55, y1 - dy * hs - dx * hs * 0.55);
+          g.closePath(); g.fill();
+        }
+      }
+    }
+  }
+});
+
+/** Graticule: light lines every 0.2° on the map, labels in the axis strips beside it. */
+function wkGraticule() {
+  const map = WK.map;
+  if (WK.grat) map.removeLayer(WK.grat);
+  WK.grat = L.layerGroup().addTo(map);
+  const b = map.getBounds(), size = map.getSize();
+  const pxPerDeg = size.x / Math.max(1e-6, b.getEast() - b.getWest());
+  const st = [0.1, 0.2, 0.25, 0.5, 1, 2].find(v => v * pxPerDeg >= 60) || 5;   // labels ≥ 60 px apart
+  const yax = $('#wkYax'), xax = $('#wkXax');
+  yax.innerHTML = ''; xax.innerHTML = '';
+  for (let lat = Math.ceil(b.getSouth() / st) * st; lat <= b.getNorth(); lat += st) {
+    L.polyline([[lat, -180], [lat, 180]], { color: '#8a8f99', weight: 0.7, opacity: 0.6, interactive: false }).addTo(WK.grat);
+    const y = map.latLngToContainerPoint([lat, b.getWest()]).y;
+    if (y >= -2 && y <= size.y + 2) yax.insertAdjacentHTML('beforeend', '<span style="top:' + y + 'px">' + (+lat.toFixed(2)) + '°N</span>');
+  }
+  for (let lon = Math.ceil(b.getWest() / st) * st; lon <= b.getEast(); lon += st) {
+    L.polyline([[-85, lon], [85, lon]], { color: '#8a8f99', weight: 0.7, opacity: 0.6, interactive: false }).addTo(WK.grat);
+    const x = map.latLngToContainerPoint([b.getSouth(), lon]).x;
+    if (x >= -2 && x <= size.x + 2) xax.insertAdjacentHTML('beforeend', '<span style="left:' + x + 'px">' + (+Math.abs(lon).toFixed(2)) + '°W</span>');
+  }
+}
+
+/** '2026-09-08' -> {day: 8, short: 'Sep 8', long: 'September 8, 2026'} */
+function wkDate(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  return { day: d.getUTCDate(), short: d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' }) + ' ' + d.getUTCDate(),
+           long: d.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' }) + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear() };
+}
+
+function wkRender() {
+  if (!WIND) return;
+  const fr = WIND.frames[WK.frame];
+  if (!fr) return;
+  const hh = String(fr.hour).padStart(2, '0') + ':00', dt = wkDate(fr.date);
+  $('#wkHour').textContent = dt.short + ' ' + hh;
+  $('#wkSlider').value = WK.frame;
+  $('#wkWhen').textContent = dt.long + ', ' + hh + ' HST';
+  // the satellite frame for this hour, if the GOES set covers it
+  if (WK.sat && SAT) {
+    const g = SAT.byTime.get(Date.parse(fr.date + 'T' + hh + ':00-10:00'));
+    if (g && g.url !== WK.satUrl) { WK.sat.setUrl(g.url); WK.satUrl = g.url; }
+  }
+  // rasters and the grid statistics, across every county in the view
+  let mn = Infinity, mx = -Infinity, sum = 0, nn = 0, nsta = 0;
+  for (const cc of WK.members) {
+    const cells = wkCells(cc);
+    if (!cells) continue;
+    if (WK.overlays[cc]) WK.overlays[cc].setUrl(cells.url);
+    for (let i = 0; i < cells.ok.length; i++) if (cells.ok[i]) {
+      const v = cells.mph[i]; if (v < mn) mn = v; if (v > mx) mx = v; sum += v; nn++;
+    }
+  }
+  if (nn) {
+    $('#wkMin').textContent = mn.toFixed(1); $('#wkMean').textContent = (sum / nn).toFixed(1);
+    $('#wkMax').textContent = mx.toFixed(1);
+  }
+  if (WK.arrows) WK.arrows.redraw();
+  if (WK.stations) {
+    WK.stations.clearLayers();
+    WK.stationMarkers = {};
+    for (const cc of WK.members) {
+      const f = WINDS[cc].frames[WK.frame];
+      if (!f) continue;
+      nsta += f.stations.length;
+      if (!$('#wkStations').checked) continue;
+      for (const st of f.stations) {
+        // the same pill as the gust map for Hawaiʻi Mesonet stations, coloured on this
+        // map's own scale; other networks get the rectangle version
+        const t = wkT(st.mph);
+        const icon = windIcon(st.mph, st.dir, t, false, { shape: st.mesonet ? 'pill' : 'rect', rgb: wkRGB(st.mph) });
+        const who = st.mesonet ? 'Hawaiʻi Mesonet' + (st.mesonet_id ? ' station ' + st.mesonet_id : '')
+                               : st.network + (st.observer && st.observer !== st.network ? ' · ' + st.observer : '');
+        const mk = L.marker([st.lat, st.lon], { icon: icon, keyboard: false, zIndexOffset: 1000 + Math.round(t * 1000) })
+          .bindTooltip('<b>' + st.name + '</b><br>' + st.mph.toFixed(1) + ' mph from ' +
+                       Math.round(st.dir) + '° (' + compass(st.dir) + ')<br><span style="color:#777">' +
+                       who + ' · SKN ' + st.skn + '</span>', { direction: 'top' })
+          .addTo(WK.stations);
+        WK.stationMarkers[st.skn] = mk;
+      }
+    }
+  }
+  // the find bar's "this hour" button follows the frame
+  const ps = wkPeakStation(WK.frame), btn = $('#wkPeakSta');
+  if (btn) {
+    btn.disabled = !ps;
+    btn.querySelector('.zoomlabel').textContent = ps ? 'Peak station this hour · ' + ps.st.mph.toFixed(1) + ' mph' : 'Peak station this hour';
+  }
+}
+
+function wkGoto(i) {
+  if (!WIND) return;
+  WK.frame = Math.max(0, Math.min(WIND.frames.length - 1, i));
+  wkRender();
+}
+function wkPlaying() { return WK.timer !== null; }
+function wkSetPlaying(on) {
+  if (WK.timer) { clearInterval(WK.timer); WK.timer = null; }
+  if (on) WK.timer = setInterval(() => wkGoto(WK.frame >= WIND.frames.length - 1 ? 0 : WK.frame + 1),
+                                 +$('#wkSpeed').value);
+  $('#wkPlay').textContent = on ? 'Pause' : 'Play';
+  $('#wkPlay').setAttribute('aria-pressed', String(on));
+}
+
+/** Switch view: decode each county's frames once, lay out its rasters, refit, keep the hour. */
+async function wkSelect(view) {
+  const def = WK_VIEWS.find(v => v[0] === view);
+  if (!def || !def[2].every(cc => WINDS[cc])) return;
+  wkSetPlaying(false);
+  const members = def[2];
+  for (const cc of members) {
+    if (!WK.cells[cc]) WK.cells[cc] = await Promise.all(WINDS[cc].frames.map(f => wkDecode(WINDS[cc], f)));
+  }
+  WK.view = view; WK.members = members; WIND = WINDS[members[0]];
+  document.querySelectorAll('#wkCounties button').forEach(b => b.classList.toggle('on', b.dataset.view === view));
+  $('#wkTitle').textContent = 'Near-surface wind speed — ' + members.map(cc => WIND_TITLES[cc] || WINDS[cc].county_name).join(' & ');
+  // the period's peak hour across the view
+  let best = null, bestCc = null;
+  for (const cc of members) WINDS[cc].frames.forEach((f, i) => { if (!best || f.max_mph > best.max_mph) { best = f; bestCc = cc; WK.peakFrame = i; } });
+  const allBtn = $('#wkPeakAll');
+  if (allBtn) allBtn.querySelector('.zoomlabel').textContent = 'Peak wind hour · ' + best.max_mph.toFixed(1) + ' mph';
+  $('#wkSlider').max = WIND.frames.length - 1;
+  const map = WK.map;
+  for (const cc in WK.overlays) map.removeLayer(WK.overlays[cc]);
+  WK.overlays = {};
+  for (const cc of members) {
+    WK.overlays[cc] = L.imageOverlay(WK.cells[cc][0].url, WINDS[cc].bounds,
+                                     { interactive: false, className: 'wkraster' }).addTo(map);
+  }
+  if (WK.coast) WK.coast.bringToFront();
+  if (WK.towns) map.removeLayer(WK.towns);
+  WK.towns = L.layerGroup();
+  for (const cc of members) {
+    for (const [name, lat, lon, dx, dy, line] of (WK_TOWNS[cc] || [])) {
+      L.marker([lat, lon], { icon: townIcon(name, dx, dy, line), interactive: false, keyboard: false, zIndexOffset: 500 })
+        .addTo(WK.towns);
+    }
+  }
+  if ($('#wkTowns').checked) WK.towns.addTo(map);
+  // the view's opening layers
+  const dflt = WK_VIEW_DEFAULTS[view] || WK_VIEW_DEFAULTS.default;
+  $('#wkStations').checked = dflt.stations; $('#wkArrows').checked = dflt.arrows; $('#wkTowns').checked = dflt.towns;
+  $('#wkStaKey').hidden = !dflt.stations;
+  if (dflt.towns) WK.towns.addTo(map); else if (map.hasLayer(WK.towns)) map.removeLayer(WK.towns);
+  // let the figure take the view's shape: height from the box's aspect, within limits
+  const bounds = wkUnionBounds(), [[s, w], [n, e]] = bounds, el = $('#kamap');
+  const aspect = ((e - w) * Math.cos((s + n) / 2 * Math.PI / 180)) / (n - s);
+  el.style.height = Math.round(Math.max(400, Math.min(640, el.clientWidth / aspect * 1.08))) + 'px';
+  map.invalidateSize();
+  wkHome(dflt);
+  wkGoto(Math.min(WK.frame, WIND.frames.length - 1));
+  wkGraticule();
+}
+
+/** The view's home position: the widest zoom with its north-east corner pinned,
+ *  or a fit to the data when no corner is given. */
+function wkHome(dflt) {
+  const map = WK.map;
+  if (dflt && dflt.minZoomNE) {
+    const z = map.getMinZoom(), size = map.getSize();
+    const ne = map.project(L.latLng(dflt.minZoomNE[0], dflt.minZoomNE[1]), z);
+    map.setView(map.unproject(ne.add([-size.x / 2, size.y / 2]), z), z, { animate: false });
+  } else {
+    map.fitBounds(wkUnionBounds(), { animate: false, padding: [6, 6] });
+  }
+}
+
+async function initWind() {
+  const views = WK_VIEWS.filter(v => v[2].every(cc => WINDS[cc]));
+  if (!views.length) {
+    $('#wk').innerHTML = '<div class="card"><div class="none">No WindNinja frames found — run build_wind_frames.py.</div></div>';
+    return;
+  }
+  $('#wkCounties').innerHTML = views.map(v => '<button data-view="' + v[0] + '">' + v[1] + '</button>').join('');
+  document.querySelectorAll('#wkCounties button').forEach(b => b.onclick = () => wkSelect(b.dataset.view));
+  // legend: the wind ramp from 0 up to 85 at its pseudo-log positions, then a
+  // solid fuchsia band across the top of the bar for everything over 85
+  const rampShare = 1 - WK_SCALE.overShare, stops = [];
+  for (let i = 1; i <= 7; i++) stops.push(css('--wind-' + i) + ' ' + ((i - 1) / 6 * rampShare * 100).toFixed(1) + '%');
+  const over = 'rgb(' + WK_SCALE.overRGB.join(',') + ')';
+  $('#wkBar').style.background = 'linear-gradient(to top,' + stops.join(',') + ',' + over + ' ' +
+    (rampShare * 100).toFixed(1) + '%,' + over + ' 100%)';
+  $('#wkTicks').innerHTML = WK_SCALE.ticks.map(v =>
+    '<span style="top:' + (100 - wkT(v) * rampShare * 100) + '%">' + v + '</span>').join('') +
+    '<span style="top:0">100+</span>';
+
+  const map = WK.map = L.map('kamap', { zoomControl: false, zoomAnimation: false, minZoom: 7, maxZoom: 14 });
+  if (SAT) {
+    // the GOES-West frames as the backdrop, the same set the gust map uses
+    $('#kamap').classList.add('sat');
+    const first = SAT.byTime.values().next().value;
+    WK.sat = L.imageOverlay(first.url, SAT.bounds, { pane: 'tilePane', interactive: false }).addTo(map);
+    WK.satUrl = first.url;
+    map.attributionControl.setPrefix(false);
+    map.attributionControl.addAttribution('GOES-West &copy; NOAA &middot; Data: HCDP; Stations: Hawaiʻi Mesonet and partners');
+  } else {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, ' +
+                   '&copy; <a href="https://carto.com/attributions">CARTO</a> &middot; Data: HCDP; Stations: Hawaiʻi Mesonet and partners',
+      subdomains: 'abcd', maxZoom: 18, opacity: 0.9
+    }).addTo(map);
+  }
+  L.control.scale({ imperial: false, position: 'bottomleft', maxWidth: 140 }).addTo(map);
+  // jump to the period's peak hour, or zoom to the strongest station right now
+  const find = L.control({ position: 'topleft' });
+  find.onAdd = () => {
+    const box = L.DomUtil.create('div', 'findbar');
+    box.innerHTML =
+      '<button id="wkPeakAll" title="Jump to the hour with the strongest modeled wind in this view, and zoom to it">' + zoomBtn('Peak wind hour') + '</button>' +
+      '<button id="wkPeakSta" title="Zoom to the station with the strongest observed wind this hour">' + zoomBtn('Peak station this hour') + '</button>';
+    L.DomEvent.disableClickPropagation(box);
+    return box;
+  };
+  L.control.zoom({ position: 'topleft' }).addTo(map);   // first, so it sits left of the find bar
+  find.addTo(map);
+  $('#wkPeakAll').onclick = () => {
+    wkSetPlaying(false);
+    wkGoto(WK.peakFrame);
+    const pk = wkPeakCell(WK.frame);
+    if (pk) map.setView(wkCellLatLng(WINDS[pk.cc], pk.i), Math.max(map.getZoom(), 11), { animate: false });
+  };
+  $('#wkPeakSta').onclick = () => {
+    const ps = wkPeakStation(WK.frame);
+    if (!ps) return;
+    if (!$('#wkStations').checked) { $('#wkStations').checked = true; $('#wkStaKey').hidden = false; wkRender(); }
+    map.setView([ps.st.lat, ps.st.lon], Math.max(map.getZoom(), 11), { animate: false });
+    const mk = WK.stationMarkers[ps.st.skn];
+    if (mk) mk.openTooltip();
+  };
+  WK.coast = coastGeo ? L.geoJSON(coastGeo, { interactive: false,
+    style: { color: '#ffe14d', weight: 1.1, opacity: 0.95, fill: false } }).addTo(map) : null;
+  WK.stations = L.layerGroup().addTo(map);
+  WK.arrows = new WkArrows().addTo(map);
+  map.on('moveend zoomend resize', wkGraticule);
+
+  const read = $('#wkRead');
+  map.on('mousemove', e => {
+    if (!WIND) return;
+    for (const cc of WK.members) {
+      const m = WINDS[cc], f = wkCells(cc), i = wkCellAt(m, e.latlng);
+      if (i < 0 || !f || !f.ok[i]) continue;
+      read.innerHTML = '<b>' + f.mph[i].toFixed(1) + ' mph</b> from ' + Math.round(f.dir[i]) + '° (' + compass(f.dir[i]) +
+        ')<br>' + e.latlng.lat.toFixed(4) + ', ' + e.latlng.lng.toFixed(4) + ' &middot; ' + $('#wkHour').textContent + ' HST';
+      return;
+    }
+    read.innerHTML = 'No data at ' + e.latlng.lat.toFixed(3) + ', ' + e.latlng.lng.toFixed(3);
+  });
+  map.on('mouseout', () => { read.textContent = 'Hover the map for the wind at any grid cell'; });
+
+  $('#wkPlay').onclick = () => wkSetPlaying(!wkPlaying());
+  $('#wkPrev').onclick = () => { wkSetPlaying(false); wkGoto(WK.frame - 1); };
+  $('#wkNext').onclick = () => { wkSetPlaying(false); wkGoto(WK.frame + 1); };
+  $('#wkSlider').oninput = e => { wkSetPlaying(false); wkGoto(+e.target.value); };
+  $('#wkSpeed').onchange = () => { if (wkPlaying()) wkSetPlaying(true); };
+  $('#wkReset').onclick = () => { if (WIND) wkHome(WK_VIEW_DEFAULTS[WK.view] || WK_VIEW_DEFAULTS.default); };
+  $('#wkTowns').onchange = e => { if (WK.towns) (e.target.checked ? WK.towns.addTo(map) : map.removeLayer(WK.towns)); };
+  $('#wkArrows').onchange = () => WK.arrows.redraw();
+  $('#wkStations').onchange = () => { $('#wkStaKey').hidden = !$('#wkStations').checked; wkRender(); };
+  await wkSelect(views.some(v => v[0] === 'KAOA') ? 'KAOA' : views[0][0]);
+  addEventListener('resize', () => { map.invalidateSize(); wkGraticule(); });
+  setTimeout(wkGraticule, 600);            // once layout has settled after the first paint
+}
+
+/* ============================================================ rainfall highlight */
+/* Statewide daily rainfall from the HCDP API, packed by build_rainfall_frames.py:
+ * one PNG per day, R and G holding hundredths of an inch, B the data mask, plus
+ * every station's daily total. The page decodes the PNGs itself so hovering
+ * reads back any cell. */
+const RAIN = window.RAIN_DAYS || null;
+// county boxes for the zoom buttons: west, east, south, north
+const RK_ZOOMS = [['KA', 'Kauai', [-159.816, -159.251, 21.819, 22.269]], ['OA', 'Oahu', [-158.322, -157.602, 21.180, 21.742]],
+                  ['MN', 'Maui', [-157.350, -155.926, 20.343, 21.322]], ['BI', 'Hawaii', [-156.243, -154.668, 18.849, 20.334]],
+                  ['ALL', 'Statewide', [-159.816, -154.668, 18.849, 22.269]]];
+const RK_TITLES = { KA: 'Kauaʻi', OA: 'Oʻahu', MN: 'Maui Nui', BI: 'Island of Hawaiʻi', ALL: 'Statewide' };
+// the rain ramp on a fixed pseudo-log scale for daily totals, as on the HCDP Lala page
+const RK_SCALE = { domain: 30, soft: 0.05, ticks: [0, 0.1, 0.25, 0.75, 2, 5, 12, 30] };
+function rkT(v) { return Math.min(1, Math.log1p(Math.max(0, v) / RK_SCALE.soft) / Math.log1p(RK_SCALE.domain / RK_SCALE.soft)); }
+function rkRGB(v) { return rampRGB(rkT(v), 'rain'); }
+const RK = { day: 0, zoom: 'KA', cells: [], map: null, overlay: null, stations: null, coast: null, grat: null,
+             stationMarkers: {} };
+
+function rkDecode(day) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const W = RAIN.width, H = RAIN.height;
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(img, 0, 0);
+      const px = g.getImageData(0, 0, W, H).data;
+      const inches = new Float32Array(W * H), ok = new Uint8Array(W * H);
+      const out = g.createImageData(W, H), o = out.data;
+      const cache = new Map();                              // colour per hundredth, the loop is 3.5 M cells
+      for (let i = 0; i < W * H; i++) {
+        const k = i * 4;
+        if (px[k + 2] > 127) {
+          ok[i] = 1;
+          const code = px[k] * 256 + px[k + 1];
+          inches[i] = code / RAIN.scale;
+          let rgb = cache.get(code);
+          if (!rgb) { rgb = rkRGB(inches[i]); cache.set(code, rgb); }
+          o[k] = rgb[0]; o[k + 1] = rgb[1]; o[k + 2] = rgb[2]; o[k + 3] = 235;
+        }
+      }
+      g.putImageData(out, 0, 0);
+      resolve({ inches: inches, ok: ok, url: c.toDataURL('image/png') });
+    };
+    img.src = day.data;
+  });
+}
+
+function rkCellAt(latlng) {
+  const W = RAIN.width, H = RAIN.height, [[s, w], [n, e]] = RAIN.bounds;
+  const col = Math.floor((latlng.lng - w) / (e - w) * W);
+  const row = Math.floor((n - latlng.lat) / (n - s) * H);
+  if (col < 0 || col >= W || row < 0 || row >= H) return -1;
+  return row * W + col;
+}
+function rkCellLatLng(i) {
+  const [[s, w], [n, e]] = RAIN.bounds;
+  return L.latLng(n - (Math.floor(i / RAIN.width) + 0.5) * (n - s) / RAIN.height,
+                  w + ((i % RAIN.width) + 0.5) * (e - w) / RAIN.width);
+}
+function rkBox(zoom) {
+  const z = RK_ZOOMS.find(v => v[0] === zoom) || RK_ZOOMS[RK_ZOOMS.length - 1];
+  const [w, e, s, n] = z[2];
+  return L.latLngBounds([[s, w], [n, e]]);
+}
+
+function rkGraticule() {
+  const map = RK.map;
+  if (RK.grat) map.removeLayer(RK.grat);
+  RK.grat = L.layerGroup().addTo(map);
+  const b = map.getBounds(), size = map.getSize();
+  const pxPerDeg = size.x / Math.max(1e-6, b.getEast() - b.getWest());
+  const st = [0.1, 0.2, 0.25, 0.5, 1, 2].find(v => v * pxPerDeg >= 60) || 5;
+  const yax = $('#rkYax'), xax = $('#rkXax');
+  yax.innerHTML = ''; xax.innerHTML = '';
+  for (let lat = Math.ceil(b.getSouth() / st) * st; lat <= b.getNorth(); lat += st) {
+    L.polyline([[lat, -180], [lat, 180]], { color: '#8a8f99', weight: 0.7, opacity: 0.6, interactive: false }).addTo(RK.grat);
+    const y = map.latLngToContainerPoint([lat, b.getWest()]).y;
+    if (y >= -2 && y <= size.y + 2) yax.insertAdjacentHTML('beforeend', '<span style="top:' + y + 'px">' + (+lat.toFixed(2)) + '°N</span>');
+  }
+  for (let lon = Math.ceil(b.getWest() / st) * st; lon <= b.getEast(); lon += st) {
+    L.polyline([[-85, lon], [85, lon]], { color: '#8a8f99', weight: 0.7, opacity: 0.6, interactive: false }).addTo(RK.grat);
+    const x = map.latLngToContainerPoint([b.getSouth(), lon]).x;
+    if (x >= -2 && x <= size.x + 2) xax.insertAdjacentHTML('beforeend', '<span style="left:' + x + 'px">' + (+Math.abs(lon).toFixed(2)) + '°W</span>');
+  }
+}
+
+/** A square marker for stations outside the Mesonet, matching the circle's size. */
+function rkSquare(rgb, r) {
+  const d = r * 2;
+  return L.divIcon({ className: 'stations-sq', iconSize: [d + 3, d + 3], iconAnchor: [(d + 3) / 2, (d + 3) / 2],
+    html: '<svg width="' + (d + 3) + '" height="' + (d + 3) + '"><rect x="1.5" y="1.5" width="' + d + '" height="' + d +
+          '" fill="rgb(' + rgb.join(',') + ')" stroke="#fff" stroke-width="1.5"/></svg>' });
+}
+
+function rkRender() {
+  const day = RAIN.days[RK.day], cells = RK.cells[RK.day];
+  if (!day) return;
+  const dt = wkDate(day.date);
+  $('#rkWhen').textContent = dt.long + ', 00:00 to 24:00 HST';
+  $('#rkTitle').textContent = 'Daily rainfall — ' + RK_TITLES[RK.zoom];
+  document.querySelectorAll('#rkDays button').forEach(b => b.classList.toggle('on', +b.dataset.day === RK.day));
+  if (cells && RK.overlay) RK.overlay.setUrl(cells.url);
+  // grid statistics within the zoom box
+  if (cells) {
+    const box = rkBox(RK.zoom), W = RAIN.width, H = RAIN.height, [[s, w], [n, e]] = RAIN.bounds;
+    const c0 = Math.max(0, Math.floor((box.getWest() - w) / (e - w) * W)), c1 = Math.min(W, Math.ceil((box.getEast() - w) / (e - w) * W));
+    const r0 = Math.max(0, Math.floor((n - box.getNorth()) / (n - s) * H)), r1 = Math.min(H, Math.ceil((n - box.getSouth()) / (n - s) * H));
+    let mn = Infinity, mx = -Infinity, sum = 0, nn = 0;
+    for (let r = r0; r < r1; r++) for (let c = c0; c < c1; c++) {
+      const i = r * W + c;
+      if (!cells.ok[i]) continue;
+      const v = cells.inches[i]; if (v < mn) mn = v; if (v > mx) mx = v; sum += v; nn++;
+    }
+    $('#rkMin').textContent = nn ? mn.toFixed(2) : '—'; $('#rkMean').textContent = nn ? (sum / nn).toFixed(2) : '—';
+    $('#rkMax').textContent = nn ? mx.toFixed(2) : '—';
+  }
+  // stations: circles for the Mesonet, squares for other networks, coloured by the day's total
+  RK.stations.clearLayers();
+  RK.stationMarkers = {};
+  const box = rkBox(RK.zoom);
+  let inBox = 0, wettest = null;
+  for (const st of day.stations) {
+    if (box.contains([st.lat, st.lon])) { inBox++; if (!wettest || st.inches > wettest.inches) wettest = st; }
+    if (!$('#rkStations').checked) continue;
+    const t = rkT(st.inches), rgb = rkRGB(st.inches), r = 4 + t * 7;
+    const tip = '<b>' + st.name + '</b><br>' + st.inches.toFixed(2) + ' in on ' + dt.short +
+      '<br><span style="color:#777">' + (st.mesonet ? 'Hawaiʻi Mesonet' : st.network + (st.observer && st.observer !== st.network ? ' · ' + st.observer : '')) +
+      ' · SKN ' + st.skn + '</span>';
+    const mk = st.mesonet
+      ? L.circleMarker([st.lat, st.lon], { radius: r, fillColor: 'rgb(' + rgb.join(',') + ')', fillOpacity: 0.95, color: '#fff', weight: 1.5 })
+      : L.marker([st.lat, st.lon], { icon: rkSquare(rgb, r), keyboard: false, zIndexOffset: Math.round(t * 1000) });
+    mk.bindTooltip(tip, { direction: 'top' }).addTo(RK.stations);
+    RK.stationMarkers[st.skn] = mk;
+  }
+  $('#rkSta').textContent = inBox;
+  $('#rkStaMax').textContent = wettest ? wettest.inches.toFixed(2) : '—';
+  $('#rkStaAt').textContent = wettest ? wettest.name : '—';
+  const btn = $('#rkPeakSta');
+  if (btn) { btn.disabled = !wettest; btn.querySelector('.zoomlabel').textContent = wettest ? 'Wettest station · ' + wettest.inches.toFixed(2) + ' in' : 'Wettest station'; }
+}
+
+function rkZoom(zoom) {
+  RK.zoom = zoom;
+  document.querySelectorAll('#rkCounties button').forEach(b => b.classList.toggle('on', b.dataset.zoom === zoom));
+  RK.map.fitBounds(rkBox(zoom), { animate: false, padding: [6, 6] });
+  rkRender();
+}
+
+async function initRain() {
+  if (!RAIN || !RAIN.days.length) {
+    $('#rk').innerHTML = '<div class="card"><div class="none">No rainfall frames found — run build_rainfall_frames.py.</div></div>';
+    return;
+  }
+  $('#rkCounties').innerHTML = RK_ZOOMS.map(z => '<button data-zoom="' + z[0] + '">' + z[1] + '</button>').join('');
+  $('#rkDays').innerHTML = RAIN.days.map((d, i) => '<button data-day="' + i + '">' + wkDate(d.date).short + '</button>').join('');
+  document.querySelectorAll('#rkCounties button').forEach(b => b.onclick = () => rkZoom(b.dataset.zoom));
+  document.querySelectorAll('#rkDays button').forEach(b => b.onclick = () => { RK.day = +b.dataset.day; rkRender(); });
+  // legend on the rain ramp at its pseudo-log positions
+  const stops = [];
+  for (let i = 1; i <= 7; i++) stops.push(css('--rate-' + i));
+  $('#rkBar').style.background = 'linear-gradient(to top,' + stops.join(',') + ')';
+  $('#rkTicks').innerHTML = RK_SCALE.ticks.map(v =>
+    '<span style="top:' + (100 - rkT(v) * 100) + '%">' + (v === RK_SCALE.domain ? '&ge;' + v : v) + '</span>').join('');
+  // the three days' peak
+  let best = RAIN.days[0];
+  for (const d of RAIN.days) if (d.max_in > best.max_in) best = d;
+  $('#rkAllMax').textContent = best.max_in.toFixed(2);
+  $('#rkAllAt').textContent = wkDate(best.date).short;
+
+  RK.cells = await Promise.all(RAIN.days.map(rkDecode));
+
+  const map = RK.map = L.map('rkmap', { zoomControl: false, zoomAnimation: false, minZoom: 6, maxZoom: 14 });
+  // CARTO's free tiles now require an API key (see WindNinja panel above), so
+  // this map uses Esri's free, keyless World Street Map instead, same as the
+  // Angular Lowell pages.
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Esri &mdash; Sources: Esri &middot; Data: HCDP; Stations: Hawaiʻi Mesonet and partners',
+    maxZoom: 18
+  }).addTo(map);
+  map.attributionControl.setPrefix(false);
+  L.control.scale({ imperial: false, position: 'bottomleft', maxWidth: 140 }).addTo(map);
+  const find = L.control({ position: 'topleft' });
+  find.onAdd = () => {
+    const box = L.DomUtil.create('div', 'findbar');
+    box.innerHTML = '<button id="rkPeakCell" title="Zoom to the wettest grid cell in this view on this day">' + zoomBtn('Wettest grid cell') + '</button>' +
+                    '<button id="rkPeakSta" title="Zoom to the wettest station in this view on this day">' + zoomBtn('Wettest station') + '</button>';
+    L.DomEvent.disableClickPropagation(box);
+    return box;
+  };
+  L.control.zoom({ position: 'topleft' }).addTo(map);   // first, so it sits left of the find bar
+  find.addTo(map);
+  RK.overlay = L.imageOverlay(RK.cells[0].url, RAIN.bounds, { interactive: false }).addTo(map);
+  RK.coast = coastGeo ? L.geoJSON(coastGeo, { interactive: false,
+    style: { color: '#222', weight: 1, opacity: 0.9, fill: false } }).addTo(map) : null;
+  RK.stations = L.layerGroup().addTo(map);
+  map.on('moveend zoomend resize', rkGraticule);
+
+  $('#rkPeakCell').onclick = () => {
+    const cells = RK.cells[RK.day], box = rkBox(RK.zoom);
+    let best = -1, at = -1;
+    for (let i = 0; i < cells.ok.length; i++) if (cells.ok[i] && cells.inches[i] > best && box.contains(rkCellLatLng(i))) { best = cells.inches[i]; at = i; }
+    if (at >= 0) map.setView(rkCellLatLng(at), Math.max(map.getZoom(), 11), { animate: false });
+  };
+  $('#rkPeakSta').onclick = () => {
+    const box = rkBox(RK.zoom);
+    let wettest = null;
+    for (const st of RAIN.days[RK.day].stations) if (box.contains([st.lat, st.lon]) && (!wettest || st.inches > wettest.inches)) wettest = st;
+    if (!wettest) return;
+    if (!$('#rkStations').checked) { $('#rkStations').checked = true; $('#rkStaKey').hidden = false; rkRender(); }
+    map.setView([wettest.lat, wettest.lon], Math.max(map.getZoom(), 11), { animate: false });
+    const mk = RK.stationMarkers[wettest.skn];
+    if (mk) mk.openTooltip();
+  };
+  const read = $('#rkRead');
+  map.on('mousemove', e => {
+    const cells = RK.cells[RK.day], i = rkCellAt(e.latlng);
+    if (i < 0 || !cells.ok[i]) { read.innerHTML = 'No data at ' + e.latlng.lat.toFixed(3) + ', ' + e.latlng.lng.toFixed(3); return; }
+    read.innerHTML = '<b>' + cells.inches[i].toFixed(2) + ' in</b> on ' + wkDate(RAIN.days[RK.day].date).short + '<br>' +
+      e.latlng.lat.toFixed(4) + ', ' + e.latlng.lng.toFixed(4);
+  });
+  map.on('mouseout', () => { read.textContent = 'Hover the map for the rainfall at any grid cell'; });
+  $('#rkStations').onchange = () => { $('#rkStaKey').hidden = !$('#rkStations').checked; rkRender(); };
+  $('#rkReset').onclick = () => rkZoom(RK.zoom);
+  RK.day = Math.max(0, RAIN.days.findIndex(d => d.date === '2026-09-07'));
+  rkZoom('KA');
+  rkGraticule();
+  addEventListener('resize', () => { map.invalidateSize(); rkGraticule(); });
+  setTimeout(rkGraticule, 600);
+}
+
+/* -------------------------------------------------------------------- boot */
+function bootProgress(frac, done) {
+  const box = document.getElementById('boot');
+  if (!box) return;
+  const pct = Math.round(Math.max(0, Math.min(1, frac)) * 100);
+  const fill = document.getElementById('bootfill');
+  const label = document.getElementById('bootpct');
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = pct + '%';
+  if (done) { box.style.opacity = '0'; setTimeout(() => box.remove(), 400); }
+}
+
+async function getToken() {
+  const saved = sessionStorage.getItem('hcdp_token');
+  if (saved) return saved;
+  try {
+    const r = await fetch('hi_meso_token.txt');
+    if (r.ok) {
+      const t = (await r.text()).trim();
+      if (t && t.indexOf('<') !== 0) return t;
+    }
+  } catch (e) { /* file:// — fall through to the prompt */ }
+  return null;
+}
+
+/** The Mesonet panel: needs the token. Everything else is already on the page. */
+async function boot(token) {
+  TOKEN = token;
+  $('#gate').classList.add('hidden');
+  bootProgress(0.55);
+  try {
+    await loadStations();
+    bootProgress(0.7);
+    const n = await loadData();
+    bootProgress(0.9);
+    initMap();
+    renderLegend();
+    wireControls();
+    goto(0);
+    setStatus(DATA.rain.rates.size + ' rain · ' + DATA.gust.rates.size + ' gust stations · ' +
+              N_FRAMES + ' frames · ' + n.toLocaleString() + ' observations' +
+              (SAT ? ' · ' + SAT.count + ' GOES frames' : ' · no GOES frames, tile basemap'));
+    bootProgress(1, true);
+  } catch (e) {
+    setStatus(e.message, true);
+    bootProgress(1, true);
+  }
+}
+
+(async () => {
+  // the base map, coastline, wind and rainfall panels need no token
+  $('#app').classList.remove('hidden');
+  bootProgress(0.05);
+  await loadBasemap(0.05, 0.5);
+  initWind().catch(e => console.warn('wind panel:', e));
+  initRain().catch(e => console.warn('rain panel:', e));
+  const t = await getToken();
+  if (t) { boot(t); return; }
+  bootProgress(1, true);
+  $('#gate').classList.remove('hidden');
+  setStatus('Mesonet animation: token required', true);
+  const use = v => {
+    v = (v || '').trim();
+    if (!v) return;
+    sessionStorage.setItem('hcdp_token', v);
+    if (!document.getElementById('boot')) {       // bring the progress bar back for this load
+      const b = document.createElement('div'); b.id = 'boot';
+      b.innerHTML = '<div class="bootcard"><div class="boottitle">Loading the Mesonet observations</div>' +
+                    '<div class="bootbar"><i id="bootfill"></i></div><div class="bootpct" id="bootpct">0%</div></div>';
+      document.body.appendChild(b);
+    }
+    boot(v);
+  };
+  // reading a file the user picked works even from file://, where fetch does not
+  $('#tokfile').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      const t = String(rd.result || '').trim();
+      if (!t || t.indexOf('<') === 0) { setStatus('that file does not look like a token', true); return; }
+      use(t);
+    };
+    rd.onerror = () => setStatus('could not read ' + f.name, true);
+    rd.readAsText(f);
+  });
+  $('#tokgo').onclick = () => use($('#tokin').value);
+  $('#tokin').addEventListener('keydown', e => { if (e.key === 'Enter') $('#tokgo').click(); });
+})();
+</script>
+</body>
+</html>
