@@ -20,7 +20,7 @@
 .back-link:hover { text-decoration: underline; }
 
 .app-header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); }
-.app-header .subtitle { margin: 6px 0 0; font-size: 0.95rem; color: var(--text-secondary); }
+.app-header .subtitle { margin: 6px 0 0; font-size: 0.95rem; color: var(--text-secondary); overflow-wrap: break-word; }
 
 .boot { position: fixed; inset: 0; z-index: 500; background: var(--plane); display: grid; place-items: center; }
 .bootcard { width: min(280px, 70vw); text-align: center; }
@@ -103,4 +103,7 @@ main {
 @media (max-width: 860px) {
   /* Comfortable tap targets on touch devices (was ~35px tall). */
   .mode-btn { padding: 10px 16px; }
+  /* The description otherwise runs edge-to-edge on a phone; narrowing it to
+     a column reads far better than a full-width wall of text. */
+  .app-header .subtitle { max-width: 85%; margin-left: auto; margin-right: auto; }
 }

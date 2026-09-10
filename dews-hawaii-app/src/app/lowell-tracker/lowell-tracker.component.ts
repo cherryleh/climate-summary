@@ -47,6 +47,7 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
   private readonly MM_PER_IN = 25.4;
   private readonly MPH_PER_MS = 2.236936;
   private readonly WINDOW_START = Date.parse('2026-09-07T00:00:00-10:00');
+  private readonly WINDOW_END = Date.parse('2026-09-08T23:55:00-10:00');
   readonly WINDOW_LABEL = 'since Sep 7, 12:00 AM HST';
 
   // Same basemap as hurricane-lala: Esri's free, keyless World Street Map
@@ -115,7 +116,7 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
     chart: { height: 260, zooming: { type: 'x' } },
     title: { text: undefined },
     credits: { enabled: false },
-    xAxis: { type: 'datetime', title: { text: undefined } },
+    xAxis: { type: 'datetime', title: { text: undefined }, max: this.WINDOW_END },
     yAxis: { title: { text: 'Rainfall accumulated (in)' }, min: 0 },
     tooltip: { xDateFormat: '%b %e, %I:%M %p', pointFormat: '<b>{point.y:.2f} in</b> accumulated' },
     legend: { enabled: false },
@@ -129,7 +130,7 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
     chart: { height: 260, zooming: { type: 'x' } },
     title: { text: undefined },
     credits: { enabled: false },
-    xAxis: { type: 'datetime', title: { text: undefined } },
+    xAxis: { type: 'datetime', title: { text: undefined }, max: this.WINDOW_END },
     yAxis: { title: { text: 'Wind (mph)' }, min: 0 },
     tooltip: {
       xDateFormat: '%b %e, %I:%M %p',
@@ -206,8 +207,9 @@ export class LowellTrackerComponent implements AfterViewInit, OnDestroy {
       location: this.LOC,
       var_ids: `${this.RAINV},${this.WINDV},${this.GUSTV}`,
       start_date: new Date(this.WINDOW_START).toISOString(),
-      end_date: new Date().toISOString(),
+      end_date: new Date(this.WINDOW_END).toISOString(),
       row_mode: 'json',
+      local_tz: true,
       limit: 1000000
     });
 
