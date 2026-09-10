@@ -13,6 +13,13 @@
   font: 14px/1.45 "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+.notice-banner {
+  width: 100%; text-align: center; padding: 10px 20px;
+  background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+  font-size: 13px; font-weight: 600; color: #1e3a8a;
+}
+.notice-banner a { color: var(--accent); }
+
 .app-header {
   width: 100%; text-align: center; padding: 28px 20px 6px;
 }
