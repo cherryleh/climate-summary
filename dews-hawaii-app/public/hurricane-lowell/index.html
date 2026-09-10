@@ -1909,7 +1909,7 @@ async function wkSelect(view) {
   let best = null, bestCc = null;
   for (const cc of members) WINDS[cc].frames.forEach((f, i) => { if (!best || f.max_mph > best.max_mph) { best = f; bestCc = cc; WK.peakFrame = i; } });
   const allBtn = $('#wkPeakAll');
-  if (allBtn) allBtn.querySelector('.zoomlabel').textContent = 'Peak wind hour · ' + best.max_mph.toFixed(1) + ' mph';
+  if (allBtn) allBtn.querySelector('.zoomlabel').textContent = 'Peak grid wind this hour · ' + best.max_mph.toFixed(1) + ' mph';
   $('#wkSlider').max = WIND.frames.length - 1;
   const map = WK.map;
   for (const cc in WK.overlays) map.removeLayer(WK.overlays[cc]);
@@ -1998,7 +1998,7 @@ async function initWind() {
     const box = L.DomUtil.create('div', 'findbar');
     box.innerHTML =
       '<div class="findbar-label">Zoom to</div>' +
-      '<button id="wkPeakAll" title="Jump to the hour with the strongest modeled wind in this view, and zoom to it">' + zoomBtn('Peak wind hour') + '</button>' +
+      '<button id="wkPeakAll" title="Jump to the hour with the strongest modeled wind in this view, and zoom to it">' + zoomBtn('Peak grid wind this hour') + '</button>' +
       '<button id="wkPeakSta" title="Zoom to the station with the strongest observed wind this hour">' + zoomBtn('Peak station this hour') + '</button>';
     L.DomEvent.disableClickPropagation(box);
     return box;
