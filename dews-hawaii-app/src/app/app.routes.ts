@@ -10,6 +10,7 @@ import { TutorialComponent } from './tutorial/tutorial.component';
 import { HurricaneLalaComponent } from './extreme-events/hurricane-lala/hurricane-lala.component';
 import { LowellTrackerComponent } from './lowell-tracker/lowell-tracker.component';
 import { LowellFocusComponent } from './lowell-focus/lowell-focus.component';
+import { HurricaneLowellComponent } from './extreme-events/hurricane-lowell/hurricane-lowell.component';
 
 export const routes: Routes = [
   {path: '', component: ClimateDashboardV2Component},
@@ -24,5 +25,6 @@ export const routes: Routes = [
   { path: 'tutorial', component: TutorialComponent },
   { path: 'hurricane-lala', component: HurricaneLalaComponent },
   { path: 'lowell-tracker', component: LowellTrackerComponent },
-  { path: 'lowell-focus', component: LowellFocusComponent }
+  { path: 'lowell-focus', component: LowellFocusComponent },
+  { path: 'hurricane-lowell', component: HurricaneLowellComponent }
 ];

@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
   maintenanceMode = false;
 
   // Routes that render their own footer and should not get the global one.
-  private readonly routesWithOwnFooter = ['/climate-summary-2025'];
+  private readonly routesWithOwnFooter = ['/climate-summary-2025', '/extreme-events/hurricane-lowell'];
   showFooter = true;
 
   constructor(private router: Router) {}
