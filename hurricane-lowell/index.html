@@ -1908,8 +1908,13 @@ async function wkSelect(view) {
   // the period's peak hour across the view
   let best = null, bestCc = null;
   for (const cc of members) WINDS[cc].frames.forEach((f, i) => { if (!best || f.max_mph > best.max_mph) { best = f; bestCc = cc; WK.peakFrame = i; } });
+  // read the true peak back from the decoded grid (not the manifest's pre-quantization
+  // max_mph) so this label matches the stat box and per-cell values, which are all
+  // derived from the same 8-bit-encoded pixel data.
+  const peakCell = wkPeakCell(WK.peakFrame);
+  const peakMph = peakCell ? peakCell.mph : best.max_mph;
   const allBtn = $('#wkPeakAll');
-  if (allBtn) allBtn.querySelector('.zoomlabel').textContent = 'Peak grid wind this hour · ' + best.max_mph.toFixed(1) + ' mph';
+  if (allBtn) allBtn.querySelector('.zoomlabel').textContent = 'Peak grid wind · ' + peakMph.toFixed(1) + ' mph';
   $('#wkSlider').max = WIND.frames.length - 1;
   const map = WK.map;
   for (const cc in WK.overlays) map.removeLayer(WK.overlays[cc]);
@@ -1998,7 +2003,7 @@ async function initWind() {
     const box = L.DomUtil.create('div', 'findbar');
     box.innerHTML =
       '<div class="findbar-label">Zoom to</div>' +
-      '<button id="wkPeakAll" title="Jump to the hour with the strongest modeled wind in this view, and zoom to it">' + zoomBtn('Peak grid wind this hour') + '</button>' +
+      '<button id="wkPeakAll" title="Jump to the hour with the strongest modeled wind in this view, and zoom to it">' + zoomBtn('Peak grid wind') + '</button>' +
       '<button id="wkPeakSta" title="Zoom to the station with the strongest observed wind this hour">' + zoomBtn('Peak station this hour') + '</button>';
     L.DomEvent.disableClickPropagation(box);
     return box;
