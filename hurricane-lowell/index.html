@@ -48,6 +48,17 @@ h1 small { display: block; font-weight: 400; color: var(--text-secondary); font-
   width: min(1240px, 92%); margin: 14px auto; background: var(--surface-1); border: 1px solid var(--border);
   border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
+
+.site-footer {
+  margin-top: 24px; padding: 24px 20px; background: var(--surface-1); border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 16px;
+}
+.site-footer .label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); white-space: nowrap; }
+.site-footer .logos { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.site-footer .logos a { display: inline-flex; }
+.site-footer .logos img { height: 56px; width: auto; max-width: 100%; }
+@media (max-width: 639px) { .site-footer .logos img { height: 36px; } }
 .panel .phead { padding: 22px 26px 14px; }
 .panel .phead .kicker { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
                         color: var(--muted); margin-bottom: 6px; }
@@ -197,7 +208,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
 #kamap.sat { background: #0b1220; }          /* the ground beyond the satellite frame's edge */
 #kamap .warrows { pointer-events: none; }
 #kamap .leaflet-control-scale-line { background: rgba(255,255,255,.75); border-color: #333; color: #222; font-size: 11px; }
-.wk .badge { position: absolute; right: 10px; top: 8px; z-index: 800; display: flex; align-items: center; gap: 10px;
+.wk .badge { position: absolute; right: 10px; top: 74px; z-index: 800; display: flex; align-items: center; gap: 10px;
              pointer-events: none; }
 .wk .hcdp { height: 28px; width: auto; display: block; filter: drop-shadow(0 0 2px rgba(255,255,255,.9)); }
 /* the same logo on the gust map, as a Leaflet control so it sits with the map's own furniture */
@@ -211,7 +222,7 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
 .wk .legend .bar { width: 12px; height: 250px; border: 1px solid #555; }
 .wk .legend .ticks { position: relative; height: 250px; width: 30px; font-variant-numeric: tabular-nums; }
 .wk .legend .ticks span { position: absolute; left: 0; transform: translateY(-50%); }
-.wk .gridstat { position: absolute; right: 10px; top: 46px; z-index: 800; background: rgba(255,255,255,.92);
+.wk .gridstat { position: absolute; right: 10px; top: 8px; z-index: 800; background: rgba(255,255,255,.92);
                 border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px 6px; font-size: 11px; }
 .wk .gridstat .cap { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .wk .gridstat .vals { display: flex; gap: 12px; margin-top: 1px; }
@@ -231,6 +242,15 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
 .wk .stakey .row { display: flex; align-items: center; gap: 7px; line-height: 1.5; }
 .wk .stakey .row.note { font-size: 10px; color: #777; margin-top: 2px; }
 .wk .stakey svg { flex: none; }
+.wk .chartbox { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 6px; }
+.wk .charthead { display: flex; align-items: baseline; gap: 10px; min-height: 22px; font-size: 12px; }
+.wk .charthead .who { font-weight: 700; font-size: 13px; }
+.wk .charthead .stat { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.wk .charthead .grow { flex: 1; }
+.wk .charthead .btn { padding: 3px 9px; font-size: 11px; }
+svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
+.wk .chartempty { height: 150px; display: grid; place-items: center; color: var(--muted); font-size: 12px; text-align: center; }
+.wk .picked { pointer-events: none; }
 .townlab { background: none; border: 0; pointer-events: none; }
 .townlab svg { overflow: visible; }
 /* controls under the figure */
@@ -286,11 +306,11 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
 #rkmap .findbar button { font-size: 11px; padding: 5px 8px; }
 #rkmap .leaflet-top.leaflet-left { display: flex; flex-direction: row; align-items: flex-start; }
 #rkmap .leaflet-top.leaflet-left .findbar { margin-left: 8px; }
-.rk .badge { position: absolute; right: 10px; top: 8px; z-index: 800; display: flex; align-items: center; gap: 10px;
+.rk .badge { position: absolute; right: 10px; top: 74px; z-index: 800; display: flex; align-items: center; gap: 10px;
              pointer-events: none; }
 .rk .badge img { height: 28px; width: auto; display: block; filter: drop-shadow(0 0 2px rgba(255,255,255,.9)); }
 .rk .north { width: 30px; height: 40px; }
-.rk .gridstat { position: absolute; right: 10px; top: 46px; z-index: 800; background: rgba(255,255,255,.92);
+.rk .gridstat { position: absolute; right: 10px; top: 8px; z-index: 800; background: rgba(255,255,255,.92);
                 border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px 6px; font-size: 11px; }
 .rk .gridstat .cap { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .rk .gridstat .vals { display: flex; gap: 12px; margin-top: 1px; }
@@ -379,6 +399,23 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
       <div class="grid">
         <div class="app">
           <div class="counties" id="wkCounties"></div>
+          <div class="controls">
+            <div class="group">
+              <label class="cap">Day and hour (HST)</label>
+              <div class="pill">
+                <button class="btn primary" id="wkPlay" aria-pressed="false">Play</button>
+                <button class="btn" id="wkPrev" title="Back one hour">&#9664;</button>
+                <input type="range" id="wkSlider" min="0" max="23" value="0" step="1" aria-label="Hour">
+                <button class="btn" id="wkNext" title="Forward one hour">&#9654;</button>
+                <span class="hour" id="wkHour">12:00 AM</span>
+                <select class="speed" id="wkSpeed" aria-label="Playback speed">
+                  <option value="900">slow</option>
+                  <option value="500" selected>normal</option>
+                  <option value="220">fast</option>
+                </select>
+              </div>
+            </div>
+          </div>
           <div class="fig">
             <div class="ft" id="wkTitle">Near-surface wind speed</div>
             <div class="fw" id="wkWhen">—</div>
@@ -403,6 +440,17 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
               </div>
               <div class="xax" id="wkXax"></div>
             </div>
+            <div class="chartbox">
+              <div class="charthead">
+                <span class="who" id="wkChartWho">Nothing selected</span>
+                <span class="stat" id="wkChartStat"></span>
+                <span class="grow"></span>
+                <button class="btn" id="wkChartClear" hidden>Clear</button>
+              </div>
+              <div class="chartempty" id="wkChartEmpty">Click anywhere on the map to plot the modeled wind at that spot through the storm,
+                or click a station to plot what it measured. The red line marks the hour the map is showing.</div>
+              <svg class="wkchart hidden" id="wkChart" role="img"></svg>
+            </div>
             <p class="fnote">Arrows show wind direction (pointing downwind), length &prop; speed. Color scale fixed
               at 0&ndash;85 mph for all hours, pseudo-log spaced on the same ramp as the gust map below; anything
               over 85 mph is shown in fuchsia. Station markers use the same scale: pills are Hawaiʻi Mesonet
@@ -411,21 +459,6 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
               experimental.</p>
           </div>
           <div class="controls">
-            <div class="group">
-              <label class="cap">Day and hour (HST)</label>
-              <div class="pill">
-                <button class="btn primary" id="wkPlay" aria-pressed="false">Play</button>
-                <button class="btn" id="wkPrev" title="Back one hour">&#9664;</button>
-                <input type="range" id="wkSlider" min="0" max="23" value="0" step="1" aria-label="Hour">
-                <button class="btn" id="wkNext" title="Forward one hour">&#9654;</button>
-                <span class="hour" id="wkHour">12:00 AM</span>
-                <select class="speed" id="wkSpeed" aria-label="Playback speed">
-                  <option value="900">slow</option>
-                  <option value="500" selected>normal</option>
-                  <option value="220">fast</option>
-                </select>
-              </div>
-            </div>
             <div class="group">
               <label class="cap">Layers</label>
               <div class="pill">
@@ -585,6 +618,22 @@ svg.hourchart { display: block; width: 100%; height: 196px; touch-action: none;
     </div>
   </section>
 </main>
+
+<footer class="site-footer">
+  <span class="label">Supported by</span>
+  <div class="logos">
+    <a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener"><img src="../logos/hcdp.png" alt="HCDP Logo"></a>
+    <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet-data/#/" target="_blank" rel="noopener"><img src="../logos/mesonet.png" alt="Mesonet Logo"></a>
+    <a href="https://www.soest.hawaii.edu/pdke/" target="_blank" rel="noopener"><img src="../logos/pdke.png" alt="PDKE Logo"></a>
+    <a href="https://pi-casc.soest.hawaii.edu/" target="_blank" rel="noopener"><img src="../logos/picasc.png" alt="PICASC Logo"></a>
+    <a href="https://seagrant.soest.hawaii.edu/" target="_blank" rel="noopener"><img src="../logos/SeaGrant.jpg" alt="Sea Grant Logo"></a>
+    <a href="https://www.hawaii.edu/" target="_blank" rel="noopener"><img src="../logos/UH.jpg" alt="University of Hawaii Logo"></a>
+    <a href="https://dlnr.hawaii.gov/cwrm/" target="_blank" rel="noopener"><img src="../logos/cwrm.png" alt="CWRM Logo"></a>
+    <a href="https://www.drought.gov/" target="_blank" rel="noopener"><img src="../logos/nidis.png" alt="NIDIS Logo"></a>
+    <a href="https://datascience.hawaii.edu/" target="_blank" rel="noopener"><img src="../logos/hidsi.png" alt="HIDSI Logo"></a>
+    <a href="https://hawaii.edu/epscor/change-hi/" target="_blank" rel="noopener"><img src="../logos/changehi.png" alt="Change Hawaii Logo"></a>
+  </div>
+</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <!-- the GOES manifest and the coastline as scripts as well as JSON, so a page opened
@@ -1479,7 +1528,7 @@ function townIcon(name, dx, dy, line) {
 }
 const WK = { view: null, members: [], frame: 0, timer: null, cells: {}, map: null, overlays: {}, sat: null,
              satUrl: null, arrows: null, stations: null, stationMarkers: {}, coast: null, grat: null, towns: null,
-             peakFrame: 0 };
+             peakFrame: 0, series: null, pick: null };
 
 /* The WindNinja maps use the same ramp and scale shape as the gust map below:
  * the violet-to-red wind ramp on a fixed pseudo-log scale, here 0–85 mph, and
@@ -1709,6 +1758,7 @@ function wkRender() {
                        Math.round(st.dir) + '° (' + compass(st.dir) + ')<br><span style="color:#777">' +
                        who + ' · SKN ' + st.skn + '</span>', { direction: 'top' })
           .addTo(WK.stations);
+        mk.on('click', () => wkSelectStation(cc, st));
         WK.stationMarkers[st.skn] = mk;
       }
     }
@@ -1719,6 +1769,120 @@ function wkRender() {
     btn.disabled = !ps;
     btn.querySelector('.zoomlabel').textContent = ps ? 'Peak station this hour · ' + ps.st.mph.toFixed(1) + ' mph' : 'Peak station this hour';
   }
+  wkDrawChart();
+}
+
+/* ------------------------------------------------ the wind through the storm */
+/** Hourly values for the selection: a grid cell's modeled wind, or a station's
+ *  measured wind, one per frame, null where there is no value. */
+function wkSeriesValues(sel) {
+  const m = WINDS[sel.cc];
+  return m.frames.map((fr, f) => {
+    if (sel.kind === 'cell') {
+      const cells = WK.cells[sel.cc] && WK.cells[sel.cc][f];
+      return cells && cells.ok[sel.i] ? cells.mph[sel.i] : null;
+    }
+    const st = fr.stations.find(x => x.skn === sel.skn);
+    return st ? st.mph : null;
+  });
+}
+
+function wkSelectCell(cc, i, latlng) {
+  WK.series = { kind: 'cell', cc: cc, i: i, latlng: latlng };
+  wkMarkPick(latlng);
+  wkDrawChart();
+}
+function wkSelectStation(cc, st) {
+  WK.series = { kind: 'station', cc: cc, skn: st.skn, name: st.name, mesonet: st.mesonet, latlng: L.latLng(st.lat, st.lon) };
+  wkMarkPick(WK.series.latlng);
+  wkDrawChart();
+}
+function wkMarkPick(latlng) {
+  if (WK.pick) WK.map.removeLayer(WK.pick);
+  WK.pick = L.circleMarker(latlng, { radius: 7, color: '#000', weight: 2.5, fill: false, className: 'picked',
+                                     interactive: false }).addTo(WK.map);
+}
+function wkClearPick() {
+  WK.series = null;
+  if (WK.pick) { WK.map.removeLayer(WK.pick); WK.pick = null; }
+  wkDrawChart();
+}
+
+function wkDrawChart() {
+  const svg = $('#wkChart'), empty = $('#wkChartEmpty'), sel = WK.series;
+  const clear = $('#wkChartClear');
+  if (!sel || !WIND) {
+    svg.classList.add('hidden'); empty.classList.remove('hidden'); clear.hidden = true;
+    $('#wkChartWho').textContent = 'Nothing selected'; $('#wkChartStat').textContent = '';
+    return;
+  }
+  const vals = wkSeriesValues(sel), frames = WINDS[sel.cc].frames, N = vals.length;
+  const seen = vals.filter(v => v != null);
+  const hi = seen.length ? Math.max(...seen) : 0, hiAt = vals.indexOf(hi);
+  const where = sel.kind === 'cell'
+    ? 'Modeled wind at ' + sel.latlng.lat.toFixed(4) + ', ' + sel.latlng.lng.toFixed(4)
+    : (sel.mesonet ? 'Hawaiʻi Mesonet station ' : 'Station ') + sel.name;
+  $('#wkChartWho').textContent = where;
+  $('#wkChartStat').textContent = seen.length
+    ? 'peak ' + hi.toFixed(1) + ' mph at ' + wkDate(frames[hiAt].date).short + ' ' + fmtHour12(frames[hiAt].hour) + ' HST' +
+      (sel.kind === 'station' ? ' · ' + seen.length + ' of ' + N + ' hours reported' : '')
+    : 'no values';
+  clear.hidden = false;
+  svg.classList.remove('hidden'); empty.classList.add('hidden');
+
+  const W = svg.clientWidth || 600, H = svg.clientHeight || 150;
+  const P = { l: 40, r: 10, t: 22, b: 20 }, iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const top = niceTop(Math.max(10, hi));
+  const x = k => P.l + (k / (N - 1)) * iw, y = v => P.t + ih - (v / top) * ih;
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, a) => { const n = document.createElementNS(NS, tag); for (const k in a) n.setAttribute(k, a[k]); return n; };
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.innerHTML = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = top * i / 4, yy = y(v);
+    svg.appendChild(el('line', { x1: P.l, x2: W - P.r, y1: yy, y2: yy, stroke: i ? css('--grid') : css('--axis'), 'stroke-width': 1 }));
+    const lab = el('text', { x: P.l - 6, y: yy + 3.5, 'text-anchor': 'end', fill: css('--muted'), 'font-size': 10 });
+    lab.textContent = v.toFixed(0); svg.appendChild(lab);
+  }
+  frames.forEach((fr, k) => {
+    if (fr.hour % 6) return;
+    const xx = x(k), midnight = fr.hour === 0;
+    if (k) svg.appendChild(el('line', { x1: xx, x2: xx, y1: P.t, y2: P.t + ih, stroke: midnight ? css('--axis') : css('--grid'), 'stroke-width': 1 }));
+    const lab = el('text', { x: xx, y: H - 5, 'text-anchor': k === 0 ? 'start' : (k === N - 1 ? 'end' : 'middle'), fill: css('--muted'), 'font-size': 10 });
+    lab.textContent = midnight || k === 0 ? wkDate(fr.date).short + ' ' + fmtHour12(fr.hour) : fmtHour12(fr.hour);
+    svg.appendChild(lab);
+  });
+  // the line, broken where there is no value
+  const colour = css('--accent'), segs = [];
+  let cur = null;
+  vals.forEach((v, k) => { if (v == null) { if (cur) { segs.push(cur); cur = null; } return; } (cur || (cur = [])).push(k); });
+  if (cur) segs.push(cur);
+  for (const sg of segs) {
+    if (sg.length < 2) { svg.appendChild(el('circle', { cx: x(sg[0]), cy: y(vals[sg[0]]), r: 2.5, fill: colour })); continue; }
+    svg.appendChild(el('path', { d: 'M' + x(sg[0]) + ',' + y(0) + sg.map(k => 'L' + x(k) + ',' + y(vals[k])).join('') + 'L' + x(sg[sg.length - 1]) + ',' + y(0) + 'Z',
+                                 fill: colour, 'fill-opacity': 0.14 }));
+    svg.appendChild(el('path', { d: 'M' + sg.map(k => x(k) + ',' + y(vals[k])).join('L'), fill: 'none', stroke: colour, 'stroke-width': 2,
+                                 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+  }
+  // the hour on the map
+  const k0 = WK.frame, hl = css('--hl'), v0 = vals[k0];
+  svg.appendChild(el('line', { x1: x(k0), x2: x(k0), y1: P.t, y2: P.t + ih, stroke: hl, 'stroke-width': 1.5 }));
+  if (v0 != null) svg.appendChild(el('circle', { cx: x(k0), cy: y(v0), r: 3.5, fill: hl, stroke: '#fff', 'stroke-width': 1.5 }));
+  const near = 120, mid = x(k0);
+  const anchor = mid < P.l + near ? 'start' : (mid > W - P.r - near ? 'end' : 'middle');
+  const lx = anchor === 'start' ? P.l : (anchor === 'end' ? W - P.r : mid);
+  const lab = el('text', { x: lx, y: P.t - 8, 'text-anchor': anchor, fill: hl, 'font-size': 11, 'font-weight': 600 });
+  lab.textContent = wkDate(frames[k0].date).short + ' ' + fmtHour12(frames[k0].hour) + ' HST · ' +
+                    (v0 == null ? 'no value' : v0.toFixed(1) + ' mph');
+  svg.appendChild(lab);
+  // click anywhere on the chart to move the map to that hour
+  const hit = el('rect', { x: P.l, y: P.t, width: iw, height: ih, fill: 'transparent' });
+  hit.addEventListener('click', ev => {
+    const r = svg.getBoundingClientRect();
+    const k = Math.round((((ev.clientX - r.left) * (W / r.width)) - P.l) / iw * (N - 1));
+    wkSetPlaying(false); wkGoto(Math.max(0, Math.min(N - 1, k)));
+  });
+  svg.appendChild(hit);
 }
 
 function wkGoto(i) {
@@ -1745,6 +1909,7 @@ async function wkSelect(view) {
     if (!WK.cells[cc]) WK.cells[cc] = await Promise.all(WINDS[cc].frames.map(f => wkDecode(WINDS[cc], f)));
   }
   WK.view = view; WK.members = members; WIND = WINDS[members[0]];
+  if (WK.series && !members.includes(WK.series.cc)) wkClearPick();
   document.querySelectorAll('#wkCounties button').forEach(b => b.classList.toggle('on', b.dataset.view === view));
   $('#wkTitle').textContent = 'Near-surface wind speed — ' + members.map(cc => WIND_TITLES[cc] || WINDS[cc].county_name).join(' & ');
   // the period's peak hour across the view
@@ -1880,6 +2045,13 @@ async function initWind() {
     read.innerHTML = 'No data at ' + e.latlng.lat.toFixed(3) + ', ' + e.latlng.lng.toFixed(3);
   });
   map.on('mouseout', () => { read.textContent = 'Hover the map for the wind at any grid cell'; });
+  map.on('click', e => {
+    if (!WIND) return;
+    for (const cc of WK.members) {
+      const m = WINDS[cc], i = wkCellAt(m, e.latlng), f = wkCells(cc);
+      if (i >= 0 && f && f.ok[i]) { wkSelectCell(cc, i, wkCellLatLng(m, i)); return; }
+    }
+  });
 
   $('#wkPlay').onclick = () => wkSetPlaying(!wkPlaying());
   $('#wkPrev').onclick = () => { wkSetPlaying(false); wkGoto(WK.frame - 1); };
@@ -1890,6 +2062,8 @@ async function initWind() {
   $('#wkTowns').onchange = e => { if (WK.towns) (e.target.checked ? WK.towns.addTo(map) : map.removeLayer(WK.towns)); };
   $('#wkArrows').onchange = () => WK.arrows.redraw();
   $('#wkStations').onchange = () => { $('#wkStaKey').hidden = !$('#wkStations').checked; wkRender(); };
+  $('#wkChartClear').onclick = wkClearPick;
+  addEventListener('resize', wkDrawChart);
   await wkSelect(views.some(v => v[0] === 'KAOA') ? 'KAOA' : views[0][0]);
   addEventListener('resize', () => { map.invalidateSize(); wkGraticule(); });
   setTimeout(wkGraticule, 600);            // once layout has settled after the first paint
