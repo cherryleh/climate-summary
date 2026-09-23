@@ -1,0 +1,77 @@
+<header class="app-header">
+  <h1>Tropical Storm Viewer</h1>
+  <p class="subtitle">This website is designed to enable access to the most recent rainfall and wind speed data from Hawaiʻi Mesonet stations. Those stations record and transmit data every 5 minutes for numerous different variables. With the approach of the tropical storm, interest is mainly on rainfall and wind speed. Here you can find up-to-date rainfall accumulation and maximum wind and wind gust speeds for the period starting September 22, 10:00 PM HST. Data will be updated every 15 minutes.</p>
+</header>
+
+<div class="boot" *ngIf="loading">
+  <div class="bootcard">
+    <div class="boottitle">Loading Hawaiʻi Mesonet data&hellip;</div>
+    <div class="bootbar"><i [style.width.%]="loadPct"></i></div>
+    <div class="bootpct">{{ loadPct }}%</div>
+  </div>
+</div>
+
+<div class="error-banner" *ngIf="statusErr && !loading">
+  <span>{{ statusMsg }}</span>
+  <button type="button" class="retry-btn" (click)="retry()">Retry</button>
+</div>
+
+<main>
+  <section class="panel map-panel">
+    <div class="county-filter">
+      <button
+        *ngFor="let c of COUNTIES"
+        type="button"
+        class="county-btn"
+        [class.active]="selectedCounty === c.key"
+        (click)="selectCounty(c.key)">
+        {{ c.label }}
+      </button>
+    </div>
+    <div class="map-wrap">
+      <div class="map" #map></div>
+    </div>
+    <p class="sourcenote">
+      Stations: <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet/" target="_blank" rel="noopener">Hawaiʻi Mesonet</a>
+      via the <a href="https://hcdp.github.io/hcdp_api_docs/" target="_blank" rel="noopener">HCDP API</a>. Active stations are shown; totals cover data {{ WINDOW_LABEL }}.
+    </p>
+  </section>
+
+  <div class="col-right">
+    <section class="panel chartwrap">
+      <div class="charthead">
+        <span class="who">{{ selectedName }}</span>
+        <span class="stat">{{ selectedMeta }}</span>
+      </div>
+
+      <div class="empty" *ngIf="!hasSelection">Click a station on the map to plot its rainfall and wind {{ WINDOW_LABEL }}.</div>
+
+      <ng-container *ngIf="hasSelection">
+        <div class="stats-heading">Summary &middot; {{ WINDOW_LABEL }}</div>
+        <div class="stats">
+          <div><span class="stat-label">Total rainfall</span><b>{{ selectedRainTotal.toFixed(2) }} in</b></div>
+          <div><span class="stat-label">Max sustained wind</span><b>{{ selectedMaxWind.toFixed(1) }} mph</b></div>
+          <div><span class="stat-label">Max gust</span><b>{{ selectedMaxGust.toFixed(1) }} mph</b></div>
+        </div>
+
+        <h3 class="chart-title">Rainfall ({{ WINDOW_LABEL }})</h3>
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [options]="rainChartOptions"
+          [(update)]="rainUpdateFlag"
+          [callbackFunction]="rainChartCallback"
+          style="width:100%; height:260px; display:block;">
+        </highcharts-chart>
+
+        <h3 class="chart-title">Wind speed &amp; gust ({{ WINDOW_LABEL }})</h3>
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [options]="windChartOptions"
+          [(update)]="windUpdateFlag"
+          [callbackFunction]="windChartCallback"
+          style="width:100%; height:260px; display:block;">
+        </highcharts-chart>
+      </ng-container>
+    </section>
+  </div>
+</main>
