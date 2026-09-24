@@ -6,33 +6,21 @@ import * as L from 'leaflet';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { environment } from '../../environments/environment';
+import { NoloHourlyMapComponent } from './nolo-hourly-map.component';
+import {
+  County, CountyFilter, MapMode, MapKind, Station, StationSeries,
+  compass, sizeScale, rampRGB, gustIcon, legendFor, LegendTick, RAIN_RAMP, WIND_RAMP, TILE_URL,
+  STATEWIDE_BOUNDS, COUNTY_BOUNDS, COUNTIES, NODATA_COLOR
+} from './nolo-map';
 
 Highcharts.setOptions({
   time: { timezone: 'Pacific/Honolulu' }
 });
 
-type County = 'hawaii' | 'maui' | 'honolulu' | 'kauai';
-type CountyFilter = 'all' | County;
-
-interface Station {
-  id: string;
-  name: string;
-  lat: number;
-  lng: number;
-  county: County | null;
-  active: boolean;
-}
-
-interface StationSeries {
-  rain: [number, number][];   // [time, 5-min amount, in]
-  wind: [number, number][];   // [time, avg speed, mph]
-  gust: [number, number][];   // [time, max gust, mph]
-}
-
 @Component({
   selector: 'app-nolo-viewer',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [CommonModule, HighchartsChartModule, NoloHourlyMapComponent],
   templateUrl: './nolo-viewer.component.html',
   styleUrl: './nolo-viewer.component.css'
 })
@@ -45,38 +33,37 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
   private readonly RAINV = 'RF_1_Tot300s';   // 5-minute rainfall total, mm
   private readonly WINDV = 'WS_1_Avg';       // 5-minute scalar-average wind speed, m/s
   private readonly GUSTV = 'WG_1_Max';       // 5-minute maximum gust, m/s
+  private readonly DIRV = 'WDrs_1_Avg';      // 5-minute vector-average wind direction, degrees from north the wind blew from
   private readonly MM_PER_IN = 25.4;
   private readonly MPH_PER_MS = 2.236936;
-  private readonly WINDOW_START = Date.parse('2026-09-22T22:00:00-10:00');
+  readonly WINDOW_START = Date.parse('2026-09-22T22:00:00-10:00');
   readonly WINDOW_LABEL = 'since Sep 22, 10:00 PM HST';
 
-  // Same basemap as hurricane-lala: Esri's free, keyless World Street Map
-  // (World Physical Map's tiles only go up to native zoom 8).
-  private readonly TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
-  private readonly STATEWIDE_BOUNDS = L.latLngBounds([18.849, -159.816], [22.269, -154.668]);
-
-  // Fixed island/county extents (not derived from station positions, which
-  // don't reach every coastline and were clipping Oʻahu and Kauaʻi).
-  private readonly COUNTY_BOUNDS: Record<County, L.LatLngBounds> = {
-    kauai: L.latLngBounds([21.819, -159.816], [22.269, -159.25125]),
-    honolulu: L.latLngBounds([21.18, -158.322], [21.7425, -157.602]),
-    maui: L.latLngBounds([20.343, -157.35], [21.32175, -155.92575]),
-    hawaii: L.latLngBounds([18.849, -156.243], [20.334, -154.668])
-  };
+  private readonly STATEWIDE_BOUNDS = STATEWIDE_BOUNDS;
+  private readonly COUNTY_BOUNDS = COUNTY_BOUNDS;
 
   // Station IDs are 4-digit codes; the first two digits are a county code.
   // '01' Maui, '03' Lānaʻi, '04' Molokaʻi — all part of Maui County.
   private readonly COUNTY_PREFIXES: Record<string, County> = {
     '02': 'hawaii', '01': 'maui', '03': 'maui', '04': 'maui', '05': 'honolulu', '06': 'kauai'
   };
-  readonly COUNTIES: { key: CountyFilter; label: string }[] = [
-    { key: 'all', label: 'Statewide' },
-    { key: 'hawaii', label: 'Hawaiʻi' },
-    { key: 'maui', label: 'Maui' },
-    { key: 'honolulu', label: 'Oʻahu' },
-    { key: 'kauai', label: 'Kauaʻi' }
-  ];
-  private readonly MARKER_COLOR = '#2563eb';
+  readonly COUNTIES = COUNTIES;
+
+  readonly MAP_KINDS: Record<MapMode, MapKind> = {
+    rain: {
+      label: 'Rainfall total', unit: 'inches, total (log)',
+      domain: 15, soft: 0.1, ticks: [0, 0.25, 0.5, 1, 2, 4, 8, 15],
+      ramp: RAIN_RAMP,
+      fmt: v => v.toFixed(2) + ' in'
+    },
+    gust: {
+      label: 'Max wind gust', unit: 'mph, max gust (log)',
+      domain: 80, soft: 10, ticks: [0, 4, 9, 15, 25, 38, 55, 80],
+      ramp: WIND_RAMP,
+      fmt: v => v.toFixed(1) + ' mph'
+    }
+  };
+  readonly MAP_MODES: MapMode[] = ['rain', 'gust'];
 
   // ------------------------------------------------------------- template refs
   @ViewChild('map') private mapEl!: ElementRef<HTMLDivElement>;
@@ -95,6 +82,11 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
   selectedRainTotal = 0;
   selectedMaxWind = 0;
   selectedMaxGust = 0;
+  selectedGustDir = '';
+
+  mapMode: MapMode = 'rain';
+  legendGradient = '';
+  legendTicks: LegendTick[] = [];
 
   rainUpdateFlag = false;
   windUpdateFlag = false;
@@ -131,11 +123,22 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     title: { text: undefined },
     credits: { enabled: false },
     xAxis: { type: 'datetime', title: { text: undefined } },
-    yAxis: { title: { text: 'Wind (mph)' }, min: 0 },
+    yAxis: [
+      { title: { text: 'Wind (mph)' }, min: 0 },
+      {
+        title: { text: 'Direction (from)' }, opposite: true, min: 0, max: 360, tickPositions: [0, 90, 180, 270, 360],
+        gridLineWidth: 0,
+        labels: { formatter() { return ['N', 'E', 'S', 'W', 'N'][Math.round(+this.value / 90)]; } }
+      }
+    ],
     tooltip: {
       xDateFormat: '%b %e, %I:%M %p',
       shared: true,
-      pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} mph</b><br/>'
+      pointFormatter() {
+        const dir = this.series.name === 'Direction';
+        const val = dir ? `${Math.round(this.y!)}° (${compass(this.y!)})` : `${this.y!.toFixed(1)} mph`;
+        return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${val}</b><br/>`;
+      }
     },
     legend: { enabled: true },
     plotOptions: {
@@ -143,19 +146,30 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     },
     series: [
       { type: 'line', name: 'Sustained', data: [], color: '#d03b3b' },
-      { type: 'line', name: 'Gust', data: [], color: '#fb7744' }
+      { type: 'line', name: 'Gust', data: [], color: '#fb7744' },
+      this.dirSeries([])
     ]
   };
 
+  private dirSeries(data: [number, number][]): Highcharts.SeriesScatterOptions {
+    return {
+      type: 'scatter', name: 'Direction', data, yAxis: 1, color: 'rgba(71,85,105,.45)', lineWidth: 0,
+      marker: { enabled: true, radius: 1.6, symbol: 'circle' }, stickyTracking: true
+    };
+  }
+
   // ------------------------------------------------------------- internal state
-  private stations: Station[] = [];
+  stations: Station[] = [];
   private stationById = new Map<string, Station>();
-  private seriesByStation = new Map<string, StationSeries>();
-  private markers = new Map<string, L.CircleMarker>();
+  seriesByStation = new Map<string, StationSeries>();
+  private rainMarkers = new Map<string, L.CircleMarker>();
+  private gustMarkers = new Map<string, L.Marker>();
   private map: L.Map | null = null;
   private mapResizeObserver: ResizeObserver | null = null;
 
-  constructor(private http: HttpClient, private zone: NgZone) {}
+  constructor(private http: HttpClient, private zone: NgZone) {
+    this.buildLegend();
+  }
 
   ngAfterViewInit() {
     setTimeout(() => this.boot(), 0);
@@ -207,7 +221,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
   private async loadLatest(): Promise<void> {
     const rows = await this.apiGet<any[]>('measurements', {
       location: this.LOC,
-      var_ids: `${this.RAINV},${this.WINDV},${this.GUSTV}`,
+      var_ids: `${this.RAINV},${this.WINDV},${this.GUSTV},${this.DIRV}`,
       start_date: new Date(this.WINDOW_START).toISOString(),
       end_date: new Date().toISOString(),
       row_mode: 'json',
@@ -221,15 +235,17 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
       if (!isFinite(raw)) continue;
       const t = Date.parse(r.timestamp);
       let s = this.seriesByStation.get(r.station_id);
-      if (!s) { s = { rain: [], wind: [], gust: [] }; this.seriesByStation.set(r.station_id, s); }
+      if (!s) { s = { rain: [], wind: [], gust: [], dir: [] }; this.seriesByStation.set(r.station_id, s); }
       if (r.variable === this.RAINV) s.rain.push([t, raw / this.MM_PER_IN]);
       else if (r.variable === this.WINDV) s.wind.push([t, raw * this.MPH_PER_MS]);
       else if (r.variable === this.GUSTV) s.gust.push([t, raw * this.MPH_PER_MS]);
+      else if (r.variable === this.DIRV) s.dir.push([t, ((raw % 360) + 360) % 360]);
     }
     for (const s of this.seriesByStation.values()) {
       s.rain.sort((a, b) => a[0] - b[0]);
       s.wind.sort((a, b) => a[0] - b[0]);
       s.gust.sort((a, b) => a[0] - b[0]);
+      s.dir.sort((a, b) => a[0] - b[0]);
     }
   }
 
@@ -240,6 +256,14 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
 
   private maxOf(points: [number, number][]): number {
     return points.reduce((m, p) => Math.max(m, p[1]), 0);
+  }
+
+  /** Direction the wind blew from in the 5 minutes that held the station's peak gust. */
+  private maxGustDir(id: string): number {
+    const s = this.seriesByStation.get(id);
+    if (!s?.gust.length) return NaN;
+    const peak = s.gust.reduce((a, b) => (b[1] > a[1] ? b : a));
+    return s.dir.find(d => d[0] === peak[0])?.[1] ?? NaN;
   }
 
   // -------------------------------------------------------------------- the map
@@ -253,7 +277,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
 
   private buildMap() {
     const m = L.map(this.mapEl.nativeElement, { zoomControl: true, zoomSnap: 0 });
-    L.tileLayer(this.TILE_URL, { maxZoom: 16, attribution: 'Esri &mdash; Sources: Esri' } as any).addTo(m);
+    L.tileLayer(TILE_URL, { maxZoom: 16, attribution: 'Esri &mdash; Sources: Esri' } as any).addTo(m);
     m.fitBounds(this.STATEWIDE_BOUNDS, { animate: false });
     this.map = m;
     this.drawMarkers();
@@ -267,23 +291,87 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     this.mapResizeObserver.observe(this.mapEl.nativeElement);
   }
 
+  // ------------------------------------------------------------- colour scale
+  private sizeScale(v: number): number { return sizeScale(v, this.MAP_KINDS[this.mapMode]); }
+
+  private buildLegend() {
+    ({ gradient: this.legendGradient, ticks: this.legendTicks } = legendFor(this.MAP_KINDS[this.mapMode]));
+  }
+
+  /** The station's value for the current map mode, or NaN when it has no data in the window. */
+  private mapValue(id: string): number {
+    const s = this.seriesByStation.get(id);
+    if (this.mapMode === 'rain') return s?.rain.length ? this.totalRain(id) : NaN;
+    return s?.gust.length ? this.maxOf(s.gust) : NaN;
+  }
+
   private drawMarkers() {
     if (!this.map) return;
     for (const st of this.stations) {
-      const mk = L.circleMarker([st.lat, st.lng], {
-        radius: 5,
-        fillColor: this.MARKER_COLOR,
-        fillOpacity: 0.85,
-        color: '#1d1d1d', weight: 1, opacity: 0.8
-      }).addTo(this.map);
-      const total = this.totalRain(st.id);
-      mk.bindTooltip(
-        `<b>${st.name}</b> (${st.id})<br>${total.toFixed(2)} in ${this.WINDOW_LABEL}`,
-        { direction: 'top', sticky: true }
-      );
-      mk.on('click', () => this.zone.run(() => this.select(st.id)));
-      this.markers.set(st.id, mk);
+      const mk = L.circleMarker([st.lat, st.lng], { radius: 5, fillOpacity: 0.9, opacity: 1 });
+      const gm = L.marker([st.lat, st.lng], { keyboard: false });
+      for (const m of [mk, gm] as L.Layer[]) {
+        m.on('click', () => this.zone.run(() => this.select(st.id)));
+      }
+      this.rainMarkers.set(st.id, mk);
+      this.gustMarkers.set(st.id, gm);
     }
+    this.renderMarkers();
+  }
+
+  /** Puts the right marker for the current mode on the map for each visible
+   *  station, coloured and sized by its value, with the selection outlined. */
+  private renderMarkers() {
+    const map = this.map;
+    if (!map) return;
+    const K = this.MAP_KINDS[this.mapMode];
+    const visibleIds = new Set(this.visibleStations().map(s => s.id));
+    const drop = (m?: L.Layer) => { if (m && map.hasLayer(m)) map.removeLayer(m); };
+
+    // Draw no-data stations first and the biggest values last, so they sit on top.
+    const order = this.stations
+      .map(st => ({ st, v: this.mapValue(st.id) }))
+      .sort((a, b) => (isFinite(a.v) ? a.v : -1) - (isFinite(b.v) ? b.v : -1));
+
+    for (const { st, v } of order) {
+      const mk = this.rainMarkers.get(st.id)!, gm = this.gustMarkers.get(st.id)!;
+      if (!visibleIds.has(st.id)) { drop(mk); drop(gm); continue; }
+      const picked = st.id === this.selectedId;
+      const has = isFinite(v);
+      const dir = this.mapMode === 'gust' && has ? this.maxGustDir(st.id) : NaN;
+      const from = isFinite(dir) ? ` from ${Math.round(dir)}° (${compass(dir)})` : '';
+      const tip = `<b>${st.name}</b> (${st.id})<br>${K.label}: ${has ? K.fmt(v) + from : 'no data'} ${this.WINDOW_LABEL}`;
+
+      if (this.mapMode === 'gust' && has) {
+        drop(mk);
+        const t = this.sizeScale(v);
+        gm.setIcon(gustIcon(v, dir, t, picked, K));
+        gm.setZIndexOffset(picked ? 100000 : Math.round(Math.min(1, t) * 50000));
+        gm.bindTooltip(tip, { direction: 'top' });
+        if (!map.hasLayer(gm)) gm.addTo(map);
+      } else {
+        drop(gm);
+        const t = has ? this.sizeScale(v) : 0;
+        const [r, g, b] = rampRGB(t, K);
+        mk.setRadius(has ? 4 + t * 16 : 3.5);
+        mk.setStyle({
+          fillColor: has ? `rgb(${r},${g},${b})` : NODATA_COLOR,
+          fillOpacity: has ? 0.9 : 0.6,
+          color: picked ? '#000' : '#fff',
+          weight: picked ? 3 : 1.5
+        });
+        mk.bindTooltip(tip, { direction: 'top', sticky: true });
+        if (!map.hasLayer(mk)) mk.addTo(map);
+        mk.bringToFront();
+      }
+    }
+  }
+
+  setMapMode(mode: MapMode) {
+    if (this.mapMode === mode) return;
+    this.mapMode = mode;
+    this.buildLegend();
+    this.renderMarkers();
   }
 
   // -------------------------------------------------------------- county filter
@@ -295,33 +383,17 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
 
   private updateMarkerVisibility() {
     if (!this.map) return;
-    const visible = this.visibleStations();
-    const visibleIds = new Set(visible.map(s => s.id));
-
-    for (const [id, mk] of this.markers) {
-      const show = visibleIds.has(id);
-      const onMap = this.map.hasLayer(mk);
-      if (show && !onMap) mk.addTo(this.map);
-      if (!show && onMap) this.map.removeLayer(mk);
-    }
-
-    const bounds = this.selectedCounty === 'all' ? this.STATEWIDE_BOUNDS : this.COUNTY_BOUNDS[this.selectedCounty];
-    this.map.fitBounds(bounds, { animate: true, padding: [12, 12] });
-
+    const visibleIds = new Set(this.visibleStations().map(s => s.id));
     if (this.selectedId && !visibleIds.has(this.selectedId)) {
       this.selectedId = null;
       this.selectedName = 'No station selected';
       this.selectedMeta = '';
       this.hasSelection = false;
     }
-  }
+    this.renderMarkers();
 
-  private highlight() {
-    for (const [id, mk] of this.markers) {
-      const on = id === this.selectedId;
-      mk.setStyle({ color: on ? '#000' : '#1d1d1d', weight: on ? 3 : 1, radius: on ? 7 : 5 });
-      if (on) mk.bringToFront();
-    }
+    const bounds = this.selectedCounty === 'all' ? this.STATEWIDE_BOUNDS : this.COUNTY_BOUNDS[this.selectedCounty];
+    this.map.fitBounds(bounds, { animate: true, padding: [12, 12] });
   }
 
   // ---------------------------------------------------------------- selection
@@ -332,7 +404,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     this.selectedName = st.name;
     this.selectedMeta = st.id;
     this.hasSelection = true;
-    this.highlight();
+    this.renderMarkers();
     this.updateCharts(id);
   }
 
@@ -341,6 +413,8 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     this.selectedRainTotal = this.totalRain(id);
     this.selectedMaxWind = this.maxOf(s?.wind ?? []);
     this.selectedMaxGust = this.maxOf(s?.gust ?? []);
+    const gd = this.maxGustDir(id);
+    this.selectedGustDir = isFinite(gd) ? `from ${compass(gd)}` : '';
 
     let running = 0;
     const rainData: [number, number][] = (s?.rain ?? []).map(([t, v]) => {
@@ -355,11 +429,13 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
 
     const windData = s?.wind ?? [];
     const gustData = s?.gust ?? [];
+    const dirData = s?.dir ?? [];
     this.windChartOptions = {
       ...this.windChartOptions,
       series: [
         { type: 'line', name: 'Sustained', data: windData, color: '#d03b3b' },
-        { type: 'line', name: 'Gust', data: gustData, color: '#fb7744' }
+        { type: 'line', name: 'Gust', data: gustData, color: '#fb7744' },
+        this.dirSeries(dirData)
       ]
     };
     this.windUpdateFlag = true;
@@ -367,9 +443,10 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     // Belt-and-suspenders: call setData directly on the live chart refs
     // instead of trusting the declarative [options]/[(update)] binding alone.
     if (this.rainChartRef?.series[0]) this.rainChartRef.series[0].setData(rainData, true, false, false);
-    if (this.windChartRef?.series[0] && this.windChartRef.series[1]) {
+    if (this.windChartRef?.series[0] && this.windChartRef.series[1] && this.windChartRef.series[2]) {
       this.windChartRef.series[0].setData(windData, false, false, false);
-      this.windChartRef.series[1].setData(gustData, true, false, false);
+      this.windChartRef.series[1].setData(gustData, false, false, false);
+      this.windChartRef.series[2].setData(dirData, true, false, false);
     }
   }
 

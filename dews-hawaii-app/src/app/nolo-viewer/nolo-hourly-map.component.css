@@ -1,0 +1,72 @@
+:host {
+  --surface-1: #ffffff;
+  --plane: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --accent: #2563eb;
+  display: block;
+}
+
+.panel { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+.hourly-head { padding: 16px 18px 6px; }
+.hourly-head h2 { margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-primary); }
+.hourly-head p { margin: 4px 0 0; font-size: 13px; color: var(--text-secondary); max-width: 900px; }
+
+.controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+            padding: 10px 18px 12px; border-bottom: 1px solid var(--border); }
+
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button { font: inherit; font-size: 13px; font-weight: 600; padding: 7px 16px; border: 0; cursor: pointer;
+              background: var(--plane); color: var(--text-secondary); }
+.seg button + button { border-left: 1px solid var(--border); }
+.seg button:hover { background: var(--surface-1); }
+.seg button.on { background: var(--accent); color: #fff; }
+
+.counties { display: flex; flex-wrap: wrap; gap: 6px; }
+.county-btn { font: inherit; font-size: 12px; font-weight: 600; color: var(--text-secondary); background: var(--plane);
+              border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+.county-btn:hover { border-color: var(--accent); }
+.county-btn.active { background: var(--text-primary); border-color: var(--text-primary); color: #fff; }
+
+.map-wrap { position: relative; }
+.map { height: min(68vh, 620px); min-height: 360px; background: var(--plane); }
+.maptime { position: absolute; right: 12px; top: 10px; z-index: 800; pointer-events: none; text-align: right;
+           font-size: 18px; font-weight: 700; color: #111; font-variant-numeric: tabular-nums;
+           text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 6px #fff, 1px 1px 0 #fff, -1px -1px 0 #fff; }
+.maptime small { display: block; font-size: 11px; font-weight: 600; color: #333; }
+:host ::ng-deep .gust-icon { background: none; border: 0; }
+
+.transport { display: flex; align-items: center; gap: 10px; padding: 11px 18px; border-top: 1px solid var(--border);
+             border-bottom: 1px solid var(--border); }
+.btn { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 8px; cursor: pointer; min-width: 38px;
+       border: 1px solid var(--border); background: var(--plane); color: var(--text-primary); }
+.btn:hover { background: var(--surface-1); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; min-width: 74px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.slider { flex: 1; min-width: 0; -webkit-appearance: none; appearance: none; height: 8px; border-radius: 4px; outline: none; }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,.3); cursor: pointer; }
+.slider::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid var(--accent);
+  box-shadow: 0 1px 3px rgba(0,0,0,.3); cursor: pointer; }
+.slider::-moz-range-track { height: 8px; border-radius: 4px; background: transparent; }
+.speed { font: inherit; font-size: 12px; padding: 5px 7px; border-radius: 7px; border: 1px solid var(--border);
+         background: var(--plane); color: var(--text-secondary); }
+
+.legend { display: flex; align-items: center; gap: 10px; padding: 10px 18px 2px; font-size: 11px; color: var(--muted); }
+.legend .unit { white-space: nowrap; }
+.legend .ramp { flex: 1; min-width: 0; }
+.legend .rampbar { height: 9px; border-radius: 2px; }
+.legend .rampticks { position: relative; height: 14px; }
+.legend .rampticks span { position: absolute; top: 1px; font-size: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.summary { margin: 0; padding: 4px 18px 0; font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.footnote { margin: 0; padding: 4px 18px 14px; font-size: 11px; color: var(--muted); }
+
+@media (max-width: 700px) {
+  .transport { flex-wrap: wrap; }
+  .slider { flex-basis: 100%; order: 5; }
+  .maptime { font-size: 14px; }
+}

@@ -28,8 +28,29 @@
         {{ c.label }}
       </button>
     </div>
+    <div class="mode-switch" role="group" aria-label="Map variable">
+      <button
+        *ngFor="let m of MAP_MODES"
+        type="button"
+        class="mode-btn"
+        [class.active]="mapMode === m"
+        [attr.aria-pressed]="mapMode === m"
+        (click)="setMapMode(m)">
+        {{ MAP_KINDS[m].label }}
+      </button>
+    </div>
     <div class="map-wrap">
       <div class="map" #map></div>
+    </div>
+    <div class="legend">
+      <span class="unit">{{ MAP_KINDS[mapMode].unit }}</span>
+      <div class="ramp">
+        <div class="rampbar" [style.background]="legendGradient"></div>
+        <div class="rampticks">
+          <span *ngFor="let t of legendTicks" [style.left.%]="t.left" [style.transform]="'translateX(' + t.shift + ')'">{{ t.label }}</span>
+        </div>
+      </div>
+      <span class="nodata"><i></i>no data</span>
     </div>
     <p class="sourcenote">
       Stations: <a href="https://www.hawaii.edu/climate-data-portal/hawaii-mesonet/" target="_blank" rel="noopener">Hawaiʻi Mesonet</a>
@@ -51,7 +72,7 @@
         <div class="stats">
           <div><span class="stat-label">Total rainfall</span><b>{{ selectedRainTotal.toFixed(2) }} in</b></div>
           <div><span class="stat-label">Max sustained wind</span><b>{{ selectedMaxWind.toFixed(1) }} mph</b></div>
-          <div><span class="stat-label">Max gust</span><b>{{ selectedMaxGust.toFixed(1) }} mph</b></div>
+          <div><span class="stat-label">Max gust</span><b>{{ selectedMaxGust.toFixed(1) }} mph <small *ngIf="selectedGustDir">{{ selectedGustDir }}</small></b></div>
         </div>
 
         <h3 class="chart-title">Rainfall ({{ WINDOW_LABEL }})</h3>
@@ -63,7 +84,7 @@
           style="width:100%; height:260px; display:block;">
         </highcharts-chart>
 
-        <h3 class="chart-title">Wind speed &amp; gust ({{ WINDOW_LABEL }})</h3>
+        <h3 class="chart-title">Wind speed, gust &amp; direction ({{ WINDOW_LABEL }})</h3>
         <highcharts-chart
           [Highcharts]="Highcharts"
           [options]="windChartOptions"
@@ -75,3 +96,13 @@
     </section>
   </div>
 </main>
+
+<div class="hourly-wrap" *ngIf="!loading && !statusErr">
+  <app-nolo-hourly-map
+    [stations]="stations"
+    [series]="seriesByStation"
+    [windowStart]="WINDOW_START"
+    [selectedId]="selectedId"
+    (stationClick)="select($event)">
+  </app-nolo-hourly-map>
+</div>

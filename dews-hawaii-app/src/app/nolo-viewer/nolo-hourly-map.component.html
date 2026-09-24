@@ -1,0 +1,55 @@
+<section class="panel hourly">
+  <div class="hourly-head">
+    <h2>Hour by hour</h2>
+    <p>
+      Every hour of the storm at each Hawaiʻi Mesonet station: the rain that fell in that hour, or the strongest
+      5-minute gust in it, with the arrow pointing the way that gust blew. Press play to step through the storm, or
+      drag the slider to any hour. Click a station to chart it above.
+    </p>
+  </div>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Map variable">
+      <button *ngFor="let m of MAP_MODES" type="button" [class.on]="mode === m" [attr.aria-pressed]="mode === m"
+        (click)="setMode(m)">{{ MAP_KINDS[m].label }}</button>
+    </div>
+    <div class="counties">
+      <button *ngFor="let c of COUNTIES" type="button" class="county-btn" [class.active]="county === c.key"
+        (click)="setCounty(c.key)">{{ c.label }}</button>
+    </div>
+  </div>
+
+  <div class="map-wrap">
+    <div class="map" #map></div>
+    <div class="maptime">{{ frameLabel }}<small>{{ frameSub }}</small></div>
+  </div>
+
+  <div class="transport">
+    <button type="button" class="btn primary" (click)="togglePlay()" [attr.aria-pressed]="playing"
+      [disabled]="frames.length < 2">{{ playing ? 'Pause' : 'Play' }}</button>
+    <button type="button" class="btn" (click)="step(-1)" [disabled]="frame <= 0" title="Previous hour"
+      aria-label="Previous hour">&#9664;</button>
+    <button type="button" class="btn" (click)="step(1)" [disabled]="frame >= frames.length - 1" title="Next hour"
+      aria-label="Next hour">&#9654;</button>
+    <input type="range" class="slider" min="0" [max]="frames.length - 1" step="1" [value]="frame"
+      [style.background]="sliderFill" (input)="onSlider($event)" aria-label="Hour">
+    <select class="speed" aria-label="Playback speed" (change)="setSpeed(+$any($event.target).value)">
+      <option *ngFor="let s of SPEEDS" [value]="s.ms" [selected]="s.ms === speedMs">{{ s.label }}</option>
+    </select>
+  </div>
+
+  <div class="legend">
+    <span class="unit">{{ MAP_KINDS[mode].unit }}</span>
+    <div class="ramp">
+      <div class="rampbar" [style.background]="legendGradient"></div>
+      <div class="rampticks">
+        <span *ngFor="let t of legendTicks" [style.left.%]="t.left" [style.transform]="'translateX(' + t.shift + ')'">{{ t.label }}</span>
+      </div>
+    </div>
+  </div>
+  <p class="summary">{{ frameSummary }}</p>
+  <p class="footnote">
+    Hours run on the clock (e.g. 2:00–3:00 AM). Only stations that reported during an hour are drawn for it. Fixed
+    pseudo-log colour scales: 0–5 in for rainfall (circles keep growing above 5 in) and 0–80 mph for gusts.
+  </p>
+</section>
