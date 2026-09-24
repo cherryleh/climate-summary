@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 import { NoloHourlyMapComponent } from './nolo-hourly-map.component';
 import {
   County, CountyFilter, MapMode, MapKind, Station, StationSeries,
-  compass, sizeScale, rampRGB, gustIcon, legendFor, LegendTick, RAIN_RAMP, WIND_RAMP, TILE_URL,
+  compass, sizeScale, rampRGB, gustIcon, legendFor, LegendTick, RAIN_RAMP, WIND_RAMP, TILE_URL, MAP_OPTIONS, markerScale,
   STATEWIDE_BOUNDS, COUNTY_BOUNDS, COUNTIES, NODATA_COLOR
 } from './nolo-map';
 
@@ -67,6 +67,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
 
   // ------------------------------------------------------------- template refs
   @ViewChild('map') private mapEl!: ElementRef<HTMLDivElement>;
+  @ViewChild('chartPanel') private chartPanel?: ElementRef<HTMLElement>;
 
   // ------------------------------------------------------------- bound state
   loading = true;
@@ -110,6 +111,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     credits: { enabled: false },
     xAxis: { type: 'datetime', title: { text: undefined } },
     yAxis: { title: { text: 'Rainfall accumulated (in)' }, min: 0 },
+    responsive: { rules: [{ condition: { maxWidth: 480 }, chartOptions: { yAxis: { title: { text: 'in' } } } }] },
     tooltip: { xDateFormat: '%b %e, %I:%M %p', pointFormat: '<b>{point.y:.2f} in</b> accumulated' },
     legend: { enabled: false },
     plotOptions: {
@@ -143,6 +145,12 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     legend: { enabled: true },
     plotOptions: {
       series: { marker: { enabled: false }, turboThreshold: 0, lineWidth: 1.5, animation: false }
+    },
+    responsive: {
+      rules: [{
+        condition: { maxWidth: 480 },
+        chartOptions: { yAxis: [{ title: { text: 'mph' } }, { title: { text: undefined } }] }
+      }]
     },
     series: [
       { type: 'line', name: 'Sustained', data: [], color: '#d03b3b' },
@@ -276,7 +284,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
   }
 
   private buildMap() {
-    const m = L.map(this.mapEl.nativeElement, { zoomControl: true, zoomSnap: 0 });
+    const m = L.map(this.mapEl.nativeElement, MAP_OPTIONS);
     L.tileLayer(TILE_URL, { maxZoom: 16, attribution: 'Esri &mdash; Sources: Esri' } as any).addTo(m);
     m.fitBounds(this.STATEWIDE_BOUNDS, { animate: false });
     this.map = m;
@@ -324,6 +332,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
   private renderMarkers() {
     const map = this.map;
     if (!map) return;
+    const scale = markerScale(map);
     const K = this.MAP_KINDS[this.mapMode];
     const visibleIds = new Set(this.visibleStations().map(s => s.id));
     const drop = (m?: L.Layer) => { if (m && map.hasLayer(m)) map.removeLayer(m); };
@@ -345,7 +354,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
       if (this.mapMode === 'gust' && has) {
         drop(mk);
         const t = this.sizeScale(v);
-        gm.setIcon(gustIcon(v, dir, t, picked, K));
+        gm.setIcon(gustIcon(v, dir, t, picked, K, scale));
         gm.setZIndexOffset(picked ? 100000 : Math.round(Math.min(1, t) * 50000));
         gm.bindTooltip(tip, { direction: 'top' });
         if (!map.hasLayer(gm)) gm.addTo(map);
@@ -353,7 +362,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
         drop(gm);
         const t = has ? this.sizeScale(v) : 0;
         const [r, g, b] = rampRGB(t, K);
-        mk.setRadius(has ? 4 + t * 16 : 3.5);
+        mk.setRadius(has ? (4 + t * 16) * scale : 3.5);
         mk.setStyle({
           fillColor: has ? `rgb(${r},${g},${b})` : NODATA_COLOR,
           fillOpacity: has ? 0.9 : 0.6,
@@ -406,6 +415,11 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     this.hasSelection = true;
     this.renderMarkers();
     this.updateCharts(id);
+
+    // On a phone the charts are stacked below the maps, out of sight, so bring them into view.
+    if (window.matchMedia('(max-width: 900px)').matches) {
+      setTimeout(() => this.chartPanel?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
   }
 
   private updateCharts(id: string) {

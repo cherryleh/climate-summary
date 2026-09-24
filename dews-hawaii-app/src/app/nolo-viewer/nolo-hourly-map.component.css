@@ -67,6 +67,31 @@
 
 @media (max-width: 700px) {
   .transport { flex-wrap: wrap; }
-  .slider { flex-basis: 100%; order: 5; }
+  .slider { flex-basis: 100%; order: 5; height: 10px; margin: 6px 0 2px; }
+  .slider::-webkit-slider-thumb { width: 26px; height: 26px; }
+  .slider::-moz-range-thumb { width: 24px; height: 24px; }
   .maptime { font-size: 14px; }
+}
+
+@media (max-width: 600px) {
+  .hourly-head { padding: 14px 12px 4px; }
+  .hourly-head p { font-size: 12.5px; }
+  .controls { padding: 8px 10px 10px; gap: 8px; }
+  .seg { display: flex; width: 100%; }
+  .seg button { flex: 1; padding: 10px 6px; }
+  /* Island buttons stretch to fill the row; on very narrow screens they wrap instead of clipping. */
+  .counties { width: 100%; gap: 4px; }
+  .county-btn { flex: 1 1 auto; padding: 10px 6px; white-space: nowrap; }
+  .map { height: 62vh; max-height: 520px; min-height: 320px; }
+  .maptime { left: 52px; right: 8px; top: 8px; font-size: 13px; }
+  .maptime small { font-size: 10px; }
+  /* Big, evenly spaced transport buttons; the slider takes its own full-width row. */
+  .transport { padding: 10px 12px; gap: 8px; }
+  .btn { min-height: 42px; padding: 8px 14px; }
+  .btn.primary { flex: 1; }
+  .speed { min-height: 42px; padding: 6px 8px; }
+  .legend { flex-wrap: wrap; row-gap: 4px; padding: 10px 12px 2px; }
+  .legend .ramp { flex-basis: 100%; }
+  .summary { padding: 4px 12px 0; }
+  .footnote { padding: 4px 12px 12px; }
 }

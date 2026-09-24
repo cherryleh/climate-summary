@@ -64,6 +64,16 @@ export const COUNTIES: { key: CountyFilter; label: string }[] = [
 // (World Physical Map's tiles only go up to native zoom 8).
 export const TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
 
+/** Leaflet options shared by both maps. On touch devices one finger scrolls the
+ *  page instead of getting caught panning the map; pinch (two fingers) still
+ *  zooms and moves it, and the island buttons jump between islands. */
+export const MAP_OPTIONS: L.MapOptions = { zoomControl: true, zoomSnap: 0, dragging: !L.Browser.mobile };
+
+/** Markers shrink on a phone-width map, where the islands are close together. */
+export function markerScale(map: L.Map): number {
+  return map.getSize().x < 520 ? 0.8 : 1;
+}
+
 /** 16-point compass name for a bearing in degrees. */
 export function compass(deg: number): string {
   const pts = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
@@ -96,8 +106,8 @@ export function legendFor(kind: MapKind): { gradient: string; ticks: LegendTick[
 
 /** The gust marker: a pill in the ramp colour with an arrowhead pointing the way the
  *  wind blew during the gust and the mph beside it, scaled with the magnitude. */
-export function gustIcon(v: number, dir: number, t: number, picked: boolean, kind: MapKind): L.DivIcon {
-  const k = 0.85 + 0.6 * Math.min(1, t);
+export function gustIcon(v: number, dir: number, t: number, picked: boolean, kind: MapKind, scale = 1): L.DivIcon {
+  const k = (0.85 + 0.6 * Math.min(1, t)) * scale;
   const h = 18 * k, fs = 11 * k, pad = 5 * k, glyph = 9 * k, gap = 3 * k;
   const label = v.toFixed(0);
   const tw = label.length * fs * 0.62;
