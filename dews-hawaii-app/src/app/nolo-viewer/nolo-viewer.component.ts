@@ -30,13 +30,13 @@ interface StationSeries {
 }
 
 @Component({
-  selector: 'app-tropical-storm-viewer',
+  selector: 'app-nolo-viewer',
   standalone: true,
   imports: [CommonModule, HighchartsChartModule],
-  templateUrl: './tropical-storm-viewer.component.html',
-  styleUrl: './tropical-storm-viewer.component.css'
+  templateUrl: './nolo-viewer.component.html',
+  styleUrl: './nolo-viewer.component.css'
 })
-export class TropicalStormViewerComponent implements AfterViewInit, OnDestroy {
+export class NoloViewerComponent implements AfterViewInit, OnDestroy {
   Highcharts: typeof Highcharts = Highcharts;
 
   // ------------------------------------------------------------ config
