@@ -47,12 +47,12 @@ export class NoloHourlyMapComponent implements AfterViewInit, OnChanges, OnDestr
   readonly MAP_MODES: MapMode[] = ['rain', 'gust'];
   readonly MAP_KINDS: Record<MapMode, MapKind> = {
     rain: {
-      label: 'Past-hour rainfall', unit: 'inches, past hour (log)',
+      label: 'Past-hour rain', unit: 'inches, past hour (log)',
       domain: 5, soft: 0.05, ticks: [0, 0.05, 0.12, 0.3, 0.6, 1.3, 2.5, 5],
       ramp: RAIN_RAMP, fmt: v => v.toFixed(2) + ' in'
     },
     gust: {
-      label: 'Past-hour max gust', unit: 'mph, past-hour max gust (log)',
+      label: 'Past-hour gust', unit: 'mph, past-hour max gust (log)',
       domain: 80, soft: 10, ticks: [0, 4, 9, 15, 25, 38, 55, 80],
       ramp: WIND_RAMP, fmt: v => v.toFixed(1) + ' mph'
     }

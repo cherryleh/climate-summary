@@ -125,22 +125,11 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     title: { text: undefined },
     credits: { enabled: false },
     xAxis: { type: 'datetime', title: { text: undefined } },
-    yAxis: [
-      { title: { text: 'Wind (mph)' }, min: 0 },
-      {
-        title: { text: 'Direction (from)' }, opposite: true, min: 0, max: 360, tickPositions: [0, 90, 180, 270, 360],
-        gridLineWidth: 0,
-        labels: { formatter() { return ['N', 'E', 'S', 'W', 'N'][Math.round(+this.value / 90)]; } }
-      }
-    ],
+    yAxis: { title: { text: 'Wind (mph)' }, min: 0 },
     tooltip: {
       xDateFormat: '%b %e, %I:%M %p',
       shared: true,
-      pointFormatter() {
-        const dir = this.series.name === 'Direction';
-        const val = dir ? `${Math.round(this.y!)}° (${compass(this.y!)})` : `${this.y!.toFixed(1)} mph`;
-        return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${val}</b><br/>`;
-      }
+      pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} mph</b><br/>'
     },
     legend: { enabled: true },
     plotOptions: {
@@ -149,22 +138,14 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     responsive: {
       rules: [{
         condition: { maxWidth: 480 },
-        chartOptions: { yAxis: [{ title: { text: 'mph' } }, { title: { text: undefined } }] }
+        chartOptions: { yAxis: { title: { text: 'mph' } } }
       }]
     },
     series: [
       { type: 'line', name: 'Sustained', data: [], color: '#d03b3b' },
-      { type: 'line', name: 'Gust', data: [], color: '#fb7744' },
-      this.dirSeries([])
+      { type: 'line', name: 'Gust', data: [], color: '#fb7744' }
     ]
   };
-
-  private dirSeries(data: [number, number][]): Highcharts.SeriesScatterOptions {
-    return {
-      type: 'scatter', name: 'Direction', data, yAxis: 1, color: 'rgba(71,85,105,.45)', lineWidth: 0,
-      marker: { enabled: true, radius: 1.6, symbol: 'circle' }, stickyTracking: true
-    };
-  }
 
   // ------------------------------------------------------------- internal state
   stations: Station[] = [];
@@ -443,13 +424,11 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
 
     const windData = s?.wind ?? [];
     const gustData = s?.gust ?? [];
-    const dirData = s?.dir ?? [];
     this.windChartOptions = {
       ...this.windChartOptions,
       series: [
         { type: 'line', name: 'Sustained', data: windData, color: '#d03b3b' },
-        { type: 'line', name: 'Gust', data: gustData, color: '#fb7744' },
-        this.dirSeries(dirData)
+        { type: 'line', name: 'Gust', data: gustData, color: '#fb7744' }
       ]
     };
     this.windUpdateFlag = true;
@@ -457,10 +436,9 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
     // Belt-and-suspenders: call setData directly on the live chart refs
     // instead of trusting the declarative [options]/[(update)] binding alone.
     if (this.rainChartRef?.series[0]) this.rainChartRef.series[0].setData(rainData, true, false, false);
-    if (this.windChartRef?.series[0] && this.windChartRef.series[1] && this.windChartRef.series[2]) {
+    if (this.windChartRef?.series[0] && this.windChartRef.series[1]) {
       this.windChartRef.series[0].setData(windData, false, false, false);
-      this.windChartRef.series[1].setData(gustData, false, false, false);
-      this.windChartRef.series[2].setData(dirData, true, false, false);
+      this.windChartRef.series[1].setData(gustData, true, false, false);
     }
   }
 
