@@ -37,7 +37,8 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
   private readonly MM_PER_IN = 25.4;
   private readonly MPH_PER_MS = 2.236936;
   readonly WINDOW_START = Date.parse('2026-09-22T22:00:00-10:00');
-  readonly WINDOW_LABEL = 'since Sep 22, 10:00 PM HST';
+  readonly WINDOW_END   = Date.parse('2026-10-01T23:55:00-10:00');
+  readonly WINDOW_LABEL = 'Sep 22, 10:00 PM to Oct 1, 11:55 PM HST';
 
   private readonly STATEWIDE_BOUNDS = STATEWIDE_BOUNDS;
   private readonly COUNTY_BOUNDS = COUNTY_BOUNDS;
@@ -212,7 +213,7 @@ export class NoloViewerComponent implements AfterViewInit, OnDestroy {
       location: this.LOC,
       var_ids: `${this.RAINV},${this.WINDV},${this.GUSTV},${this.DIRV}`,
       start_date: new Date(this.WINDOW_START).toISOString(),
-      end_date: new Date().toISOString(),
+      end_date: new Date(this.WINDOW_END).toISOString(),
       row_mode: 'json',
       local_tz: true,
       limit: 1000000
