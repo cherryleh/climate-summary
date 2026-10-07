@@ -2,15 +2,15 @@
 
 A single-page web map, `nolo_wind_rainfall.html`, covering Hurricane Nolo's pass
 south of Hawaiʻi Island and its turn north toward Kauaʻi, from the start of
-23 September 2026 to the end of 1 October 2026. It is the Hurricane Lowell viewer rebuilt for Nolo, with the
+23 September 2026 to the end of 2 October 2026. It is the Hurricane Lowell viewer rebuilt for Nolo, with the
 two sections whose data exist for this storm, in this order on the page:
 
 1. **Wind Gusts and Rainfall, Every 15 Minutes** — a Hawaiʻi Mesonet animation
    of hourly peak gust and hourly rainfall, stepped every 15 minutes from
-   23 Sep 00:00 HST to 2 Oct 00:00 HST, over GOES-West infrared imagery, with the
+   23 Sep 00:00 HST to 3 Oct 00:00 HST, over GOES-West infrared imagery, with the
    storm track and a per-station chart of the whole period.
 2. **How Much Rain Fell, Day by Day** — HCDP statewide daily rainfall maps for
-   24 September to 1 October with every reporting station's daily total.
+   24 September to 2 October with every reporting station's daily total.
 
 The Lowell page's WindNinja wind-map section and its storm-surf section are not
 on this page: no WindNinja runs and no wave figure exist for Nolo. If they are
@@ -43,9 +43,9 @@ the tab's session storage and sent only to the HCDP API.
 
 | Section | Data files read by the page | Notes |
 |---|---|---|
-| 1. Mesonet animation | `data/goes/frames.js` + WebP frames, live HCDP mesonet API | 865 GOES frames at 15 min |
-| 1. Storm track | `data/track_nolo.js` | 39 six-hourly best-track fixes, 23 Sep 00 UTC to 2 Oct 12 UTC |
-| 2. Rainfall | `data/rain/manifest.js` | 8 daily statewide frames, 24 Sep – 1 Oct; opens on the 26th, zoomed to Hawaiʻi Island |
+| 1. Mesonet animation | `data/goes/frames.js` + WebP frames, live HCDP mesonet API | 961 GOES frames at 15 min |
+| 1. Storm track | `data/track_nolo.js` | 40 six-hourly best-track fixes, 23 Sep 00 UTC to 2 Oct 18 UTC |
+| 2. Rainfall | `data/rain/manifest.js` | 9 daily statewide frames, 24 Sep – 2 Oct; opens on the 26th, zoomed to Hawaiʻi Island |
 | Both maps | `data/coastline_hawaii.js` | State of Hawaiʻi coastline, drawn in yellow |
 | Logos | `mn_logo.png`, `logo.png` | see below |
 
@@ -70,7 +70,7 @@ Section 1 carries three paragraphs, set 12 px apart: the overview of the storm
 (formation, watches and warnings, closest approach, peak strength, strongest
 gusts, emergency declarations), then how to read the animation, then how to use
 the chart and the two find buttons. Section 2 carries the rainfall account, one
-paragraph per day from 24 September to 1 October, and a closing paragraph on how to
+paragraph per day from 24 September to 2 October, and a closing paragraph on how to
 use the map. The sources are listed at the end of this file.
 
 ### Mesonet animation (section 1)
@@ -95,7 +95,7 @@ use the map. The sources are listed at the end of this file.
   turned into a plain grey ramp (200 K white to 310 K black) and warped to Web
   Mercator. Built by `fetch_goes_aws.py`; the period lives in
   `fetch_goes_frames.py` (`FIRST`, `LAST`), which also holds the projection
-  helpers. About 21 GB of NetCDF passes through for the 865 frames, 46.2 MB of
+  helpers. About 23 GB of NetCDF passes through for the 961 frames, 49.8 MB of
   WebP once rendered; each NetCDF is deleted after its frame is written. The
   downloader retries dropped connections, and a rerun keeps the frames already
   on disk, so an interrupted run can simply be started again.
@@ -110,10 +110,10 @@ use the map. The sources are listed at the end of this file.
   symbol at the position interpolated to the frame. Hover a dot or the symbol
   for time, category, wind and pressure. The box under the logo is the key
   and switches the track off and on. The file is preliminary while the storm
-  is active; rerun the script for new fixes. The animation ends at 00:00 HST
-  on 2 October (the end of 1 October); `build_track.py` keeps fixes up to
-  `UNTIL`, the first one after that, so the storm symbol is on the map in
-  every frame.
+  is active; rerun the script for new fixes. `build_track.py` keeps only the fixes inside the GOES frames (east of
+  `BBOX`'s western edge, 167.95°W): the center crosses it on the afternoon of
+  2 October, so the last fix is 2 Oct 08:00 HST. After that the animation runs
+  on to 00:00 HST on 3 October with the whole track drawn but no storm symbol.
 * The map opens on the statewide extent pushed west and south so the track
   south of Hawaiʻi Island is in view (`EXTENT_BOX` in the page's script).
 * The page's own period is set by `FIRST` and `LAST` near the top of its
@@ -126,7 +126,7 @@ use the map. The sources are listed at the end of this file.
 * Source: HCDP API, `/raster?datatype=rainfall&production=new&period=day&extent=statewide`
   (250 m statewide daily rainfall, mm) and `/stations` (`hcdp_station_value`
   daily totals with `partial` fill, joined to `hcdp_station_metadata` by SKN).
-* Built by `build_rainfall_frames.py` (the default `DATES` are 24 Sep to 1 Oct); pass
+* Built by `build_rainfall_frames.py` (the default `DATES` are 24 Sep to 2 Oct); pass
   `--env path/to/environment.ts` to read the token from the Angular app instead of
   `hi_meso_token.txt`.
   Each day is one lossless RGB PNG, code = round(inches × 100) in R and G, B

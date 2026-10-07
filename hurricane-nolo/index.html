@@ -66,6 +66,13 @@ h1 small { display: block; font-weight: 400; color: var(--text-secondary); font-
 .panel .phead p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-secondary); }
 .panel .phead p + p { margin-top: 12px; }   /* a clear break between paragraphs */
 .panel .phead #status { padding: 8px 0 0; }
+.panel .phead p.lead { font-size: 16px; color: var(--text-primary); }
+.panel .phead p.hint { margin-top: 6px; font-size: 13px; color: var(--muted); }
+.panel .phead p.hint b { color: var(--text-secondary); font-weight: 600; }
+/* the storm story and how to read the map, below the player so the map leads */
+.pstory { border-top: 1px solid var(--border); padding: 18px 26px 10px; }
+.pstory h3 { margin: 0 0 6px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.pstory p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); }
 #map { height: min(62vh, 620px); background: var(--plane); border-bottom: 1px solid var(--border); }
 #map.sat { background: #0b1220; }          /* the ground beyond the satellite frame's edge */
 
@@ -278,8 +285,10 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
 .rk .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 24px;
             overflow: hidden; padding: 22px 26px 24px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); }
 .rk h2 { margin: 0 0 12px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
-.rk .grid { display: grid; grid-template-columns: minmax(420px, 1.9fr) minmax(280px, 1fr); gap: 22px; }
-@media (max-width: 1050px) { .rk .grid { grid-template-columns: 1fr; } }
+/* the map floats left and the text wraps beside it, then under it, as on the Lowell page */
+.rk .grid { display: flow-root; }
+.rk .app { float: left; width: 65%; min-width: 420px; margin: 0 22px 18px 0; }
+@media (max-width: 1050px) { .rk .app { float: none; width: auto; min-width: 0; margin: 0 0 18px; } }
 .rk .prose p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-align: justify; hyphens: auto; }
 .rk .prose p:last-child { margin-bottom: 0; }
 .rk .btnrow { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 10px; }
@@ -398,34 +407,10 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
     <div class="phead">
       <div class="kicker">Hawaiʻi Mesonet</div>
       <h2>Wind Gusts and Rainfall, Every 15 Minutes</h2>
-      <p>Hurricane Nolo began as a tropical depression far out in the eastern Pacific on September 13,
-        faded away, and then came back to life southeast of Hawaiʻi on September 22, when the Central
-        Pacific Hurricane Center gave it its name. A hurricane watch went up for Hawaiʻi County late on
-        September 23 and a tropical storm warning followed on the 24th. The storm never made landfall.
-        Its center stalled about 145 miles south of South Point on the morning of September 26 as a
-        Category 2 hurricane with winds near 105 mph, then turned west and pulled away. Two days later,
-        far to the southwest of the islands, it grew into a Category 4 storm with winds of 155 mph. It
-        then curved north, passing about 260 miles west of Niʻihau on September 29 as a Category 1
-        hurricane, weakened to a tropical storm on the 30th and lingered there before drifting off to the
-        northwest on October 1. The
-        strongest measured gusts were 62 mph in the uplands of the northwest side of Hawaiʻi Island and
-        60 mph at Hanaula in the West Maui mountains, both on the morning of the 26th; the Hawaiʻi Mesonet's
-        own strongest gust was 67 mph at Puʻuloa, in the Kohala uplands, at about 4 that morning. The governor
-        declared a state of emergency, a federal emergency declaration was approved on September 25,
-        and schools and county offices on Hawaiʻi Island closed.</p>
-      <p>Watch Hurricane Nolo unfold as the Hawaiʻi Mesonet saw it, from the start of September 23 to the
-        end of October 1. Press play and the map steps forward 15 minutes at a time, with each step
-        showing what the weather stations recorded over the hour that had just ended. Choose <b>Gusts</b> to see the strongest burst of wind each station felt
-        in that hour, drawn as a small pill that points the way the wind was blowing. The bigger and
-        redder the pill, the harder it blew. Choose <b>Rain</b> to see how much rain fell in that hour,
-        the wetter the redder. Behind the stations is the view from the GOES-West weather satellite,
-        also refreshed every 15 minutes: the brightest white marks the tallest, coldest storm clouds, so
-        you can watch the rain bands sweep over the islands as the stations light up beneath them. The
-        white line is the storm's track from the National Hurricane Center, with a dot every 6 hours
-        coloured by the storm's category and a storm symbol that follows the center through time.</p>
-      <p>Click any station to see its whole storm charted below the map, drag the slider to any moment,
-        or use the two buttons on the map to jump straight to the wildest station of the storm or of the
-        hour on screen. Hover over a station for its name and reading.</p>
+      <p class="lead">Watch Hurricane Nolo pass the islands from September 23 to October 2, 15 minutes at
+        a time, as the Hawaiʻi Mesonet's weather stations recorded it beneath the GOES-West satellite view.</p>
+      <p class="hint">Press <b>Play</b> or drag the slider &middot; switch between <b>Rain</b> and <b>Gusts</b>
+        &middot; click a station to chart its whole storm</p>
       <div id="status" role="status"></div>
     </div>
     <div id="map"></div>
@@ -459,13 +444,47 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
       <div class="empty" id="hourempty"></div>
       <svg class="hourchart hidden" id="hourchart" role="img"></svg>
     </div>
+
+    <div class="pstory">
+      <h3>The storm</h3>
+      <p>Hurricane Nolo began as a tropical depression far out in the eastern Pacific on September 13,
+        faded away, and then came back to life southeast of Hawaiʻi on September 22, when the Central
+        Pacific Hurricane Center gave it its name. A hurricane watch went up for Hawaiʻi County late on
+        September 23 and a tropical storm warning followed on the 24th. The storm never made landfall.
+        Its center stalled about 145 miles south of South Point on the morning of September 26 as a
+        Category 2 hurricane with winds near 105 mph, then turned west and pulled away. Two days later,
+        far to the southwest of the islands, it grew into a Category 4 storm with winds of 155 mph. It
+        then curved north, passing about 260 miles west of Niʻihau on September 29 as a Category 1
+        hurricane, weakened to a tropical storm on the 30th and lingered there before drifting off to the
+        northwest on October 1, then turned west and became a hurricane again on October 2 as it moved
+        away from the islands. The
+        strongest measured gusts were 62 mph in the uplands of the northwest side of Hawaiʻi Island and
+        60 mph at Hanaula in the West Maui mountains, both on the morning of the 26th; the Hawaiʻi Mesonet's
+        own strongest gust was 67 mph at Puʻuloa, in the Kohala uplands, at about 4 that morning. The governor
+        declared a state of emergency, a federal emergency declaration was approved on September 25,
+        and schools and county offices on Hawaiʻi Island closed.</p>
+      <h3>Reading the map</h3>
+      <p>Each step shows what the weather stations recorded over the hour that had just ended. Choose
+        <b>Gusts</b> to see the strongest burst of wind each station felt in that hour, drawn as a small pill
+        that points the way the wind was blowing: the bigger and redder the pill, the harder it blew.
+        Choose <b>Rain</b> to see how much rain fell in that hour, the wetter the redder. Behind the
+        stations is the view from the GOES-West weather satellite, also refreshed every 15 minutes: the
+        brightest white marks the tallest, coldest storm clouds, so you can watch the rain bands sweep
+        over the islands as the stations light up beneath them. The white line is the storm's track from
+        the National Hurricane Center, with a dot every 6 hours coloured by the storm's category and a
+        storm symbol that follows the center through time, until the center leaves the satellite view on
+        the morning of October 2.</p>
+      <p>Click any station to see its whole storm charted below the map, drag the slider to any moment,
+        or use the two buttons on the map to jump straight to the wildest station of the storm or of the
+        hour on screen. Hover over a station for its name and reading.</p>
+    </div>
   </section>
 
   <section class="rk" id="rk">
     <div class="card">
       <h2>How Much Rain Fell, Day by Day</h2>
       <div class="grid">
-        <div>
+        <div class="app">
           <div class="btnrow"><span class="cap">Zoom</span><span id="rkCounties"></span></div>
           <div class="btnrow"><span class="cap">Day</span><span id="rkDays"></span></div>
           <div class="fig">
@@ -545,8 +564,13 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
             North Wailua ditch gauge 5, and the Hawaiʻi Mesonet stations at Common Ground in Kīlauea and
             Hanamāʻulu about 4 and a half each. Common Ground recorded 2 inches in the hour before 11:15 that
             night, the heaviest hour at any Mesonet station in the whole storm. Central and windward Oʻahu
-            again saw 2 to 3 inches. Over the eight days the Waiʻaleʻale gauge totaled almost 31 inches,
-            24 of them from September 28 on.</p>
+            again saw 2 to 3 inches.</p>
+          <p>The rain kept falling on Kauaʻi on October 2, even as Nolo strengthened into a hurricane again
+            and headed west, away from the islands. Waiʻaleʻale measured close to 8 inches more, the North
+            Wailua ditch gauge nearly 4 and the Hawaiʻi Mesonet station at Hanamāʻulu 3. On Oʻahu the
+            windward and central gauges saw 1 to 2 inches, about 2 of them at Poamoho. Over the nine days
+            the Waiʻaleʻale gauge totaled more than 38 inches, 32 of them from September 28 on, and the
+            North Wailua ditch gauge about 20.</p>
           <p>Use the buttons to zoom to each island and to switch between the days. Hover the map to
             read the rainfall estimate at any point, and compare it with the stations, drawn as circles for
             the Hawaiʻi Mesonet and squares for other networks. The map is filled in from those station
@@ -599,17 +623,18 @@ const WIN_SLOTS = WINDOW_MS / SLOT_MS; // 12 five-minute samples make an hour
 
 // first frame, last frame, and the earliest sample any frame needs
 const FIRST = Date.parse('2026-09-23T00:00:00-10:00');   // midnight at the start of 23 Sep
-const LAST  = Date.parse('2026-10-02T00:00:00-10:00');   // midnight at the end of 1 Oct
+const LAST  = Date.parse('2026-10-03T00:00:00-10:00');   // midnight at the end of 2 Oct
 const T0    = FIRST - WINDOW_MS;      // 22 Sep 23:00 HST — the first frame's window start
 
 const N_SLOTS  = Math.round((LAST - T0) / SLOT_MS) + 1;
 const N_FRAMES = Math.round((LAST - FIRST) / STEP_MS) + 1;
 
 // Statewide, from extents_hi_counties.csv (the union of the four counties), pushed
-// 6.2° further west, 2.5° further south and 1° further north so Nolo's whole track to
-// 1 Oct — south of Hawaiʻi Island, then north toward Kauaʻi near 165°W — is in view when
-// the page opens. The map is not fenced — pan and zoom are unrestricted.
-const EXTENT_BOX = [-166.0, -154.668, 16.35, 23.3];   // west, east, south, north
+// out to 168°W (the western edge of the GOES frames), 2.5° further south and 1.5° further
+// north so Nolo's track — south of Hawaiʻi Island, then north toward Kauaʻi near 165°W and
+// west along 23°N — is in view when the page opens. The map is not fenced — pan and zoom
+// are unrestricted.
+const EXTENT_BOX = [-168.0, -154.668, 16.35, 23.8];   // west, east, south, north
 
 // The two things the map can show. All run on a FIXED domain with pseudo-log
 // spacing, the same shape of scale the companion map uses, so a colour means the
@@ -627,7 +652,7 @@ const KINDS = {
     footnote: 'Fixed 0–1 in/hr scale, pseudo-log spaced. Each frame is the total that fell ' +
               'over the previous 60 minutes. A station is drawn only when it reported during ' +
               'that hour; a station that reported no rain sits at the bottom of the scale.',
-    empty: 'Click a station to plot its rainfall accumulated from 00:00 HST 7 Sep. Hover the ' +
+    empty: 'Click a station to plot its rainfall accumulated from 00:00 HST Sep 23. Hover the ' +
            'line for the running total and the rate at that moment, and click it to move the ' +
            'map to that hour.'
   },
@@ -642,7 +667,7 @@ const KINDS = {
               'and reduced here. The arrow points the way the wind was blowing in the ' +
               '5 minutes that held the gust; hover for the compass point it came from. A ' +
               'station is drawn only when it reported during that hour.',
-    empty: 'Click a station to plot its 5-minute peak gust from 00:00 HST 7 Sep. Hover the ' +
+    empty: 'Click a station to plot its 5-minute peak gust from 00:00 HST Sep 23. Hover the ' +
            'line for the gust at that moment, and click it to move the map to that hour.'
   }
 };
@@ -672,7 +697,10 @@ const wmarkers = new Map();        // wind and gusts: pill icons, id -> L.marker
 const SAT_DIR = 'data/goes/';
 let SAT = null;                    // { bounds, byTime: Map(ms -> {url, utc}), count }
 let satOverlay = null, satUrl = null;
-// the storm track: 6-hourly best-track fixes from data/track_nolo.js (build_track.py)
+// the storm track: 6-hourly best-track fixes from data/track_nolo.js (build_track.py), which
+// keeps only the fixes inside the GOES frames. SHOW_TRACK = false hides the track, its key
+// and the storm symbol.
+const SHOW_TRACK = true;
 const TRACK = (window.NOLO_TRACK && window.NOLO_TRACK.points || [])
   .map(p => Object.assign({}, p, { ms: Date.parse(p.t) })).sort((a, b) => a.ms - b.ms);
 const TRACK_NAME = (window.NOLO_TRACK && window.NOLO_TRACK.storm) || 'Nolo';
@@ -891,7 +919,7 @@ async function loadBasemap(from, to) {
  *  travelled at the time on screen as a solid one, a dot for every 6-hourly fix coloured
  *  by Saffir-Simpson class, and a storm symbol at the position interpolated to the frame. */
 function initTrack() {
-  if (!TRACK.length) return;
+  if (!SHOW_TRACK || !TRACK.length) return;
   map.createPane('track').style.zIndex = 450;        // above the imagery and coast, below the stations
   map.createPane('trackpts').style.zIndex = 590;     // fixes stay clickable under the station icons
   const line = TRACK.map(p => [p.lat, p.lon]);
@@ -957,7 +985,14 @@ let trackCatShown = null;
 function trackUpdate(t) {
   if (!trackLayer || !trackOn) return;
   const at = trackAt(t);
-  if (!at) { trackDone.setLatLngs([]); trackNow.setOpacity(0); return; }
+  if (!at) {
+    // before the first fix nothing has been travelled; after the last one (the center has
+    // left the satellite view) the whole track stays drawn, without the storm symbol
+    const past = TRACK.length && t > TRACK[TRACK.length - 1].ms;
+    trackDone.setLatLngs(past ? TRACK.map(p => [p.lat, p.lon]) : []);
+    trackNow.setOpacity(0); trackNow.unbindTooltip();
+    return;
+  }
   trackDone.setLatLngs(TRACK.slice(0, at.i + 1).map(p => [p.lat, p.lon]).concat([[at.lat, at.lon]]));
   trackNow.setOpacity(1);
   trackNow.setLatLng([at.lat, at.lon]);
@@ -1170,7 +1205,7 @@ function render() {
 }
 
 /* ------------------------------------------ the selected station's whole record */
-/* Across the entire span at native 5-minute resolution, from 00:00 HST 7 Sep —
+/* Across the entire span at native 5-minute resolution, from 00:00 HST 23 Sep —
  * the animation's own start. Rain plots the running accumulation; hovering reads
  * out the total and the instantaneous rate, that 5-minute catch scaled to an
  * hour. Gusts plot the 5-minute peak gust itself. */
@@ -1284,7 +1319,7 @@ function drawSeries() {
 
   svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
   svg.setAttribute('aria-label', (mode === 'rain' ? 'Rainfall accumulated at '
-    : K.chartName + ' at ') + st.name + ' since 7 Sep 00:00');
+    : K.chartName + ' at ') + st.name + ' since Sep 23 00:00');
   svg.innerHTML = '';
 
   const dp = top < 1 ? 2 : (top < 10 ? 1 : 0);
@@ -1350,8 +1385,8 @@ function drawSeries() {
     stroke: hl, 'stroke-width': 1.5 }));
 
   // The hourly figure comes from the same series the map is drawn from, not from
-  // this chart: for the first hour the chart cannot see back past 7 Sep 00:00,
-  // while the map's window legitimately reaches into 6 Sep.
+  // this chart: for the first hour the chart cannot see back past 23 Sep 00:00,
+  // while the map's window legitimately reaches into 22 Sep.
   const hourly = rates.get(selected)[frame];
   // the band is only 1/36th of the width, so its label sits above it
   const mid = (bx + x(nowK)) / 2;
@@ -1751,11 +1786,11 @@ function wkGraticule() {
   }
 }
 
-/** '2026-09-08' -> {day: 8, short: '8 Sep', long: '8 September 2026'} */
+/** '2026-09-08' -> {day: 8, short: 'Sep 8', long: 'September 8, 2026'}, month first like the clock */
 function wkDate(iso) {
   const d = new Date(iso + 'T00:00:00Z');
-  return { day: d.getUTCDate(), short: d.getUTCDate() + ' ' + d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' }),
-           long: d.getUTCDate() + ' ' + d.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' }) + ' ' + d.getUTCFullYear() };
+  return { day: d.getUTCDate(), short: d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' }) + ' ' + d.getUTCDate(),
+           long: d.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' }) + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear() };
 }
 
 function wkRender() {

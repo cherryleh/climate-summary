@@ -3,7 +3,7 @@ window.NOLO_TRACK = {
  "id": "EP152026",
  "source": "NOAA National Hurricane Center ATCF best track (b-deck), preliminary",
  "url": "https://ftp.nhc.noaa.gov/atcf/btk/bep152026.dat",
- "built": "2026-10-05T22:41:09+00:00",
+ "built": "2026-10-07T02:10:20+00:00",
  "step_hours": 6,
  "points": [
   {
@@ -395,6 +395,16 @@ window.NOLO_TRACK = {
    "mb": 987,
    "type": "TS",
    "cat": "TS"
+  },
+  {
+   "t": "2026-10-02T18:00:00Z",
+   "lat": 23.3,
+   "lon": -167.4,
+   "kt": 65,
+   "mph": 75,
+   "mb": 984,
+   "type": "HU",
+   "cat": "1"
   }
  ]
 };
