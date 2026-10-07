@@ -12,6 +12,7 @@ import { LowellTrackerComponent } from './lowell-tracker/lowell-tracker.componen
 import { LowellFocusComponent } from './lowell-focus/lowell-focus.component';
 import { HurricaneLowellComponent } from './extreme-events/hurricane-lowell/hurricane-lowell.component';
 import { NoloViewerComponent } from './nolo-viewer/nolo-viewer.component';
+import { HurricaneNoloComponent } from './extreme-events/hurricane-nolo/hurricane-nolo.component';
 
 export const routes: Routes = [
   {path: '', component: ClimateDashboardV2Component},
@@ -28,5 +29,6 @@ export const routes: Routes = [
   { path: 'lowell-tracker', component: LowellTrackerComponent },
   { path: 'lowell-focus', component: LowellFocusComponent },
   { path: 'hurricane-lowell', component: HurricaneLowellComponent },
-  { path: 'nolo-viewer', component: NoloViewerComponent }
+  { path: 'nolo-viewer', component: NoloViewerComponent },
+  { path: 'hurricane-nolo', component: HurricaneNoloComponent }
 ];
