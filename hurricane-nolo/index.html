@@ -617,7 +617,7 @@ const MM_PER_IN  = 25.4;
 const MPH_PER_MS = 2.236936;
 const SLOT_MS   = 5 * 60 * 1000;      // the API's native cadence
 const STEP_MS   = 15 * 60 * 1000;     // one animation frame
-const PLAY_MS   = 100;                // playback: milliseconds on screen per frame
+const PLAY_MS   = 50;                 // playback: milliseconds on screen per frame
 const WINDOW_MS = 60 * 60 * 1000;     // the trailing window each frame covers
 const WIN_SLOTS = WINDOW_MS / SLOT_MS; // 12 five-minute samples make an hour
 
@@ -1011,7 +1011,7 @@ function homeBounds() {
 }
 
 function initMap() {
-  map = L.map('map', { zoomControl: false, zoomAnimation: false, minZoom: 5, maxZoom: 13 })
+  map = L.map('map', { zoomControl: false, scrollWheelZoom: false, zoomAnimation: false, minZoom: 5, maxZoom: 13 })
           .fitBounds(homeBounds(), { animate: false });
   if (SAT) {
     $('#map').classList.add('sat');
@@ -2075,7 +2075,7 @@ async function initWind() {
     '<span style="top:' + (100 - wkT(v) * rampShare * 100) + '%">' + v + '</span>').join('') +
     '<span style="top:0">100+</span>';
 
-  const map = WK.map = L.map('kamap', { zoomControl: false, zoomAnimation: false, minZoom: 7, maxZoom: 14 });
+  const map = WK.map = L.map('kamap', { zoomControl: false, scrollWheelZoom: false, zoomAnimation: false, minZoom: 7, maxZoom: 14 });
   if (SAT) {
     // the GOES-West frames as the backdrop, the same set the gust map uses
     $('#kamap').classList.add('sat');
@@ -2336,7 +2336,7 @@ async function initRain() {
 
   RK.cells = await Promise.all(RAIN.days.map(rkDecode));
 
-  const map = RK.map = L.map('rkmap', { zoomControl: false, zoomAnimation: false, minZoom: 6, maxZoom: 14 });
+  const map = RK.map = L.map('rkmap', { zoomControl: false, scrollWheelZoom: false, zoomAnimation: false, minZoom: 6, maxZoom: 14 });
   // CARTO's free tiles now require an API key, so this map uses Esri's free,
   // keyless World Street Map instead, same as the Lowell page.
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
