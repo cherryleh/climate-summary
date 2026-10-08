@@ -10,7 +10,9 @@ two sections whose data exist for this storm, in this order on the page:
    23 Sep 00:00 HST to 3 Oct 00:00 HST, over GOES-West infrared imagery, with the
    storm track and a per-station chart of the whole period.
 2. **How Much Rain Fell, Day by Day** — HCDP statewide daily rainfall maps for
-   24 September to 2 October with every reporting station's daily total.
+   23 September to 2 October with every reporting station's daily total, plus an
+   **All** map of the total over those ten days. The text beside the map follows
+   the selected day.
 
 The Lowell page's WindNinja wind-map section and its storm-surf section are not
 on this page: no WindNinja runs and no wave figure exist for Nolo. If they are
@@ -45,7 +47,7 @@ the tab's session storage and sent only to the HCDP API.
 |---|---|---|
 | 1. Mesonet animation | `data/goes/frames.js` + WebP frames, live HCDP mesonet API | 961 GOES frames at 15 min |
 | 1. Storm track | `data/track_nolo.js` | 40 six-hourly best-track fixes, 23 Sep 00 UTC to 2 Oct 18 UTC |
-| 2. Rainfall | `data/rain/manifest.js` | 9 daily statewide frames, 24 Sep – 2 Oct; opens on the 26th, zoomed to Hawaiʻi Island |
+| 2. Rainfall | `data/rain/manifest.js` | 10 daily statewide frames, 23 Sep – 2 Oct, and their total; opens on the 26th, zoomed to Hawaiʻi Island |
 | Both maps | `data/coastline_hawaii.js` | State of Hawaiʻi coastline, drawn in yellow |
 | Logos | `mn_logo.png`, `logo.png` | see below |
 
@@ -126,12 +128,14 @@ use the map. The sources are listed at the end of this file.
 * Source: HCDP API, `/raster?datatype=rainfall&production=new&period=day&extent=statewide`
   (250 m statewide daily rainfall, mm) and `/stations` (`hcdp_station_value`
   daily totals with `partial` fill, joined to `hcdp_station_metadata` by SKN).
-* Built by `build_rainfall_frames.py` (the default `DATES` are 24 Sep to 2 Oct); pass
+* Built by `build_rainfall_frames.py` (the default `DATES` are 23 Sep to 2 Oct); pass
   `--env path/to/environment.ts` to read the token from the Angular app instead of
   `hi_meso_token.txt`.
   Each day is one lossless RGB PNG, code = round(inches × 100) in R and G, B
   marks cells with data. The manifest is rebuilt from the dates given, so
-  pass every day you want on the page.
+  pass every day you want on the page. The manifest's `total` is the grid summed
+  over every day given, with station totals only for stations that reported on
+  all of them.
 * Stations are drawn as circles for the Hawaiʻi Mesonet and squares for the
   other networks.
 

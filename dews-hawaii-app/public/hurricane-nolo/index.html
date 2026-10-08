@@ -447,36 +447,43 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
 
     <div class="pstory">
       <h3>The storm</h3>
-      <p>Hurricane Nolo began as a tropical depression far out in the eastern Pacific on September 13,
-        faded away, and then came back to life southeast of Hawaiʻi on September 22, when the Central
-        Pacific Hurricane Center gave it its name. A hurricane watch went up for Hawaiʻi County late on
-        September 23 and a tropical storm warning followed on the 24th. The storm never made landfall.
-        Its center stalled about 145 miles south of South Point on the morning of September 26 as a
-        Category 2 hurricane with winds near 105 mph, then turned west and pulled away. Two days later,
-        far to the southwest of the islands, it grew into a Category 4 storm with winds of 155 mph. It
-        then curved north, passing about 260 miles west of Niʻihau on September 29 as a Category 1
-        hurricane, weakened to a tropical storm on the 30th and lingered there before drifting off to the
-        northwest on October 1, then turned west and became a hurricane again on October 2 as it moved
-        away from the islands. The
-        strongest measured gusts were 62 mph in the uplands of the northwest side of Hawaiʻi Island and
-        60 mph at Hanaula in the West Maui mountains, both on the morning of the 26th; the Hawaiʻi Mesonet's
-        own strongest gust was 67 mph at Puʻuloa, in the Kohala uplands, at about 4 that morning. The governor
-        declared a state of emergency, a federal emergency declaration was approved on September 25,
-        and schools and county offices on Hawaiʻi Island closed.</p>
+      <p>Hurricane Nolo began as a tropical depression far out in the eastern Pacific on September 13, faded
+        away, and then came back to life southeast of Hawaiʻi on September 22, when the Central Pacific
+        Hurricane Center gave it its name. A hurricane watch went up for Hawaiʻi County late on September 23
+        and a tropical storm warning followed on the 24th. While the center of the storm never made
+        landfall, the impacts of its strong winds and heavy rains were felt. The governor declared a state
+        of emergency, a federal emergency declaration was approved on September 25, and schools and county
+        offices on Hawaiʻi Island closed. Its center stalled about 145 miles south of South Point on the
+        morning of September 26 as a Category 2 hurricane with winds near 105 mph, then turned west and
+        pulled away. Two days later, far to the southwest of the islands, it grew into a Category 4 storm
+        with winds of 155 mph. Nolo started September 29 as a Category 3 hurricane and continued weakening
+        as it moved north, passing roughly 260 miles west of Niʻihau before weakening to a Category 1
+        hurricane later that day. By late September 29, Nolo had weakened to a tropical storm. It remained
+        west of the islands through September 30 and began drifting northwestward on October 1, then turned
+        west and became a hurricane again on October 2 as it moved away from the islands.</p>
+      <p>The storm brought heavy rain to parts of the islands, especially to the eastern slopes of Hawaiʻi
+        Island early in the storm and Kauaʻi toward the end. The highest storm rainfall totals recorded at
+        Hawaiʻi Mesonet stations were 22.02 inches at Laupāhoehoe, 21.31 inches at Spencer, and 20.33 inches
+        at Piʻihonua, all on the east side of the Big Island. The strongest wind gust measured by Hawaiʻi
+        Mesonet stations was 67 mph at Puʻuloa, on the western slope of Kohala, Hawaiʻi Island. The
+        Waiʻaleʻale gauge operated by the U.S. Geological Survey totaled more than 38 inches, including 32
+        inches from September 28 on.</p>
       <h3>Reading the map</h3>
       <p>Each step shows what the weather stations recorded over the hour that had just ended. Choose
-        <b>Gusts</b> to see the strongest burst of wind each station felt in that hour, drawn as a small pill
-        that points the way the wind was blowing: the bigger and redder the pill, the harder it blew.
-        Choose <b>Rain</b> to see how much rain fell in that hour, the wetter the redder. Behind the
-        stations is the view from the GOES-West weather satellite, also refreshed every 15 minutes: the
-        brightest white marks the tallest, coldest storm clouds, so you can watch the rain bands sweep
-        over the islands as the stations light up beneath them. The white line is the storm's track from
-        the National Hurricane Center, with a dot every 6 hours coloured by the storm's category and a
-        storm symbol that follows the center through time, until the center leaves the satellite view on
-        the morning of October 2.</p>
-      <p>Click any station to see its whole storm charted below the map, drag the slider to any moment,
-        or use the two buttons on the map to jump straight to the wildest station of the storm or of the
-        hour on screen. Hover over a station for its name and reading.</p>
+        <b>Rain</b> to see how much rain fell in that hour, the wetter the redder. Choose <b>Gusts</b> to
+        see the strongest burst of wind each station measured in that hour, drawn as a small “pill” with an
+        arrow pointing in the direction the wind was blowing: the bigger and redder the pill, the stronger
+        the gust. Behind the stations is the view from the GOES-West weather satellite, with images also at
+        15-minute intervals: the brightest white indicates the tallest, coldest storm clouds, so you can
+        watch the rain bands sweep over the islands as the stations light up beneath them. The dashed white
+        line is the storm's track from the National Hurricane Center, with a dot every 6 hours colored
+        according to the storm's strength category, and a storm symbol that follows the storm center through
+        time, until October 2, when the storm no longer had significant effects on island weather.</p>
+      <p>Click any station to see its observations throughout the storm charted below the map, or drag the
+        slider to any moment. Use the first of the two map buttons to jump to the station with the highest
+        hourly rainfall or strongest wind gust of the entire storm, or the second button to jump to the
+        station with the highest value during the selected hour. Hover over a station for its name and rain
+        or wind reading.</p>
     </div>
   </section>
 
@@ -496,12 +503,12 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
                 <div id="rkmap"></div>
                 <div class="badge"><a href="https://www.hawaii.edu/climate-data-portal/" target="_blank" rel="noopener" title="Hawaiʻi Climate Data Portal"><img src="logo.png" alt="HCDP"></a>
                   <svg class="north" viewBox="0 0 30 40"><path d="M15 2 L26 30 L15 24 L4 30 Z" fill="#111"/><path d="M15 2 L15 24 L4 30 Z" fill="#555"/><text x="15" y="39" text-anchor="middle" font-size="10" font-weight="700" fill="#111">N</text></svg></div>
-                <div class="gridstat"><div class="cap">Map grid, this day (in)</div>
+                <div class="gridstat"><div class="cap" id="rkGridCap">Map grid, this day (in)</div>
                   <div class="vals"><div><span>min</span><b id="rkMin">—</b></div><div><span>average</span><b id="rkMean">—</b></div><div><span>max</span><b id="rkMax">—</b></div></div></div>
                 <div class="stakey" id="rkStaKey">
                   <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Hawaiʻi Mesonet station</div>
                   <div><svg width="14" height="14"><rect x="1.5" y="1.5" width="11" height="11" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Other network station</div>
-                  <div style="opacity:.8;font-size:10px">colour is the day's total</div>
+                  <div style="opacity:.8;font-size:10px" id="rkStaNote">colour is the day's total</div>
                 </div>
                 <div class="readout" id="rkRead">Hover the map for the rainfall at any grid cell</div>
               </div>
@@ -511,7 +518,7 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
               </div>
               <div class="xax" id="rkXax"></div>
             </div>
-            <p class="fnote">Daily total from 00:00 to 24:00 HST. Color scale fixed at 0&ndash;30 inches, pseudo-log spaced,
+            <p class="fnote">Daily total from 00:00 to 24:00 HST; <b>All</b> sums every day, Sep 23 to Oct 2. Color scale fixed at 0&ndash;30 inches, pseudo-log spaced,
               for every day; stations use the same scale, circles for Hawaiʻi Mesonet stations and squares for other
               networks. CRS: WGS 84 (EPSG:4326). HCDP statewide daily rainfall map, 250 m grid, from station observations
               &middot; experimental.</p>
@@ -523,59 +530,67 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
             </div>
           </div>
           <div class="stats">
-            <div class="stat"><div class="cap">Stations, this day (in)</div>
+            <div class="stat"><div class="cap" id="rkStaCap">Stations, this day (in)</div>
               <div class="vals"><div><span>reporting</span><b id="rkSta">—</b></div><div><span>wettest</span><b id="rkStaMax">—</b></div><div><span>at</span><b id="rkStaAt">—</b></div></div></div>
             <div class="stat"><div class="cap" id="rkAllCap">All days (in)</div>
               <div class="vals"><div><span>wettest grid cell</span><b id="rkAllMax">—</b></div><div><span>on</span><b id="rkAllAt">—</b></div></div></div>
           </div>
         </div>
-        <div class="prose">
-          <p>The first rain reached Hawaiʻi Island on September 24 while the storm was still well to the
-            southeast. It fell mostly along the Hāmākua coast and in the Kohala mountains, where the Spencer
-            gauge measured a little over 4 inches and the Hawaiʻi Mesonet station at Waipoʻo, in the hills
-            above Waimea, close to 3 and a half. The rest of the state stayed largely dry.</p>
-          <p>September 25 brought steadier rain to the windward side as the outer bands moved in. The
-            Laupāhoehoe gauge passed 6 and a half inches, the Kawainui gauge near Waimea and Waipoʻo each
-            recorded about 5, and Glenwood and the Saddle Road quarry gauge above Hilo more than 4.</p>
-          <p>September 26 was the big day. With Nolo sitting almost still south of the island and then
-            creeping west, its rain bands streamed onto the windward slopes all day long. The Honoliʻi Stream
-            gauge above Hilo, the Saddle Road quarry gauge, Spencer, Laupāhoehoe and the Mesonet station at
-            Piʻihonua above Hilo all measured between 8 and 9 inches in the day, and the map's own estimate
-            tops out near 17 inches on the slopes of Mauna Kea above Hilo. Rain rates reached an inch an hour
-            in Kaʻū that afternoon, and flooding closed Highway 11 near Waiʻōhinu and Nāʻālehu. The Kona
-            side saw little or none.</p>
-          <p>By September 27 the storm was moving away to the southwest and the rain tailed off quickly, with
-            the wettest gauges collecting only an inch and a half. Over those four days the Laupāhoehoe and
-            Spencer gauges each totaled about 18 inches, and Piʻihonua more than 16, the largest total of any
-            Hawaiʻi Mesonet station in the storm.</p>
-          <p>September 28 was the quietest day of the storm. Nolo was turning north far to the southwest of
-            the islands, Hawaiʻi Island and Maui County stayed almost completely dry, and the only rain worth
-            noting fell on Kauaʻi, where the Mount Waiʻaleʻale gauge caught about an inch and a half.</p>
-          <p>On September 29 the storm passed about 260 miles west of Niʻihau, and the rain shifted to Kauaʻi.
-            Waiʻaleʻale measured more than 3 inches, the North Wailua ditch gauge about an inch and a half, and
-            the Hawaiʻi Mesonet station at Hanamāʻulu an inch. Oʻahu saw only half an inch at most and the rest
-            of the state almost nothing.</p>
-          <p>September 30 was Kauaʻi's wettest day. As the weakening storm lingered to the west, Waiʻaleʻale
-            measured almost 12 inches, the North Wailua ditch gauge close to 6, the Waiʻalae gauge in the
-            uplands above Waimea Canyon more than 5 and the Wailua experiment station 4 and a half. The rain
-            reached central Oʻahu too, with about 3 inches at Schofield Barracks and Poamoho and two and a half
-            at Waiawa and Kunia. The islands to the east stayed under half an inch.</p>
-          <p>October 1 brought a second soaking to Kauaʻi. Waiʻaleʻale added another 7 and a half inches, the
-            North Wailua ditch gauge 5, and the Hawaiʻi Mesonet stations at Common Ground in Kīlauea and
-            Hanamāʻulu about 4 and a half each. Common Ground recorded 2 inches in the hour before 11:15 that
-            night, the heaviest hour at any Mesonet station in the whole storm. Central and windward Oʻahu
-            again saw 2 to 3 inches.</p>
-          <p>The rain kept falling on Kauaʻi on October 2, even as Nolo strengthened into a hurricane again
-            and headed west, away from the islands. Waiʻaleʻale measured close to 8 inches more, the North
-            Wailua ditch gauge nearly 4 and the Hawaiʻi Mesonet station at Hanamāʻulu 3. On Oʻahu the
-            windward and central gauges saw 1 to 2 inches, about 2 of them at Poamoho. Over the nine days
-            the Waiʻaleʻale gauge totaled more than 38 inches, 32 of them from September 28 on, and the
-            North Wailua ditch gauge about 20.</p>
-          <p>Use the buttons to zoom to each island and to switch between the days. Hover the map to
-            read the rainfall estimate at any point, and compare it with the stations, drawn as circles for
-            the Hawaiʻi Mesonet and squares for other networks. The map is filled in from those station
-            readings, so it is most trustworthy near a station and most uncertain in the mountains between
-            them.</p>
+        <div class="prose" id="rkProse">
+          <p data-day="all">Over the ten days from September 23 to October 2, Nolo's rain fell in two places
+            above all: the windward slopes of Hawaiʻi Island in the storm's first days, and Kauaʻi in its last.
+            The Mount Waiʻaleʻale gauge totaled more than 38 inches, the most of any gauge in the state, and the
+            map's own estimate tops out near 37 and a half inches on the mountain; the North Wailua ditch gauge
+            collected about 20 and the Hawaiʻi Mesonet stations at Hanamāʻulu and Common Ground about 12 and a
+            half and 11. On Hawaiʻi Island the Laupāhoehoe, Spencer and Piʻihonua gauges each totaled 20 to
+            22 inches and the Saddle Road quarry gauge above Hilo more than 19, and the map's estimate reaches
+            about 34 and a half inches on the slopes of Mauna Kea. Maui saw 9 and a half inches near
+            Keʻanae and Oʻahu about 7 at Waiawa and Poamoho, while the leeward sides of every island stayed
+            almost dry. Station totals here count only the stations that reported on every one of the ten days.</p>
+          <p data-day="2026-09-23 2026-09-24">The first storm-related rain reached the Hāmākua slopes and Kohala Mountains on Hawaiʻi Island on
+            September 23 while Nolo was still well to the southeast. Hawaiʻi Mesonet stations Spencer and
+            Waipoʻo measured a little over 4 inches and close to 3.5 inches, respectively.</p>
+          <p data-day="2026-09-25">September 25 brought steadier rain to the windward side as the outer bands moved in. The Laupāhoehoe
+            gauge recorded more than 6.5 inches, Kawainui and Waipoʻo about 5 inches each, and the Glenwood and
+            Saddle Road quarry gauges upslope of Hilo more than 4 inches.</p>
+          <p data-day="2026-09-26 2026-09-27">As Nolo remained nearly stationary south of the island, its rain bands repeatedly swept across the
+            windward slopes, making September 26 the rainiest day of the storm for Hawaiʻi Island. The Honoliʻi
+            Stream gauge above Hilo, the Saddle Road quarry gauge, Spencer, Laupāhoehoe and the Mesonet station
+            at Piʻihonua above Hilo all measured between 8 and 9 inches in the day. The interpolated rainfall
+            map estimates a daily maximum of approximately 17 inches on the slopes of Maunakea above Hilo. Rain
+            rates reached an inch an hour in Kaʻū that afternoon, and flooding closed Highway 11 near Waiʻōhinu
+            and Nāʻālehu. The Kona side saw little or no rain. By September 27 the storm was moving away to the
+            southwest and the rain tailed off quickly.</p>
+          <p data-day="2026-09-28">September 28 was one of the quietest days of the storm for the main Hawaiian Islands. Nolo was
+            curving northwestward far to the southwest of the islands. Hawaiʻi Island and Maui County remained
+            almost completely dry, and Kauaʻi experienced moderate rainfall, including Mount Waiʻaleʻale with
+            about 1.5 inches.</p>
+          <p data-day="2026-09-29">On September 29 Nolo was moving northward west of Kauaʻi and Niʻihau, then slowed and turned west-
+            northwest late that night. With Nolo roughly 260 miles west of Niʻihau, rainfall increased on
+            Kauaʻi. Waiʻaleʻale measured more than 3 inches, the North Wailua ditch gauge had about an inch and
+            a half, and the Hawaiʻi Mesonet station at Hanamāʻulu received an inch. Oʻahu saw about a half an
+            inch at most stations and the rest of the state had very little rainfall.</p>
+          <p data-day="2026-09-30">Although Nolo had weakened to a tropical storm by September 30, it still produced heavy rainfall on
+            Kauaʻi. Waiʻaleʻale measured almost 12 inches, the North Wailua ditch gauge close to 6 inches, the
+            Waiʻalae gauge in the uplands above Waimea Canyon more than 5 inches, and the Wailua experiment
+            station about 4.5 inches. The rain reached as far as central Oʻahu, with about 3 inches at Schofield
+            Barracks and Poamoho and 2.5 inches at Waiawa and Kunia. Rain on the islands to the east stayed
+            under half an inch.</p>
+          <p data-day="2026-10-01">October 1 brought more rain to Kauaʻi. Waiʻaleʻale added another 7.5 inches, the North Wailua ditch
+            gauge 5 inches, and the Hawaiʻi Mesonet stations at Common Ground in Kīlauea and at Hanamāʻulu about
+            4.5 inches each. Common Ground recorded 2 inches in the hour before 11:15 that night, the heaviest
+            hourly total at any Mesonet station in the whole storm. Central and windward Oʻahu saw 2 to 3
+            inches.</p>
+          <p data-day="2026-10-02">The rain kept falling on Kauaʻi on October 2, even as Nolo strengthened into a hurricane again and
+            headed west, away from the islands. Waiʻaleʻale measured close to 8 inches more, the North Wailua
+            ditch gauge nearly 4 inches, and the Hawaiʻi Mesonet station at Hanamāʻulu 3 inches. On Oʻahu the
+            windward and central gauges saw 1 to 2 inches.</p>
+          <p>Use the buttons to zoom in to each island and to switch between the days. Hover over the map to read
+            the rainfall estimate at any point, and compare them with measured values at the stations, shown as
+            circles for Hawaiʻi Mesonet stations and squares for stations in other networks. The map is
+            interpolated from station observations, so estimates are generally more reliable where station
+            coverage is dense and less certain in areas with few observations, particularly in complex mountain
+            terrain.</p>
         </div>
       </div>
     </div>
@@ -612,6 +627,7 @@ const LOC   = 'hawaii';
 const RAINV = 'RF_1_Tot300s';         // 5-minute rainfall total, mm
 const GUSTV = 'WG_1_Max';             // 5-minute maximum gust, m/s
 const DIRV  = 'WDrs_1_Avg';           // 5-minute vector-average wind direction, degrees from
+const NO_DIR = new Set(['0253']);      // stations whose direction readings aren't trustworthy (Puuloa)
 
 const MM_PER_IN  = 25.4;
 const MPH_PER_MS = 2.236936;
@@ -847,7 +863,7 @@ async function loadData() {
   DIRS.gust = new Map();
   for (const [sid, gu] of grids.gust) {
     const dg = grids.dir.get(sid);
-    if (!dg) continue;
+    if (!dg || NO_DIR.has(sid)) continue;
     const gd = new Float32Array(N_FRAMES).fill(NaN);
     for (let f = 0; f < N_FRAMES; f++) {
       const end = Math.round((frameTime(f) - T0) / SLOT_MS);
@@ -1170,7 +1186,8 @@ function render() {
       // otherwise, so the offset has to dominate
       wm.setZIndexOffset(picked ? 1000000 : Math.round(v * 500));   // by the value itself, so the order holds past the top of the scale
       wm.bindTooltip('<b>' + st.name + '</b> (' + st.id + ')<br>' + K.fmt(v) +
-        (isFinite(dir) ? ' from ' + Math.round(dir) + '° (' + compass(dir) + ')' : '') +
+        (isFinite(dir) ? ' from ' + Math.round(dir) + '° (' + compass(dir) + ')' :
+          NO_DIR.has(st.id) ? ' · direction unavailable' : '') +
         '<br><span style="color:#777">Hawaiʻi Mesonet' + (st.skn ? ' · SKN ' + st.skn : '') + '</span>',
         { direction: 'top' });
     } else {
@@ -2167,6 +2184,16 @@ async function initWind() {
  * every station's daily total. The page decodes the PNGs itself so hovering
  * reads back any cell. */
 const RAIN = window.RAIN_DAYS || null;
+// the buttons' frames: every day, then the whole-storm total ("All") when the manifest has one
+const RK_FRAMES = RAIN ? RAIN.days.concat(RAIN.total ? [RAIN.total] : []) : [];
+/** Labels for one frame: a day, or the total over every day. */
+function rkLabel(fr) {
+  if (fr.date) { const dt = wkDate(fr.date); return { short: dt.short, on: 'on ' + dt.short, when: dt.long + ', 00:00 to 24:00 HST',
+                                                      title: 'Daily rainfall', unit: 'day' }; }
+  const a = wkDate(fr.start), b = wkDate(fr.end);
+  return { short: 'All', on: a.short + ' – ' + b.short, when: a.long.slice(0, a.long.lastIndexOf(',')) + ' to ' + b.long + ', total',
+           title: 'Total rainfall', unit: 'period' };
+}
 // county boxes for the zoom buttons: west, east, south, north
 const RK_ZOOMS = [['KA', 'Kauai', [-159.816, -159.251, 21.819, 22.269]], ['OA', 'Oahu', [-158.322, -157.602, 21.180, 21.742]],
                   ['MN', 'Maui', [-157.350, -155.926, 20.343, 21.322]], ['BI', 'Hawaii', [-156.243, -154.668, 18.849, 20.334]],
@@ -2257,12 +2284,17 @@ function rkSquare(rgb, r) {
 }
 
 function rkRender() {
-  const day = RAIN.days[RK.day], cells = RK.cells[RK.day];
+  const day = RK_FRAMES[RK.day], cells = RK.cells[RK.day];
   if (!day) return;
-  const dt = wkDate(day.date);
-  $('#rkWhen').textContent = dt.long + ', 00:00 to 24:00 HST';
-  $('#rkTitle').textContent = 'Daily rainfall — ' + RK_TITLES[RK.zoom];
+  const lb = rkLabel(day);
+  $('#rkWhen').textContent = lb.when;
+  $('#rkTitle').textContent = lb.title + ' — ' + RK_TITLES[RK.zoom];
+  $('#rkGridCap').textContent = 'Map grid, this ' + lb.unit + ' (in)';
+  $('#rkStaCap').textContent = 'Stations, this ' + lb.unit + ' (in)';
+  $('#rkStaNote').textContent = day.date ? "colour is the day's total" : 'colour is the total, stations reporting every day';
   document.querySelectorAll('#rkDays button').forEach(b => b.classList.toggle('on', +b.dataset.day === RK.day));
+  // the text that goes with this day; paragraphs without a day always show
+  document.querySelectorAll('#rkProse p[data-day]').forEach(p => { p.hidden = !p.dataset.day.split(' ').includes(day.date || 'all'); });
   if (cells && RK.overlay) RK.overlay.setUrl(cells.url);
   // grid statistics within the zoom box
   if (cells) {
@@ -2287,7 +2319,7 @@ function rkRender() {
     if (box.contains([st.lat, st.lon])) { inBox++; if (!wettest || st.inches > wettest.inches) wettest = st; }
     if (!$('#rkStations').checked) continue;
     const t = rkT(st.inches), rgb = rkRGB(st.inches), r = 4 + t * 7;
-    const tip = '<b>' + st.name + '</b><br>' + st.inches.toFixed(2) + ' in on ' + dt.short +
+    const tip = '<b>' + st.name + '</b><br>' + st.inches.toFixed(2) + ' in ' + lb.on +
       '<br><span style="color:#777">' + (st.mesonet ? 'Hawaiʻi Mesonet' : st.network + (st.observer && st.observer !== st.network ? ' · ' + st.observer : '')) +
       ' · SKN ' + st.skn + '</span>';
     const mk = st.mesonet
@@ -2316,7 +2348,7 @@ async function initRain() {
     return;
   }
   $('#rkCounties').innerHTML = RK_ZOOMS.map(z => '<button data-zoom="' + z[0] + '">' + z[1] + '</button>').join('');
-  $('#rkDays').innerHTML = RAIN.days.map((d, i) => '<button data-day="' + i + '">' + wkDate(d.date).short + '</button>').join('');
+  $('#rkDays').innerHTML = RK_FRAMES.map((d, i) => '<button data-day="' + i + '">' + rkLabel(d).short + '</button>').join('');
   document.querySelectorAll('#rkCounties button').forEach(b => b.onclick = () => rkZoom(b.dataset.zoom));
   document.querySelectorAll('#rkDays button').forEach(b => b.onclick = () => { RK.day = +b.dataset.day; rkRender(); });
   // legend on the rain ramp at its pseudo-log positions
@@ -2334,7 +2366,7 @@ async function initRain() {
   $('#rkAllMax').textContent = best.max_in.toFixed(2);
   $('#rkAllAt').textContent = wkDate(best.date).short;
 
-  RK.cells = await Promise.all(RAIN.days.map(rkDecode));
+  RK.cells = await Promise.all(RK_FRAMES.map(rkDecode));
 
   const map = RK.map = L.map('rkmap', { zoomControl: false, scrollWheelZoom: false, zoomAnimation: false, minZoom: 6, maxZoom: 14 });
   // CARTO's free tiles now require an API key, so this map uses Esri's free,
@@ -2349,8 +2381,8 @@ async function initRain() {
   find.onAdd = () => {
     const box = L.DomUtil.create('div', 'findbar');
     box.innerHTML = '<div class="findbar-label">Zoom to</div>' +
-                    '<button id="rkPeakCell" title="Zoom to the wettest grid cell in this view on this day">Wettest grid cell</button>' +
-                    '<button id="rkPeakSta" title="Zoom to the wettest station in this view on this day">Wettest station</button>';
+                    '<button id="rkPeakCell" title="Zoom to the wettest grid cell in this view for the selected day">Wettest grid cell</button>' +
+                    '<button id="rkPeakSta" title="Zoom to the wettest station in this view for the selected day">Wettest station</button>';
     L.DomEvent.disableClickPropagation(box);
     return box;
   };
@@ -2371,7 +2403,7 @@ async function initRain() {
   $('#rkPeakSta').onclick = () => {
     const box = rkBox(RK.zoom);
     let wettest = null;
-    for (const st of RAIN.days[RK.day].stations) if (box.contains([st.lat, st.lon]) && (!wettest || st.inches > wettest.inches)) wettest = st;
+    for (const st of RK_FRAMES[RK.day].stations) if (box.contains([st.lat, st.lon]) && (!wettest || st.inches > wettest.inches)) wettest = st;
     if (!wettest) return;
     if (!$('#rkStations').checked) { $('#rkStations').checked = true; $('#rkStaKey').hidden = false; rkRender(); }
     map.setView([wettest.lat, wettest.lon], Math.max(map.getZoom(), 11), { animate: false });
@@ -2382,7 +2414,7 @@ async function initRain() {
   map.on('mousemove', e => {
     const cells = RK.cells[RK.day], i = rkCellAt(e.latlng);
     if (i < 0 || !cells.ok[i]) { read.innerHTML = 'No data at ' + e.latlng.lat.toFixed(3) + ', ' + e.latlng.lng.toFixed(3); return; }
-    read.innerHTML = '<b>' + cells.inches[i].toFixed(2) + ' in</b> on ' + wkDate(RAIN.days[RK.day].date).short + '<br>' +
+    read.innerHTML = '<b>' + cells.inches[i].toFixed(2) + ' in</b> ' + rkLabel(RK_FRAMES[RK.day]).on + '<br>' +
       e.latlng.lat.toFixed(4) + ', ' + e.latlng.lng.toFixed(4);
   });
   map.on('mouseout', () => { read.textContent = 'Hover the map for the rainfall at any grid cell'; });
