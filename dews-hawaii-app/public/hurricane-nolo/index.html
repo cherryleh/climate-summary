@@ -722,6 +722,8 @@ const frameTime = i => FIRST + i * STEP_MS;
 const fmtClock = ms => new Date(ms).toLocaleString('en-US', {
   timeZone: 'Pacific/Honolulu', month: 'short', day: 'numeric',
   hour: '2-digit', minute: '2-digit', hour12: false });
+const fmtDay = ms => new Date(ms).toLocaleString('en-US', {
+  timeZone: 'Pacific/Honolulu', month: 'short', day: 'numeric' });
 const fmtHM = ms => new Date(ms).toLocaleString('en-US', {
   timeZone: 'Pacific/Honolulu', hour: '2-digit', minute: '2-digit', hour12: false });
 
@@ -1293,8 +1295,7 @@ function drawSeries() {
 
   $('#hourwho').textContent = st.name + ' (' + st.id + ')';
   if (mode === 'rain') {
-    $('#hourstat').textContent = vals[SERIES_N - 1].toFixed(2) + ' in total since ' +
-      fmtClock(FIRST) + ' HST';
+    $('#hourstat').textContent = vals[SERIES_N - 1].toFixed(2) + ' in cumulative storm total';
   } else {
     const at = vals.indexOf(hi);
     $('#hourstat').textContent = hi.toFixed(1) + ' mph strongest gust, ' +
@@ -1332,18 +1333,24 @@ function drawSeries() {
     lab.textContent = v.toFixed(dp);
     svg.appendChild(lab);
   }
-  // a gridline every 3 hours across the 36-hour span, with a firmer rule at midnight;
-  // labels only every 6 hours so the dated midnight labels have room
-  for (let k = 0; k < SERIES_N; k += 36) {
+  // gridlines and labels spaced to fit the chart width: the label step is the
+  // finest that leaves room for its text (dated clock labels below a day, bare
+  // dates at a day or more), and the gridlines the finest that stay legible.
+  // Midnights get a firmer rule.
+  const pxHr = iw / ((SERIES_N - 1) * SLOT_MS / 3600000);
+  const labHr = [6, 12, 24, 48, 72].find(h => h * pxHr >= (h < 24 ? 80 : 50)) || 72;
+  const gridHr = Math.min(labHr, [3, 6, 12, 24].find(h => h * pxHr >= 12) || 24);
+  const perHr = 3600000 / SLOT_MS;
+  for (let k = 0; k < SERIES_N; k += gridHr * perHr) {
     const t = seriesTime(k), xx = x(k);
     // HST is UTC-10, so shift back to read the local hour off a UTC getter
     const midnight = new Date(t - 10 * 3600 * 1000).getUTCHours() === 0;   // 00:00 HST
     if (k > 0) svg.appendChild(el('line', { x1: xx, x2: xx, y1: P.t, y2: P.t + ih,
       stroke: midnight ? css('--axis') : css('--grid'), 'stroke-width': 1 }));
-    if (k % 72) continue;
+    if (k % (labHr * perHr)) continue;
     const lab = el('text', { x: xx, y: H - 6, 'text-anchor': k === 0 ? 'start' : (k === SERIES_N - 1 ? 'end' : 'middle'),
       fill: css('--muted'), 'font-size': 10.5 });
-    lab.textContent = midnight ? fmtClock(t) : fmtHM(t);
+    lab.textContent = labHr >= 24 ? fmtDay(t) : (midnight ? fmtClock(t) : fmtHM(t));
     svg.appendChild(lab);
   }
 
@@ -1410,7 +1417,8 @@ function drawSeries() {
   const sub = el('text', { x: lx, y: P.t - 9, 'text-anchor': anchor,
     fill: css('--muted'), 'font-size': 10.5 });
   sub.textContent = mode === 'rain'
-    ? vals[nowK].toFixed(2) + ' in accumulated  ·  ' +
+    ? vals[nowK].toFixed(2) + ' in accumulated as of ' +
+      fmtClock(frameTime(frame)) + ' HST  ·  ' +
       (nowRate == null ? 'no reading' : nowRate.toFixed(2) + ' in/hr instantaneous')
     : (nowRate == null ? 'no reading' : nowRate.toFixed(1) + ' mph ' + K.sampleWord) +
       ' at ' + fmtHM(frameTime(frame));
