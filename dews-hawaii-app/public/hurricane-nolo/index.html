@@ -511,7 +511,7 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
                 <div class="stakey" id="rkStaKey">
                   <label><input type="checkbox" id="rkStations" checked> Stations</label>
                   <div class="rows" id="rkStaRows">
-                  <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Hawaiʻi Mesonet station</div>
+                  <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#bbb" stroke="#111" stroke-width="1.5"/></svg>Hawaiʻi Mesonet station</div>
                   <div><svg width="14" height="14"><rect x="1.5" y="1.5" width="11" height="11" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Other network station</div>
                   <div style="opacity:.8;font-size:10px" id="rkStaNote">colour is the day's total</div>
                   </div>
@@ -2278,7 +2278,7 @@ function rkGraticule() {
 
 /** A square marker for stations outside the Mesonet, matching the circle's size. */
 function rkSquare(rgb, r) {
-  const d = r * 2;
+  const d = r * Math.sqrt(Math.PI);   // the same area as a circle of radius r, so equal rain reads as equal ink
   return L.divIcon({ className: 'stations-sq', iconSize: [d + 3, d + 3], iconAnchor: [(d + 3) / 2, (d + 3) / 2],
     html: '<svg width="' + (d + 3) + '" height="' + (d + 3) + '"><rect x="1.5" y="1.5" width="' + d + '" height="' + d +
           '" fill="rgb(' + rgb.join(',') + ')" stroke="#fff" stroke-width="1.5"/></svg>' });
@@ -2324,7 +2324,7 @@ function rkRender() {
       '<br><span style="color:#777">' + (st.mesonet ? 'Hawaiʻi Mesonet' : st.network + (st.observer && st.observer !== st.network ? ' · ' + st.observer : '')) +
       (st.skn ? ' · SKN ' + st.skn : '') + '</span>';
     const mk = st.mesonet
-      ? L.circleMarker([st.lat, st.lon], { radius: r, fillColor: 'rgb(' + rgb.join(',') + ')', fillOpacity: 0.95, color: '#fff', weight: 1.5 })
+      ? L.circleMarker([st.lat, st.lon], { pane: 'rkMesonet', radius: r, fillColor: 'rgb(' + rgb.join(',') + ')', fillOpacity: 0.95, color: '#111', weight: 1.5 })
       : L.marker([st.lat, st.lon], { icon: rkSquare(rgb, r), keyboard: false, zIndexOffset: Math.round(t * 1000) });
     mk.bindTooltip(tip, { direction: 'top' }).addTo(RK.stations);
     RK.stationMarkers[st.skn || st.id] = mk;
@@ -2404,6 +2404,7 @@ async function initRain() {
   RK.coast = coastGeo ? L.geoJSON(coastGeo, { interactive: false,
     style: { color: '#222', weight: 1, opacity: 0.9, fill: false } }).addTo(map) : null;
   RK.stations = L.layerGroup().addTo(map);
+  map.createPane('rkMesonet').style.zIndex = 640;   // Mesonet circles above the other networks' squares (600), below tooltips
   map.on('moveend zoomend resize', rkGraticule);
 
   $('#rkPeakCell').onclick = () => {
