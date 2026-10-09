@@ -314,7 +314,7 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
 #rkmap .leaflet-top.leaflet-left { display: flex; flex-direction: row; align-items: flex-start; }
 #map .leaflet-top.leaflet-left { display: flex; flex-direction: row; align-items: flex-start; }
 #map .leaflet-top.leaflet-left .findbar { margin-left: 8px; }
-#map .zoom-reset { display: flex; align-items: center; justify-content: center; color: #000; }
+#map .zoom-reset, #rkmap .zoom-reset { display: flex; align-items: center; justify-content: center; color: #000; }
 #rkmap .leaflet-top.leaflet-left .findbar { margin-left: 8px; }
 .rk .badge { position: absolute; right: 10px; top: 74px; z-index: 800; display: flex; align-items: center; gap: 10px;
              pointer-events: none; }
@@ -340,6 +340,9 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
 .rk .stakey { position: absolute; left: 10px; bottom: 26px; z-index: 800; background: rgba(90,90,90,.88); color: #fff;
               border-radius: 8px; padding: 6px 9px; font-size: 11px; line-height: 1.5; }
 .rk .stakey svg { vertical-align: middle; margin-right: 5px; }
+.rk .stakey label { display: flex; align-items: center; gap: 5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.rk .stakey label input { margin: 0; }
+.rk .stakey .rows { margin-top: 3px; }
 .rk .fnote { margin: 8px 0 0; font-size: 10.5px; color: #666; line-height: 1.35; }
 .rk .stations-sq { background: none; border: 0; }
 .rk .stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 20px; padding: 10px 0 0; }
@@ -506,9 +509,12 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
                 <div class="gridstat"><div class="cap" id="rkGridCap">Map grid, this day (in)</div>
                   <div class="vals"><div><span>min</span><b id="rkMin">—</b></div><div><span>average</span><b id="rkMean">—</b></div><div><span>max</span><b id="rkMax">—</b></div></div></div>
                 <div class="stakey" id="rkStaKey">
+                  <label><input type="checkbox" id="rkStations" checked> Stations</label>
+                  <div class="rows" id="rkStaRows">
                   <div><svg width="14" height="14"><circle cx="7" cy="7" r="5.5" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Hawaiʻi Mesonet station</div>
                   <div><svg width="14" height="14"><rect x="1.5" y="1.5" width="11" height="11" fill="#bbb" stroke="#fff" stroke-width="1.5"/></svg>Other network station</div>
                   <div style="opacity:.8;font-size:10px" id="rkStaNote">colour is the day's total</div>
+                  </div>
                 </div>
                 <div class="readout" id="rkRead">Hover the map for the rainfall at any grid cell</div>
               </div>
@@ -520,14 +526,9 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
             </div>
             <p class="fnote">Daily total from 00:00 to 24:00 HST; <b>All</b> sums every day, Sep 23 to Oct 2. Color scale fixed at 0&ndash;30 inches, pseudo-log spaced,
               for every day; stations use the same scale, circles for Hawaiʻi Mesonet stations and squares for other
-              networks. CRS: WGS 84 (EPSG:4326). HCDP statewide daily rainfall map, 250 m grid, from station observations
-              &middot; experimental.</p>
-          </div>
-          <div class="btnrow" style="margin-top:10px">
-            <div class="pill">
-              <label class="chk"><input type="checkbox" id="rkStations" checked> Stations</label>
-              <button class="btn" id="rkReset">Reset zoom</button>
-            </div>
+              networks. Hawaiʻi Mesonet station totals are summed from the Mesonet's 5-minute readings, the same record as
+              the map above; other networks are HCDP daily station values. CRS: WGS 84 (EPSG:4326). HCDP statewide daily
+              rainfall map, 250 m grid, from station observations &middot; experimental.</p>
           </div>
           <div class="stats">
             <div class="stat"><div class="cap" id="rkStaCap">Stations, this day (in)</div>
@@ -2321,12 +2322,12 @@ function rkRender() {
     const t = rkT(st.inches), rgb = rkRGB(st.inches), r = 4 + t * 7;
     const tip = '<b>' + st.name + '</b><br>' + st.inches.toFixed(2) + ' in ' + lb.on +
       '<br><span style="color:#777">' + (st.mesonet ? 'Hawaiʻi Mesonet' : st.network + (st.observer && st.observer !== st.network ? ' · ' + st.observer : '')) +
-      ' · SKN ' + st.skn + '</span>';
+      (st.skn ? ' · SKN ' + st.skn : '') + '</span>';
     const mk = st.mesonet
       ? L.circleMarker([st.lat, st.lon], { radius: r, fillColor: 'rgb(' + rgb.join(',') + ')', fillOpacity: 0.95, color: '#fff', weight: 1.5 })
       : L.marker([st.lat, st.lon], { icon: rkSquare(rgb, r), keyboard: false, zIndexOffset: Math.round(t * 1000) });
     mk.bindTooltip(tip, { direction: 'top' }).addTo(RK.stations);
-    RK.stationMarkers[st.skn] = mk;
+    RK.stationMarkers[st.skn || st.id] = mk;
   }
   $('#rkSta').textContent = inBox;
   $('#rkStaMax').textContent = wettest ? wettest.inches.toFixed(2) : '—';
@@ -2386,8 +2387,19 @@ async function initRain() {
     L.DomEvent.disableClickPropagation(box);
     return box;
   };
-  L.control.zoom({ position: 'topleft' }).addTo(map);   // first, so it sits left of the find bar
+  // zoom in, zoom out and reset zoom in one bar, first so it sits left of the find bar
+  const zoom = L.control.zoom({ position: 'topleft' }).addTo(map);
+  const reset = L.DomUtil.create('a', 'zoom-reset', zoom.getContainer());
+  reset.href = '#'; reset.title = 'Reset zoom'; reset.setAttribute('role', 'button');
+  reset.setAttribute('aria-label', 'Reset zoom');
+  reset.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" ' +
+                    'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+                    '<path d="M5 12H3l9-9 9 9h-2"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>' +
+                    '<path d="M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/></svg>';   // a house: back to the island's view
+  L.DomEvent.disableClickPropagation(reset);
+  L.DomEvent.on(reset, 'click', e => { L.DomEvent.preventDefault(e); rkZoom(RK.zoom); });
   find.addTo(map);
+  L.DomEvent.disableClickPropagation($('#rkStaKey'));
   RK.overlay = L.imageOverlay(RK.cells[0].url, RAIN.bounds, { interactive: false }).addTo(map);
   RK.coast = coastGeo ? L.geoJSON(coastGeo, { interactive: false,
     style: { color: '#222', weight: 1, opacity: 0.9, fill: false } }).addTo(map) : null;
@@ -2405,9 +2417,9 @@ async function initRain() {
     let wettest = null;
     for (const st of RK_FRAMES[RK.day].stations) if (box.contains([st.lat, st.lon]) && (!wettest || st.inches > wettest.inches)) wettest = st;
     if (!wettest) return;
-    if (!$('#rkStations').checked) { $('#rkStations').checked = true; $('#rkStaKey').hidden = false; rkRender(); }
+    if (!$('#rkStations').checked) { $('#rkStations').checked = true; $('#rkStaRows').hidden = false; rkRender(); }
     map.setView([wettest.lat, wettest.lon], Math.max(map.getZoom(), 11), { animate: false });
-    const mk = RK.stationMarkers[wettest.skn];
+    const mk = RK.stationMarkers[wettest.skn || wettest.id];
     if (mk) mk.openTooltip();
   };
   const read = $('#rkRead');
@@ -2418,8 +2430,7 @@ async function initRain() {
       e.latlng.lat.toFixed(4) + ', ' + e.latlng.lng.toFixed(4);
   });
   map.on('mouseout', () => { read.textContent = 'Hover the map for the rainfall at any grid cell'; });
-  $('#rkStations').onchange = () => { $('#rkStaKey').hidden = !$('#rkStations').checked; rkRender(); };
-  $('#rkReset').onclick = () => rkZoom(RK.zoom);
+  $('#rkStations').onchange = () => { $('#rkStaRows').hidden = !$('#rkStations').checked; rkRender(); };
   RK.day = Math.max(0, RAIN.days.findIndex(d => d.date === '2026-09-26'));
   rkZoom('BI');
   rkGraticule();
