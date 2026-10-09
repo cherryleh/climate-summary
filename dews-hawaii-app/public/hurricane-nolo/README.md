@@ -138,6 +138,12 @@ use the map. The sources are listed at the end of this file.
   all of them.
 * Stations are drawn as circles for the Hawaiʻi Mesonet and squares for the
   other networks.
+* Hawaiʻi Mesonet stations are then rewritten from the Mesonet database, so they
+  match section 1: run `python3 scripts/nolo_mesonet_rain.py` from
+  `dews-hawaii-app/` after every `build_rainfall_frames.py` run. It sums the
+  unflagged 5-minute `RF_1_Tot300s` readings stamped after 00:00 and up to 24:00 HST,
+  counts a station-day only with at least 80% of its 288 readings, and keeps the
+  "every day" rule for the total. Other networks keep their HCDP values.
 
 ## Files
 
