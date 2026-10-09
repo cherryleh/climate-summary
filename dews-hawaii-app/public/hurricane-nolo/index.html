@@ -291,9 +291,13 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
             overflow: hidden; padding: 22px 26px 24px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); }
 .rk h2 { margin: 0 0 12px; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
 /* the map floats left and the text wraps beside it, then under it, as on the Lowell page */
-.rk .grid { display: flow-root; }
-.rk .app { float: left; width: 65%; min-width: 420px; margin: 0 22px 18px 0; }
-@media (max-width: 1050px) { .rk .app { float: none; width: auto; min-width: 0; margin: 0 0 18px; } }
+/* two columns: the buttons, figure and stats on the left, the text on the right starting level with the figure */
+.rk .grid { display: grid; grid-template-columns: minmax(420px, 65%) 1fr; column-gap: 22px; align-items: start; }
+.rk .app { display: contents; }
+.rk .app > * { grid-column: 1; }
+.rk .prose { grid-column: 2; grid-row: 3 / span 2; }
+@media (max-width: 1050px) { .rk .grid { grid-template-columns: 1fr; }
+                             .rk .prose { grid-column: 1; grid-row: auto; margin-top: 18px; } }
 .rk .prose p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--text-secondary); text-align: justify; hyphens: auto; }
 .rk .prose p:last-child { margin-bottom: 0; }
 .rk .btnrow { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 10px; }
@@ -302,6 +306,7 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
   box-shadow: 0 1px 3px rgba(0,0,0,.08); }
 .rk .btnrow button:hover { background: var(--accent-soft); border-color: var(--accent-soft-border); color: var(--accent-hover); }
 .rk .btnrow button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.rk #rkDays button { padding: 8px 10px; }   /* narrower, so All and the ten days fit on one row */
 .rk .btnrow .cap { align-self: center; font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
                    color: var(--muted); margin-right: 4px; }
 .rk .fig { border: 1px solid var(--border); border-radius: 10px; background: #fff; padding: 10px 10px 8px; }
@@ -472,8 +477,9 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
       <p>The storm brought heavy rain to parts of the islands, especially to the eastern slopes of Hawaiʻi
         Island early in the storm and Kauaʻi toward the end. The highest storm rainfall totals recorded at
         Hawaiʻi Mesonet stations were 22.02 inches at Laupāhoehoe, 21.31 inches at Spencer, and 20.33 inches
-        at Piʻihonua, all on the east side of the Big Island. The strongest wind gust measured by Hawaiʻi
-        Mesonet stations was 67 mph at Puʻuloa, on the western slope of Kohala, Hawaiʻi Island. The
+        at Piʻihonua, all on the east side of the Big Island. At 4:05 AM on September 26, the strongest wind
+        gust experienced by Hawaiʻi Mesonet stations, 67 mph, was measured at Puʻuloa, on the western slope
+        of Kohala, Hawaiʻi Island. The
         Waiʻaleʻale gauge operated by the U.S. Geological Survey totaled more than 38 inches, including 32
         inches from September 28 on.</p>
       <h3>Reading the map</h3>
@@ -543,19 +549,14 @@ svg.wkchart { display: block; width: 100%; height: 150px; cursor: pointer; }
           </div>
         </div>
         <div class="prose" id="rkProse">
-          <p data-day="all">Over the ten days from September 23 to October 2, Nolo's rain fell in two places
-            above all: the windward slopes of Hawaiʻi Island in the storm's first days, and Kauaʻi in its last.
-            The Mount Waiʻaleʻale gauge totaled more than 38 inches, the most of any gauge in the state, and the
-            map's own estimate tops out near 37 and a half inches on the mountain; the North Wailua ditch gauge
-            collected about 20 and the Hawaiʻi Mesonet stations at Hanamāʻulu and Common Ground about 12 and a
-            half and 11. On Hawaiʻi Island the Laupāhoehoe, Spencer and Piʻihonua gauges each totaled 20 to
-            22 inches and the Saddle Road quarry gauge above Hilo more than 19, and the map's estimate reaches
-            about 34 and a half inches on the slopes of Mauna Kea. Maui saw 9 and a half inches near
-            Keʻanae and Oʻahu about 7 at Waiawa and Poamoho, while the leeward sides of every island stayed
-            almost dry. Station totals here count only the stations that reported on every one of the ten days.</p>
-          <p data-day="2026-09-23 2026-09-24">The first storm-related rain reached the Hāmākua slopes and Kohala Mountains on Hawaiʻi Island on
+          <p data-day="all">Over all ten days of the storm, our map estimates yielded an average of 4.28 inches of
+            rainfall across the islands, and a maximum of 37.57 inches.</p>
+          <p data-day="2026-09-23">The first storm-related rain reached the Hāmākua slopes and Kohala Mountains on Hawaiʻi Island on
             September 23 while Nolo was still well to the southeast. Hawaiʻi Mesonet stations Spencer and
             Waipoʻo measured a little over 4 inches and close to 3.5 inches, respectively.</p>
+          <p data-day="2026-09-24">On September 24, the heaviest rainfall continued to be focused on the eastern slope of Maunakea
+            (Spencer received about 4.4 inches), and the crest and eastern side of Kohala Mountain (Kawainui
+            recorded 3.7 inches).</p>
           <p data-day="2026-09-25">September 25 brought steadier rain to the windward side as the outer bands moved in. The Laupāhoehoe
             gauge recorded more than 6.5 inches, Kawainui and Waipoʻo about 5 inches each, and the Glenwood and
             Saddle Road quarry gauges upslope of Hilo more than 4 inches.</p>
@@ -2376,7 +2377,10 @@ async function initRain() {
     return;
   }
   $('#rkCounties').innerHTML = RK_ZOOMS.map(z => '<button data-zoom="' + z[0] + '">' + z[1] + '</button>').join('');
-  $('#rkDays').innerHTML = RK_FRAMES.map((d, i) => '<button data-day="' + i + '">' + rkLabel(d).short + '</button>').join('');
+  // "All" first, then the days in order; data-day stays each frame's index
+  const order = RK_FRAMES.map((d, i) => i);
+  if (RAIN.total) order.unshift(order.pop());
+  $('#rkDays').innerHTML = order.map(i => '<button data-day="' + i + '">' + rkLabel(RK_FRAMES[i]).short + '</button>').join('');
   document.querySelectorAll('#rkCounties button').forEach(b => b.onclick = () => rkZoom(b.dataset.zoom));
   document.querySelectorAll('#rkDays button').forEach(b => b.onclick = () => { RK.day = +b.dataset.day; rkRender(); });
   // legend on the rain ramp at its pseudo-log positions
@@ -2460,7 +2464,7 @@ async function initRain() {
   });
   map.on('mouseout', () => { read.textContent = 'Hover the map for the rainfall at any grid cell'; });
   $('#rkStations').onchange = () => { $('#rkStaRows').hidden = !$('#rkStations').checked; rkRender(); };
-  RK.day = Math.max(0, RAIN.days.findIndex(d => d.date === '2026-09-26'));
+  RK.day = RK_FRAMES.length - 1;   // open on "All" (the total, or the last day when there is none)
   rkZoom('BI');
   rkGraticule();
   addEventListener('resize', () => { map.invalidateSize(); rkGraticule(); });
